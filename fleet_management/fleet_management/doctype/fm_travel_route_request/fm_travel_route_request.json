@@ -1,0 +1,86 @@
+{
+ "actions": [],
+ "autoname": "format:TR_{MM}{YY}_{####}",
+ "creation": "2024-07-29 18:46:33.736596",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "employee_name",
+  "employee_email",
+  "route_id",
+  "pickup_point",
+  "drop_point",
+  "same_route",
+  "terms"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name"
+  },
+  {
+   "default": "User",
+   "fieldname": "employee_email",
+   "fieldtype": "Read Only",
+   "label": "Employee Email"
+  },
+  {
+   "fieldname": "route_id",
+   "fieldtype": "Data",
+   "label": "Route ID"
+  },
+  {
+   "fieldname": "pickup_point",
+   "fieldtype": "Data",
+   "label": "Pickup Point"
+  },
+  {
+   "fieldname": "drop_point",
+   "fieldtype": "Data",
+   "label": "Drop Point"
+  },
+  {
+   "default": "0",
+   "fieldname": "same_route",
+   "fieldtype": "Check",
+   "label": "Return via Same Route"
+  },
+  {
+   "default": "0",
+   "fieldname": "terms",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Terms and Conditions",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-07-29 18:46:33.736596",
+ "modified_by": "Administrator",
+ "module": "Fleet Management",
+ "name": "FM_Travel_Route_Request",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

@@ -1,0 +1,17 @@
+{
+  "name": "fleet_management",
+  "version": "1.0.0",
+  "description": "Fleet Management System @AgnikulCosmos",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "cd Fleet_Management && yarn install && yarn run dev",
+    "build": "cd Fleet_Management && yarn install && yarn run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "frappe-react-sdk": "^1.7.1"
+  }
+}

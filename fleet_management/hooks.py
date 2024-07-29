@@ -199,3 +199,5 @@ app_license = "MIT"
 # auth_hooks = [
 #	"fleet_management.auth.validate"
 # ]
+
+website_route_rules = [{'from_route': '/Fleet_Management/<path:app_path>', 'to_route': 'Fleet_Management'},]

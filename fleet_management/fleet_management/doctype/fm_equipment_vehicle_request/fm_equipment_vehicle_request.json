@@ -1,0 +1,188 @@
+{
+ "actions": [],
+ "autoname": "format:EQ_{MM}{YY}_{####}",
+ "creation": "2024-07-29 18:21:09.997236",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "project_name",
+  "type",
+  "equipment_type",
+  "employee_name",
+  "employee_email",
+  "from",
+  "to",
+  "request_date",
+  "request_time",
+  "mod",
+  "mod_dates",
+  "terms",
+  "purpose",
+  "status",
+  "reports_to",
+  "reports_head",
+  "vehicle_no",
+  "driver_name_no",
+  "allotment",
+  "otp",
+  "bill_amount",
+  "payment_status",
+  "ride_start_time",
+  "ride_end_time"
+ ],
+ "fields": [
+  {
+   "fieldname": "project_name",
+   "fieldtype": "Data",
+   "label": "Project Name"
+  },
+  {
+   "default": "Equipment",
+   "fieldname": "type",
+   "fieldtype": "Read Only",
+   "label": "Type"
+  },
+  {
+   "fieldname": "equipment_type",
+   "fieldtype": "Data",
+   "label": "Equipment Type"
+  },
+  {
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name"
+  },
+  {
+   "default": "User",
+   "fieldname": "employee_email",
+   "fieldtype": "Read Only",
+   "label": "Employee Email"
+  },
+  {
+   "fieldname": "from",
+   "fieldtype": "Data",
+   "label": "From Location"
+  },
+  {
+   "fieldname": "to",
+   "fieldtype": "Data",
+   "label": "To Location"
+  },
+  {
+   "fieldname": "request_date",
+   "fieldtype": "Date",
+   "label": "Requesting Date"
+  },
+  {
+   "fieldname": "request_time",
+   "fieldtype": "Time",
+   "label": "Requesting Time"
+  },
+  {
+   "default": "0",
+   "fieldname": "mod",
+   "fieldtype": "Check",
+   "label": "More than One Day"
+  },
+  {
+   "fieldname": "mod_dates",
+   "fieldtype": "Data",
+   "label": "Dates (MOD)"
+  },
+  {
+   "default": "0",
+   "fieldname": "terms",
+   "fieldtype": "Check",
+   "label": "Terms and Conditions"
+  },
+  {
+   "fieldname": "purpose",
+   "fieldtype": "Data",
+   "label": "Purpose"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Request Status"
+  },
+  {
+   "fieldname": "reports_to",
+   "fieldtype": "Data",
+   "label": "PL Email"
+  },
+  {
+   "fieldname": "reports_head",
+   "fieldtype": "Data",
+   "label": "DL Email"
+  },
+  {
+   "fieldname": "vehicle_no",
+   "fieldtype": "Data",
+   "label": "Assigned Vehicle No."
+  },
+  {
+   "fieldname": "driver_name_no",
+   "fieldtype": "Data",
+   "label": "Assigned Driver Name/No."
+  },
+  {
+   "fieldname": "allotment",
+   "fieldtype": "Select",
+   "label": "Vehicle Allotment",
+   "options": "Internal\nExternal"
+  },
+  {
+   "fieldname": "otp",
+   "fieldtype": "Data",
+   "label": "OTP (If External)"
+  },
+  {
+   "fieldname": "bill_amount",
+   "fieldtype": "Int",
+   "label": "Bill Amount"
+  },
+  {
+   "fieldname": "payment_status",
+   "fieldtype": "Select",
+   "label": "Payment Status",
+   "options": "Pending\nPartly Paid\nPaid\nRejected"
+  },
+  {
+   "fieldname": "ride_start_time",
+   "fieldtype": "Time",
+   "label": "Ride Start Time"
+  },
+  {
+   "fieldname": "ride_end_time",
+   "fieldtype": "Time",
+   "label": "Ride End Time"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-07-29 18:22:44.300006",
+ "modified_by": "Administrator",
+ "module": "Fleet Management",
+ "name": "FM_Equipment_Vehicle_Request",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
