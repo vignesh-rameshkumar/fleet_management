@@ -5,3 +5,5 @@
 tags
 fleet_management/docs/current
 node_modules/
+*node_modules
+node_modules*
