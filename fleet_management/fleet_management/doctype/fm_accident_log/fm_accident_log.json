@@ -1,0 +1,108 @@
+{
+ "actions": [],
+ "autoname": "format:AL_{MM}{YY}_{####}",
+ "creation": "2024-07-30 15:25:03.861696",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "accident_date",
+  "reason",
+  "accident_description",
+  "damage_description",
+  "images",
+  "fir_copy",
+  "police_station_noname",
+  "driver_employee_id",
+  "driver_name",
+  "vehicle_no"
+ ],
+ "fields": [
+  {
+   "fieldname": "accident_date",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Accident Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Reason ",
+   "reqd": 1
+  },
+  {
+   "fieldname": "accident_description",
+   "fieldtype": "Text",
+   "label": "Accident Description"
+  },
+  {
+   "fieldname": "damage_description",
+   "fieldtype": "Text",
+   "label": "Damage Description"
+  },
+  {
+   "fieldname": "images",
+   "fieldtype": "Attach",
+   "in_list_view": 1,
+   "label": "Images",
+   "reqd": 1
+  },
+  {
+   "fieldname": "fir_copy",
+   "fieldtype": "Data",
+   "label": "FIR Copy"
+  },
+  {
+   "fieldname": "police_station_noname",
+   "fieldtype": "Data",
+   "label": "Police Station No./Name"
+  },
+  {
+   "fieldname": "driver_employee_id",
+   "fieldtype": "Link",
+   "label": "Driver Employee ID",
+   "options": "FM_Driver_Details"
+  },
+  {
+   "fetch_from": "driver_employee_id.employee_name",
+   "fieldname": "driver_name",
+   "fieldtype": "Read Only",
+   "label": "Driver Name"
+  },
+  {
+   "fieldname": "vehicle_no",
+   "fieldtype": "Link",
+   "label": "Vehicle No",
+   "options": "FM_Vehicle_Details"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-07-30 15:25:15.625699",
+ "modified_by": "Administrator",
+ "module": "Fleet Management",
+ "name": "FM_Accident_Log",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

@@ -1,0 +1,90 @@
+{
+ "actions": [],
+ "autoname": "format:FI_{MM}{YY}_{####}",
+ "creation": "2024-07-30 14:39:38.802403",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "incident_date",
+  "location",
+  "fine_amount",
+  "reason",
+  "fine_bill_copy",
+  "driver_employee_id",
+  "driver_name",
+  "vehicle_number"
+ ],
+ "fields": [
+  {
+   "fieldname": "incident_date",
+   "fieldtype": "Data",
+   "label": "Incident Date"
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Data",
+   "label": "Location"
+  },
+  {
+   "fieldname": "fine_amount",
+   "fieldtype": "Data",
+   "label": "Fine Amount"
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Data",
+   "label": "Reason"
+  },
+  {
+   "fieldname": "fine_bill_copy",
+   "fieldtype": "Data",
+   "label": "Fine Bill Copy"
+  },
+  {
+   "fieldname": "driver_employee_id",
+   "fieldtype": "Link",
+   "label": "Driver Employee ID",
+   "options": "FM_Driver_Details"
+  },
+  {
+   "fetch_from": "driver_employee_id.employee_name",
+   "fieldname": "driver_name",
+   "fieldtype": "Read Only",
+   "label": "Driver Name"
+  },
+  {
+   "fieldname": "vehicle_number",
+   "fieldtype": "Link",
+   "label": "Vehicle Number",
+   "options": "FM_Vehicle_Details"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-07-30 14:45:51.440387",
+ "modified_by": "Administrator",
+ "module": "Fleet Management",
+ "name": "FM_Fine_Log",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

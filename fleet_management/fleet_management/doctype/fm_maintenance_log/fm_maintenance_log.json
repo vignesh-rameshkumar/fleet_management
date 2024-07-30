@@ -1,0 +1,101 @@
+{
+ "actions": [],
+ "autoname": "format:ML_{MM}{YY}_{####}",
+ "creation": "2024-07-30 17:36:52.842551",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date_of_service",
+  "vehicle_number",
+  "service_type",
+  "description",
+  "parts_replaced",
+  "total_cost",
+  "bill_copy",
+  "warranty_information",
+  "warranty_copy",
+  "next_scheduled_maintenance_date"
+ ],
+ "fields": [
+  {
+   "fieldname": "date_of_service",
+   "fieldtype": "Date",
+   "label": "Date of Service"
+  },
+  {
+   "fieldname": "vehicle_number",
+   "fieldtype": "Link",
+   "label": "Vehicle Number",
+   "options": "FM_Vehicle_Details"
+  },
+  {
+   "fieldname": "service_type",
+   "fieldtype": "Select",
+   "label": "Service Type",
+   "options": "Routine\nRepair\nInspection"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Text",
+   "label": "Description"
+  },
+  {
+   "fieldname": "parts_replaced",
+   "fieldtype": "Data",
+   "label": "Parts Replaced"
+  },
+  {
+   "fieldname": "total_cost",
+   "fieldtype": "Int",
+   "label": "Total Cost"
+  },
+  {
+   "fieldname": "bill_copy",
+   "fieldtype": "Attach",
+   "label": "Bill Copy"
+  },
+  {
+   "fieldname": "warranty_information",
+   "fieldtype": "Data",
+   "label": "Warranty Information"
+  },
+  {
+   "fieldname": "warranty_copy",
+   "fieldtype": "Attach",
+   "label": "Warranty Copy"
+  },
+  {
+   "fieldname": "next_scheduled_maintenance_date",
+   "fieldtype": "Date",
+   "label": "Next Scheduled Maintenance Date"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-07-30 17:36:52.842551",
+ "modified_by": "Administrator",
+ "module": "Fleet Management",
+ "name": "FM_Maintenance_Log",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

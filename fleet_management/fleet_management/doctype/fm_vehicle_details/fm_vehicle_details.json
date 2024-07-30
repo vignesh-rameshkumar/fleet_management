@@ -1,0 +1,282 @@
+{
+ "actions": [],
+ "autoname": "field:plate_number",
+ "creation": "2024-07-30 12:06:14.157785",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "vehicle_details_tab",
+  "ownership",
+  "manufacturer_name",
+  "model",
+  "colour",
+  "model_year",
+  "vehicle_image",
+  "plate_number",
+  "vehicle_type",
+  "fuel_type",
+  "column_break_7nmg5",
+  "status",
+  "identification_number",
+  "rc_date",
+  "rc_expiring_date",
+  "rc_copy",
+  "next_service_date",
+  "purchase_invoice",
+  "pollution_certificate",
+  "road_tax",
+  "permit",
+  "insurance_details_tab",
+  "policyholder_name",
+  "policy_no",
+  "policy_type",
+  "policy_effective_start",
+  "policy_effective_end",
+  "policyholder_address",
+  "insurance_copy",
+  "column_break_moiie",
+  "idv",
+  "idv_amount",
+  "coverage_limit",
+  "insurance_company_name",
+  "insurance_company_address",
+  "deductibles",
+  "contract_details_tab",
+  "contractor_name",
+  "contact_number"
+ ],
+ "fields": [
+  {
+   "fieldname": "vehicle_details_tab",
+   "fieldtype": "Tab Break",
+   "label": "Vehicle Details"
+  },
+  {
+   "fieldname": "ownership",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Ownership",
+   "options": "Own\nContract",
+   "reqd": 1
+  },
+  {
+   "fieldname": "manufacturer_name",
+   "fieldtype": "Data",
+   "label": "Manufacturer Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "model",
+   "fieldtype": "Data",
+   "label": "Model",
+   "reqd": 1
+  },
+  {
+   "fieldname": "colour",
+   "fieldtype": "Data",
+   "label": "Colour"
+  },
+  {
+   "fieldname": "model_year",
+   "fieldtype": "Data",
+   "label": "Model Year"
+  },
+  {
+   "fieldname": "vehicle_image",
+   "fieldtype": "Attach",
+   "label": "Vehicle Image",
+   "reqd": 1
+  },
+  {
+   "fieldname": "plate_number",
+   "fieldtype": "Data",
+   "label": "Plate Number",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "vehicle_type",
+   "fieldtype": "Data",
+   "label": "Vehicle Type"
+  },
+  {
+   "fieldname": "column_break_7nmg5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "fuel_type",
+   "fieldtype": "Select",
+   "label": "Fuel Type",
+   "options": "Petrol\nDiesel\nElectric\nHybrid"
+  },
+  {
+   "fieldname": "identification_number",
+   "fieldtype": "Data",
+   "label": "Identification Number"
+  },
+  {
+   "fieldname": "rc_date",
+   "fieldtype": "Date",
+   "label": "RC Date"
+  },
+  {
+   "fieldname": "rc_expiring_date",
+   "fieldtype": "Date",
+   "label": "RC Expiring Date"
+  },
+  {
+   "fieldname": "rc_copy",
+   "fieldtype": "Attach",
+   "label": "RC Copy"
+  },
+  {
+   "fieldname": "next_service_date",
+   "fieldtype": "Date",
+   "label": "Next Service Date"
+  },
+  {
+   "fieldname": "purchase_invoice",
+   "fieldtype": "Data",
+   "label": "Purchase Invoice"
+  },
+  {
+   "fieldname": "pollution_certificate",
+   "fieldtype": "Attach",
+   "label": "Pollution Certificate"
+  },
+  {
+   "fieldname": "road_tax",
+   "fieldtype": "Date",
+   "label": "Road Tax"
+  },
+  {
+   "fieldname": "permit",
+   "fieldtype": "Date",
+   "label": "Permit"
+  },
+  {
+   "fieldname": "insurance_details_tab",
+   "fieldtype": "Tab Break",
+   "label": "Insurance Details"
+  },
+  {
+   "fieldname": "policyholder_name",
+   "fieldtype": "Data",
+   "label": "Policyholder Name"
+  },
+  {
+   "fieldname": "policy_no",
+   "fieldtype": "Data",
+   "label": "Policy No."
+  },
+  {
+   "fieldname": "policy_type",
+   "fieldtype": "Data",
+   "label": "Policy Type"
+  },
+  {
+   "fieldname": "policy_effective_start",
+   "fieldtype": "Date",
+   "label": "Policy Effective Start"
+  },
+  {
+   "fieldname": "policy_effective_end",
+   "fieldtype": "Data",
+   "label": "Policy Effective End"
+  },
+  {
+   "fieldname": "policyholder_address",
+   "fieldtype": "Data",
+   "label": "Policyholder Address"
+  },
+  {
+   "fieldname": "column_break_moiie",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "idv",
+   "fieldtype": "Data",
+   "label": "IDV"
+  },
+  {
+   "fieldname": "idv_amount",
+   "fieldtype": "Data",
+   "label": "IDV Amount"
+  },
+  {
+   "fieldname": "coverage_limit",
+   "fieldtype": "Data",
+   "label": "Coverage Limit"
+  },
+  {
+   "fieldname": "insurance_company_name",
+   "fieldtype": "Data",
+   "label": "Insurance Company Name"
+  },
+  {
+   "fieldname": "insurance_company_address",
+   "fieldtype": "Data",
+   "label": "Insurance Company Address"
+  },
+  {
+   "fieldname": "deductibles",
+   "fieldtype": "Data",
+   "label": "Deductibles"
+  },
+  {
+   "fieldname": "insurance_copy",
+   "fieldtype": "Attach",
+   "label": "Insurance Copy"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Vehicle Status",
+   "options": "Online\nOffline",
+   "reqd": 1
+  },
+  {
+   "fieldname": "contract_details_tab",
+   "fieldtype": "Tab Break",
+   "label": "Contract Details"
+  },
+  {
+   "fieldname": "contractor_name",
+   "fieldtype": "Data",
+   "label": "Contractor Name"
+  },
+  {
+   "fieldname": "contact_number",
+   "fieldtype": "Phone",
+   "label": "Contact Number"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-07-30 12:18:17.463072",
+ "modified_by": "Administrator",
+ "module": "Fleet Management",
+ "name": "FM_Vehicle_Details",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

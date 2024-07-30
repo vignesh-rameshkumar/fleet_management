@@ -13,8 +13,7 @@
   "employee_email",
   "from",
   "to",
-  "request_date",
-  "request_time",
+  "request_date_time",
   "mod",
   "mod_dates",
   "terms",
@@ -22,6 +21,7 @@
   "passenger_count",
   "passenger_details",
   "status",
+  "approved_date_time",
   "reports_to",
   "reports_head",
   "vehicle_no",
@@ -31,7 +31,9 @@
   "bill_amount",
   "payment_status",
   "ride_start_time",
-  "ride_end_time"
+  "ride_end_time",
+  "distance",
+  "duration"
  ],
  "fields": [
   {
@@ -65,16 +67,6 @@
    "fieldname": "to",
    "fieldtype": "Data",
    "label": "To Location"
-  },
-  {
-   "fieldname": "request_date",
-   "fieldtype": "Date",
-   "label": "Requesting Date"
-  },
-  {
-   "fieldname": "request_time",
-   "fieldtype": "Time",
-   "label": "Requesting Time"
   },
   {
    "default": "0",
@@ -156,18 +148,38 @@
   },
   {
    "fieldname": "ride_start_time",
-   "fieldtype": "Data",
-   "label": "Ride Start Time"
+   "fieldtype": "Datetime",
+   "label": "Ride Start Date & Time"
   },
   {
    "fieldname": "ride_end_time",
+   "fieldtype": "Datetime",
+   "label": "Ride End Date & Time"
+  },
+  {
+   "fieldname": "request_date_time",
+   "fieldtype": "Datetime",
+   "label": "Requesting Date & Time"
+  },
+  {
+   "fieldname": "distance",
    "fieldtype": "Data",
-   "label": "Ride End Time"
+   "label": "Total Distance"
+  },
+  {
+   "fieldname": "duration",
+   "fieldtype": "Data",
+   "label": "Total Duration"
+  },
+  {
+   "fieldname": "approved_date_time",
+   "fieldtype": "Datetime",
+   "label": "Approved Date & Time"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-29 17:33:05.842643",
+ "modified": "2024-07-30 10:55:56.054699",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Group_Vehicle_Request",

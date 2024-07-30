@@ -1,0 +1,87 @@
+{
+ "actions": [],
+ "autoname": "format:FU_{MM}{YY}_{####}",
+ "creation": "2024-07-30 14:57:36.413053",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "vehicle_no",
+  "current_odometer_reading",
+  "bill_amount",
+  "fuel_in_litres",
+  "supplier_name",
+  "price_per_litre",
+  "bill_copy"
+ ],
+ "fields": [
+  {
+   "fieldname": "date",
+   "fieldtype": "Data",
+   "label": "Date"
+  },
+  {
+   "fieldname": "vehicle_no",
+   "fieldtype": "Link",
+   "label": "Vehicle No",
+   "options": "FM_Vehicle_Details"
+  },
+  {
+   "fieldname": "current_odometer_reading",
+   "fieldtype": "Data",
+   "label": "Current Odometer Reading"
+  },
+  {
+   "fieldname": "bill_amount",
+   "fieldtype": "Data",
+   "label": "Bill Amount"
+  },
+  {
+   "fieldname": "fuel_in_litres",
+   "fieldtype": "Data",
+   "label": "Fuel in Litres"
+  },
+  {
+   "fieldname": "supplier_name",
+   "fieldtype": "Data",
+   "label": "Supplier Name"
+  },
+  {
+   "fieldname": "price_per_litre",
+   "fieldtype": "Data",
+   "label": "Price per Litre"
+  },
+  {
+   "fieldname": "bill_copy",
+   "fieldtype": "Attach",
+   "label": "Bill Copy"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-07-30 14:57:36.413053",
+ "modified_by": "Administrator",
+ "module": "Fleet Management",
+ "name": "FM_Fuel_Log",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
