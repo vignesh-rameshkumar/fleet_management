@@ -7,6 +7,30 @@ app_description = "Fleet Management System @AgnikulCosmos"
 app_email = "automationbot@agnikul.in"
 app_license = "MIT"
 
+
+
+doc_events = {
+    "FM_Passenger_Vehicle_Request": {
+        "on_insert": "fleet_management.validate.sync_to_fm_request_master",
+        "on_update": "fleet_management.validate.sync_to_fm_request_master",
+        "before_insert": "fleet_management.validate.call"
+    },
+    "FM_Goods_Vehicle_Request": {
+        "on_insert": "fleet_management.validate.sync_to_fm_request_master",
+        "on_update": "fleet_management.validate.sync_to_fm_request_master",
+        "before_insert": "fleet_management.validate.call"
+    },
+    "FM_Equipment_Vehicle_Request": {
+        "on_insert": "fleet_management.validate.sync_to_fm_request_master",
+        "on_update": "fleet_management.validate.sync_to_fm_request_master",
+        "before_insert": "fleet_management.validate.call"
+    },
+    "FM_Group_Vehicle_Request": {
+        "on_insert": "fleet_management.validate.sync_to_fm_request_master",
+        "on_update": "fleet_management.validate.sync_to_fm_request_master",
+        "before_insert": "fleet_management.validate.call"
+    }
+}
 # Includes in <head>
 # ------------------
 

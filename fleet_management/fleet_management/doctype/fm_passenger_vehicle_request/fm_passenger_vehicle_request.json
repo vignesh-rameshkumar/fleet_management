@@ -1,6 +1,6 @@
 {
  "actions": [],
- "autoname": "format:PV_{MM}{YY}_{####}",
+ "autoname": "PV._.MM.YY._.####.",
  "creation": "2024-07-29 16:23:50.844670",
  "default_view": "List",
  "doctype": "DocType",
@@ -11,6 +11,7 @@
   "type",
   "employee_name",
   "employee_email",
+  "department",
   "from",
   "to",
   "request_date",
@@ -168,15 +169,20 @@
    "fieldname": "approved_date_time",
    "fieldtype": "Datetime",
    "label": "Approved Date & Time"
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Data",
+   "label": "Employee Department"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-30 11:27:40.978430",
+ "modified": "2024-08-01 18:20:42.661050",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Passenger_Vehicle_Request",
- "naming_rule": "Expression",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {

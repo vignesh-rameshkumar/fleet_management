@@ -1,6 +1,6 @@
 {
  "actions": [],
- "autoname": "format:EQ_{MM}{YY}_{####}",
+ "autoname": "EQ._.MM.YY._.####.",
  "creation": "2024-07-29 18:21:09.997236",
  "default_view": "List",
  "doctype": "DocType",
@@ -12,6 +12,7 @@
   "equipment_type",
   "employee_name",
   "employee_email",
+  "department",
   "from",
   "to",
   "request_date_time",
@@ -164,15 +165,20 @@
    "fieldname": "duration",
    "fieldtype": "Data",
    "label": "Total Duration"
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Data",
+   "label": "Employee Department"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-30 11:25:43.470027",
+ "modified": "2024-07-31 12:53:15.918722",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Equipment_Vehicle_Request",
- "naming_rule": "Expression",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {

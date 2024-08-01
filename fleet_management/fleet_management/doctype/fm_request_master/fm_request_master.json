@@ -13,9 +13,9 @@
   "employee_name",
   "type",
   "status",
-  "pl_email",
-  "dl_email",
-  "bill_amounr",
+  "reports_to",
+  "reports_head",
+  "bill_amount",
   "payment_status"
  ],
  "fields": [
@@ -48,29 +48,29 @@
    "label": "Request Status"
   },
   {
-   "fieldname": "pl_email",
+   "fieldname": "payment_status",
+   "fieldtype": "Data",
+   "label": "Payment Status"
+  },
+  {
+   "fieldname": "reports_to",
    "fieldtype": "Data",
    "label": "PL Email"
   },
   {
-   "fieldname": "dl_email",
+   "fieldname": "reports_head",
    "fieldtype": "Data",
    "label": "DL Email"
   },
   {
-   "fieldname": "bill_amounr",
+   "fieldname": "bill_amount",
    "fieldtype": "Data",
    "label": "Bill Amount"
-  },
-  {
-   "fieldname": "payment_status",
-   "fieldtype": "Data",
-   "label": "Payment Status"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-30 11:21:35.110230",
+ "modified": "2024-07-31 11:01:30.510451",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Request_Master",

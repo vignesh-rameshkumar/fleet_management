@@ -1,6 +1,6 @@
 {
  "actions": [],
- "autoname": "format:GD_{MM}{YY}_{####}",
+ "autoname": "GD._.MM.YY._.####.",
  "creation": "2024-07-29 17:46:33.713814",
  "default_view": "List",
  "doctype": "DocType",
@@ -12,6 +12,7 @@
   "type",
   "employee_name",
   "employee_email",
+  "department",
   "from",
   "to",
   "request_date_time",
@@ -178,15 +179,20 @@
    "fieldname": "approved_date_time",
    "fieldtype": "Datetime",
    "label": "Approved Date & Time"
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Data",
+   "label": "Employee Department"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-30 10:54:50.146295",
+ "modified": "2024-08-01 18:27:02.897793",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Goods_Vehicle_Request",
- "naming_rule": "Expression",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {
