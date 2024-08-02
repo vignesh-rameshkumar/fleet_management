@@ -6,8 +6,10 @@ app_publisher = "Agnikul Cosmos"
 app_description = "Fleet Management System @AgnikulCosmos"
 app_email = "automationbot@agnikul.in"
 app_license = "MIT"
+required_apps = ["role_management"]
 
 
+after_install = "fleet_management.install.execute"
 
 doc_events = {
     "FM_Passenger_Vehicle_Request": {
