@@ -105,12 +105,12 @@
   },
   {
    "fieldname": "reports_to",
-   "fieldtype": "Data",
+   "fieldtype": "Read Only",
    "label": "PL Email"
   },
   {
    "fieldname": "reports_head",
-   "fieldtype": "Data",
+   "fieldtype": "Read Only",
    "label": "DL Email"
   },
   {
@@ -152,7 +152,7 @@
   },
   {
    "fieldname": "ride_end_time",
-   "fieldtype": "Time",
+   "fieldtype": "Datetime",
    "label": "Ride End Date & Time"
   },
   {
@@ -172,13 +172,13 @@
   },
   {
    "fieldname": "department",
-   "fieldtype": "Data",
+   "fieldtype": "Read Only",
    "label": "Employee Department"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-01 18:20:42.661050",
+ "modified": "2024-08-01 19:34:41.912783",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Passenger_Vehicle_Request",

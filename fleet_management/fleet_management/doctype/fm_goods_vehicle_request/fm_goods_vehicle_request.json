@@ -98,12 +98,12 @@
   },
   {
    "fieldname": "reports_to",
-   "fieldtype": "Data",
+   "fieldtype": "Read Only",
    "label": "PL Email"
   },
   {
    "fieldname": "reports_head",
-   "fieldtype": "Data",
+   "fieldtype": "Read Only",
    "label": "DL Email"
   },
   {
@@ -182,13 +182,13 @@
   },
   {
    "fieldname": "department",
-   "fieldtype": "Data",
+   "fieldtype": "Read Only",
    "label": "Employee Department"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-01 18:27:02.897793",
+ "modified": "2024-08-01 19:24:21.211462",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Goods_Vehicle_Request",
