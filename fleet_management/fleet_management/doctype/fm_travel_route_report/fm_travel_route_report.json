@@ -1,6 +1,6 @@
 {
  "actions": [],
- "autoname": "format:DT_{MM}{YY}_{####}",
+ "autoname": "format:DR_{MM}{YY}_{####}",
  "creation": "2024-07-30 17:43:54.021186",
  "default_view": "List",
  "doctype": "DocType",
@@ -45,7 +45,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-30 19:06:41.061436",
+ "modified": "2024-08-03 10:38:33.442028",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Travel_Route_Report",

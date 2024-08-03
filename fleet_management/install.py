@@ -71,7 +71,7 @@ def assign_permission(doctype, role, permissions):
                 perm_map[perm]: 1
             })
             doc.insert()
-            print(f"Permission {perm} assigned to {role} for {doctype}")
+            print(f"Permissions are assigned")
 
 create_roles_and_assign_permissions()
 def after_install():
