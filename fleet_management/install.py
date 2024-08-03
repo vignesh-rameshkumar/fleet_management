@@ -10,7 +10,8 @@ def create_roles_and_assign_permissions():
             "FM_Passanger_Vehicle_Request",
             "FM_Equipment_Vehicle_Request",
             "FM_Request_Master",
-            "FM_Travel_Route_Request"
+            "FM_Travel_Route_Request",
+            "FM_Route_ID"
         ],
         "fleet_manager_access": [
             "FM_Maintenance_Log",
@@ -19,7 +20,8 @@ def create_roles_and_assign_permissions():
             "FM_Fine_Log",
             "FM_Driver_Details",
             "FM_Vehicle_Details",
-            "FM_Travel_Route_Report"
+            "FM_Travel_Route_Report",
+            "FM_Route_ID"
         ],
         "vehicle_access": [
             "FM_Group_Vehicle_Request",
@@ -28,7 +30,8 @@ def create_roles_and_assign_permissions():
             "FM_Equipment_Vehicle_Request",
             "FM_Request_Master",
             "FM_Travel_Route_Report",
-            "FM_Travel_Route_Request"
+            "FM_Travel_Route_Request",
+            "FM_Route_ID"
         ]
     }
 
@@ -42,7 +45,10 @@ def create_roles_and_assign_permissions():
             print(f"Roles are created successfully.")
 
     for doctype in doctype_permissions["employee_access"]:
-        assign_permission(doctype, "Employee", ["read", "write", "create"])
+        if doctype == "FM_Route_ID":
+            assign_permission(doctype, "Employee", ["read"])
+        else:
+            assign_permission(doctype, "Employee", ["read", "write", "create"])
 
     for doctype in doctype_permissions["fleet_manager_access"]:
         if doctype == "FM_Travel_Route_Report":

@@ -23,10 +23,12 @@
   },
   {
    "fieldname": "route_id",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Route ID",
-   "reqd": 1
+   "options": "FM_Route_ID",
+   "reqd": 1,
+   "query": "fleet_management.doctype.fm_travel_route_report.fm_travel_route_report.get_link_field_filters"
   },
   {
    "fieldname": "ride_starting_point",
@@ -45,7 +47,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-03 10:38:33.442028",
+ "modified": "2024-08-03 16:51:16.927937",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Travel_Route_Report",

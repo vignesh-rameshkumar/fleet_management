@@ -35,6 +35,7 @@ doc_events = {
         "before_insert": "fleet_management.validate.report"
     }
 }
+
 # Includes in <head>
 # ------------------
 

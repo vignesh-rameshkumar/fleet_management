@@ -7,7 +7,9 @@ def report(doc, method):
 def fetch_and_append_employees(doc):
     if doc.route_id:
         frappe.logger().debug(f"Fetching employees for route_id: {doc.route_id}")
-        route_requests = frappe.get_list('FM_Travel_Route_Request', filters={'route_id': doc.route_id}, fields=['name'])
+        route_requests = frappe.get_list('FM_Travel_Route_Request', 
+                                         filters={'route_id': doc.route_id}, 
+                                         fields=['name', 'employee_name'])
 
         frappe.logger().debug(f"Route requests found: {route_requests}")
         doc.set('onboarded_employees', [])
@@ -15,7 +17,9 @@ def fetch_and_append_employees(doc):
         for request in route_requests:
             frappe.logger().debug(f"Appending request: {request['name']}")
             doc.append('onboarded_employees', {
-                'employee_email': request['name']
+                'employee_email': request['name'],
+                'employee_name': request['employee_name'],
+                'attendance': 'Absent'
             })
 
 def sync_to_fm_request_master(doc, method):
