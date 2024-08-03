@@ -30,6 +30,9 @@ doc_events = {
         "on_insert": "fleet_management.validate.sync_to_fm_request_master",
         "on_update": "fleet_management.validate.sync_to_fm_request_master",
         "before_insert": "fleet_management.validate.call"
+    },
+    "FM_Travel_Route_Report": {
+        "before_insert": "fleet_management.validate.report"
     }
 }
 # Includes in <head>

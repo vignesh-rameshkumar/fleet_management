@@ -1,5 +1,23 @@
 import frappe
 
+def report(doc, method):
+    frappe.logger().debug(f"Before insert: {doc.name}")
+    fetch_and_append_employees(doc)
+
+def fetch_and_append_employees(doc):
+    if doc.route_id:
+        frappe.logger().debug(f"Fetching employees for route_id: {doc.route_id}")
+        route_requests = frappe.get_list('FM_Travel_Route_Request', filters={'route_id': doc.route_id}, fields=['name'])
+
+        frappe.logger().debug(f"Route requests found: {route_requests}")
+        doc.set('onboarded_employees', [])
+
+        for request in route_requests:
+            frappe.logger().debug(f"Appending request: {request['name']}")
+            doc.append('onboarded_employees', {
+                'employee_email': request['name']
+            })
+
 def sync_to_fm_request_master(doc, method):
     # Define the mapping of doctypes and their specific fields to sync
     doctype_field_mapping = {
