@@ -45,13 +45,15 @@
   {
    "fieldname": "employee_name",
    "fieldtype": "Data",
-   "label": "Employee Name"
+   "label": "Employee Name",
+   "reqd": 1
   },
   {
    "default": "User",
    "fieldname": "employee_email",
    "fieldtype": "Read Only",
-   "label": "Employee Email"
+   "label": "Employee Email",
+   "reqd": 1
   },
   {
    "fieldname": "from",
@@ -173,12 +175,13 @@
   {
    "fieldname": "department",
    "fieldtype": "Read Only",
-   "label": "Employee Department"
+   "label": "Employee Department",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-01 19:34:41.912783",
+ "modified": "2024-08-07 10:44:11.377290",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Passenger_Vehicle_Request",

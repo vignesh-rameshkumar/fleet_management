@@ -22,19 +22,25 @@
   {
    "fieldname": "date_of_service",
    "fieldtype": "Date",
-   "label": "Date of Service"
+   "in_list_view": 1,
+   "label": "Date of Service",
+   "reqd": 1
   },
   {
    "fieldname": "vehicle_number",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Vehicle Number",
-   "options": "FM_Vehicle_Details"
+   "options": "FM_Vehicle_Details",
+   "reqd": 1
   },
   {
    "fieldname": "service_type",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Service Type",
-   "options": "Routine\nRepair\nInspection"
+   "options": "Routine\nRepair\nInspection",
+   "reqd": 1
   },
   {
    "fieldname": "description",
@@ -49,7 +55,9 @@
   {
    "fieldname": "total_cost",
    "fieldtype": "Int",
-   "label": "Total Cost"
+   "in_list_view": 1,
+   "label": "Total Cost",
+   "reqd": 1
   },
   {
    "fieldname": "bill_copy",
@@ -74,7 +82,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-30 17:36:52.842551",
+ "modified": "2024-08-07 16:26:29.583280",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Maintenance_Log",

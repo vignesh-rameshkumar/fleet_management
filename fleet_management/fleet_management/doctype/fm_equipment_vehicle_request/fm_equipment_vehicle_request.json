@@ -21,6 +21,7 @@
   "terms",
   "purpose",
   "status",
+  "approved_date_time",
   "reports_to",
   "reports_head",
   "vehicle_no",
@@ -38,29 +39,38 @@
   {
    "fieldname": "project_name",
    "fieldtype": "Data",
-   "label": "Project Name"
+   "in_list_view": 1,
+   "label": "Project Name",
+   "reqd": 1
   },
   {
    "default": "Equipment",
    "fieldname": "type",
    "fieldtype": "Read Only",
-   "label": "Type"
+   "in_list_view": 1,
+   "label": "Type",
+   "reqd": 1
   },
   {
    "fieldname": "equipment_type",
    "fieldtype": "Data",
-   "label": "Equipment Type"
+   "in_list_view": 1,
+   "label": "Equipment Type",
+   "reqd": 1
   },
   {
    "fieldname": "employee_name",
    "fieldtype": "Data",
-   "label": "Employee Name"
+   "in_list_view": 1,
+   "label": "Employee Name",
+   "reqd": 1
   },
   {
    "default": "User",
    "fieldname": "employee_email",
    "fieldtype": "Read Only",
-   "label": "Employee Email"
+   "label": "Employee Email",
+   "reqd": 1
   },
   {
    "fieldname": "from",
@@ -169,12 +179,18 @@
   {
    "fieldname": "department",
    "fieldtype": "Read Only",
-   "label": "Employee Department"
+   "label": "Employee Department",
+   "reqd": 1
+  },
+  {
+   "fieldname": "approved_date_time",
+   "fieldtype": "Datetime",
+   "label": "Approved Date & Time"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-01 19:33:36.033968",
+ "modified": "2024-08-07 11:02:13.700075",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Equipment_Vehicle_Request",

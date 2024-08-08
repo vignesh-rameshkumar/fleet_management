@@ -32,8 +32,7 @@
    "fieldname": "route_id",
    "fieldtype": "Link",
    "label": "Route ID",
-   "options": "FM_Route_ID",
-   "query": "fleet_management.doctype.fm_travel_route_request.fm_travel_route_request.get_link_field_filters"
+   "options": "FM_Route_ID"
   },
   {
    "fieldname": "pickup_point",
@@ -56,13 +55,12 @@
    "fieldname": "terms",
    "fieldtype": "Check",
    "in_list_view": 1,
-   "label": "Terms and Conditions",
-   "reqd": 1
+   "label": "Terms and Conditions"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-03 16:38:09.795494",
+ "modified": "2024-08-07 12:43:02.565394",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Travel_Route_Request",

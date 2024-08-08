@@ -14,6 +14,7 @@
   {
    "fieldname": "employee_id",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Employee ID",
    "options": "Employee"
   },
@@ -27,7 +28,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-07-29 17:32:42.232648",
+ "modified": "2024-08-06 17:39:10.310478",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Group_Ride_Members",
