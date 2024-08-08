@@ -12,8 +12,8 @@
   "employee_name",
   "employee_email",
   "department",
-  "from",
-  "to",
+  "from_location",
+  "to_location",
   "request_date_time",
   "mod",
   "mod_dates",
@@ -66,16 +66,6 @@
    "in_list_view": 1,
    "label": "Employee Email",
    "reqd": 1
-  },
-  {
-   "fieldname": "from",
-   "fieldtype": "Data",
-   "label": "From Location"
-  },
-  {
-   "fieldname": "to",
-   "fieldtype": "Data",
-   "label": "To Location"
   },
   {
    "default": "0",
@@ -190,13 +180,22 @@
   {
    "fieldname": "department",
    "fieldtype": "Read Only",
-   "label": "Employee Department",
-   "reqd": 1
+   "label": "Employee Department"
+  },
+  {
+   "fieldname": "from_location",
+   "fieldtype": "Data",
+   "label": "From Location"
+  },
+  {
+   "fieldname": "to_location",
+   "fieldtype": "Data",
+   "label": "To Location"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-06 18:00:50.444651",
+ "modified": "2024-08-08 13:57:45.583436",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Group_Vehicle_Request",

@@ -14,21 +14,25 @@ doc_events = {
     "FM_Passenger_Vehicle_Request": {
         "on_insert": "fleet_management.validate.sync_to_fm_request_master",
         "on_update": "fleet_management.validate.sync_to_fm_request_master",
+        "before_save": "fleet_management.validate.before_save",
         "before_insert": "fleet_management.validate.call"
     },
     "FM_Goods_Vehicle_Request": {
         "on_insert": "fleet_management.validate.sync_to_fm_request_master",
         "on_update": "fleet_management.validate.sync_to_fm_request_master",
+        "before_save": "fleet_management.validate.before_save",
         "before_insert": "fleet_management.validate.call"
     },
     "FM_Equipment_Vehicle_Request": {
         "on_insert": "fleet_management.validate.sync_to_fm_request_master",
         "on_update": "fleet_management.validate.sync_to_fm_request_master",
+        "before_save": "fleet_management.validate.before_save",
         "before_insert": "fleet_management.validate.call"
     },
     "FM_Group_Vehicle_Request": {
         "on_insert": "fleet_management.validate.sync_to_fm_request_master",
         "on_update": "fleet_management.validate.sync_to_fm_request_master",
+        "before_save": "fleet_management.validate.before_save",
         "before_insert": "fleet_management.validate.call"
     },
     "FM_Travel_Route_Report": {

@@ -13,8 +13,8 @@
   "employee_name",
   "employee_email",
   "department",
-  "from",
-  "to",
+  "from_location",
+  "to_location",
   "request_date_time",
   "mod",
   "mod_dates",
@@ -71,16 +71,6 @@
    "fieldtype": "Read Only",
    "label": "Employee Email",
    "reqd": 1
-  },
-  {
-   "fieldname": "from",
-   "fieldtype": "Data",
-   "label": "From Location"
-  },
-  {
-   "fieldname": "to",
-   "fieldtype": "Data",
-   "label": "To Location"
   },
   {
    "default": "0",
@@ -179,18 +169,27 @@
   {
    "fieldname": "department",
    "fieldtype": "Read Only",
-   "label": "Employee Department",
-   "reqd": 1
+   "label": "Employee Department"
   },
   {
    "fieldname": "approved_date_time",
    "fieldtype": "Datetime",
    "label": "Approved Date & Time"
+  },
+  {
+   "fieldname": "from_location",
+   "fieldtype": "Data",
+   "label": "From Location"
+  },
+  {
+   "fieldname": "to_location",
+   "fieldtype": "Data",
+   "label": "To Location"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-07 11:02:13.700075",
+ "modified": "2024-08-08 13:57:11.091285",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Equipment_Vehicle_Request",

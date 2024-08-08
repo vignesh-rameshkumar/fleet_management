@@ -12,9 +12,9 @@
   "employee_name",
   "employee_email",
   "department",
-  "from",
-  "to",
-  "request_date",
+  "from_location",
+  "to_location",
+  "request_date_time",
   "mod",
   "mod_dates",
   "terms",
@@ -56,27 +56,12 @@
    "reqd": 1
   },
   {
-   "fieldname": "from",
-   "fieldtype": "Data",
-   "label": "From Location"
-  },
-  {
-   "fieldname": "to",
-   "fieldtype": "Data",
-   "label": "To Location"
-  },
-  {
    "fieldname": "type",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Type",
    "options": "Travel within Office\nVendor Site Visit\nFor Advisors\nHealth Emergency\nOthers",
    "reqd": 1
-  },
-  {
-   "fieldname": "request_date",
-   "fieldtype": "Datetime",
-   "label": "Requesting Date & Time"
   },
   {
    "default": "0",
@@ -175,13 +160,27 @@
   {
    "fieldname": "department",
    "fieldtype": "Read Only",
-   "label": "Employee Department",
-   "reqd": 1
+   "label": "Employee Department"
+  },
+  {
+   "fieldname": "from_location",
+   "fieldtype": "Data",
+   "label": "From Location"
+  },
+  {
+   "fieldname": "to_location",
+   "fieldtype": "Data",
+   "label": "To Location"
+  },
+  {
+   "fieldname": "request_date_time",
+   "fieldtype": "Datetime",
+   "label": "Requesting Date & Time"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-07 10:44:11.377290",
+ "modified": "2024-08-08 14:01:48.689652",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Passenger_Vehicle_Request",

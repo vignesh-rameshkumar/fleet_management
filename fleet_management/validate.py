@@ -124,3 +124,21 @@ def autofill(doc, method):
 def call(doc, method):
     autofill(doc, method)
     before_insert(doc, method)
+
+def restrict_duplicate(doc, method):
+    # Define the fields to check for duplicates
+    duplicate_fields = ['employee_email', 'from_location', 'to_location', 'request_date_time']
+
+    # Build the filters dictionary
+    filters = {field: doc.get(field) for field in duplicate_fields}
+
+    # Check if a document with the same field values already exists
+    existing_doc = frappe.db.get_value(doc.doctype, filters, ['name', 'status'])
+    if existing_doc:
+        existing_doc_name, existing_doc_status = existing_doc
+        if existing_doc_status not in ['Rejected', 'Cancelled'] and existing_doc_name != doc.name:
+            frappe.throw(f"A Request with the same date already exists for the Employee. Request ID: {existing_doc_name}")
+
+@frappe.whitelist()
+def before_save(doc, method):
+    restrict_duplicate(doc, method)
