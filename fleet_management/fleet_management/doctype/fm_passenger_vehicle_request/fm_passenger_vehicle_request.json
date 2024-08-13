@@ -135,12 +135,12 @@
   },
   {
    "fieldname": "ride_start_time",
-   "fieldtype": "Datetime",
+   "fieldtype": "Data",
    "label": "Ride Start Date & Time"
   },
   {
    "fieldname": "ride_end_time",
-   "fieldtype": "Datetime",
+   "fieldtype": "Data",
    "label": "Ride End Date & Time"
   },
   {
@@ -155,7 +155,7 @@
   },
   {
    "fieldname": "approved_date_time",
-   "fieldtype": "Datetime",
+   "fieldtype": "Data",
    "label": "Approved Date & Time"
   },
   {
@@ -175,7 +175,7 @@
   },
   {
    "fieldname": "request_date_time",
-   "fieldtype": "Datetime",
+   "fieldtype": "Data",
    "label": "Requesting Date & Time"
   },
   {
@@ -186,7 +186,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-13 13:56:44.080672",
+ "modified": "2024-08-13 15:58:45.006344",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Passenger_Vehicle_Request",

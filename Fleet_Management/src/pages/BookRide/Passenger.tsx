@@ -17,7 +17,9 @@ import {
   InputLabel,
   Select,
   Modal,
+  Chip,
 } from "@mui/material";
+import Autocomplete from "@mui/material/Autocomplete";
 import { createTheme } from "@mui/material/styles";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -44,13 +46,17 @@ const Passenger: React.FC<PassengerProps> = ({
   employeeID,
   userName,
 }) => {
-  const [rideType, SetRideType] = useState("");
-  const [fromLocation, SetFromLocation] = useState("");
-  const [toLocation, SetToLocation] = useState("");
-  const [rideDate, SetRideDate] = useState(null);
-  const [rideTime, SetRideTime] = useState(null);
-  const [travelMore, SetTravelMore] = useState(false);
-  const [terms, SetTerms] = useState(false);
+  const [rideType, setRideType] = useState("");
+  const [fromLocation, setFromLocation] = useState("");
+  const [toLocation, setToLocation] = useState("");
+  const [purpose, setPurpose] = useState("");
+  const [rideDate, setRideDate] = useState(null);
+  const [rideMoreDates, setRideMoreDates] = useState([]);
+  const [currentdate, setCurrentDate] = useState(null);
+
+  const [rideTime, setRideTime] = useState(null);
+  const [travelMore, setTravelMore] = useState(false);
+  const [terms, setTerms] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   // const [travelMore, SetTravelMore] = useState(false);
 
@@ -133,51 +139,85 @@ const Passenger: React.FC<PassengerProps> = ({
     },
   });
 
+  useEffect(() => {
+    const today = dayjs().format("DD-MM-YYYY");
+    setCurrentDate(today);
+  }, []);
+
   const handleCancel = () => {
     onCloseDrawer();
-    SetRideType("");
-    SetFromLocation("");
-    SetToLocation("");
-    SetRideDate(null);
-    SetTravelMore(false);
-    SetTerms(false);
+    setRideType("");
+    setFromLocation("");
+    setToLocation("");
+    setRideDate(null);
+    setTravelMore(false);
+    setTerms(false);
     setOpenModal(false);
-    SetRideTime(null);
+    setRideTime(null);
   };
 
   const Changeride = (event) => {
-    SetRideType(event.target.value);
+    setRideType(event.target.value);
   };
 
-  const HandleFromLocation = (event) => {
-    const newFromLocation = event.target.value;
-    SetFromLocation(newFromLocation);
-    if (newFromLocation === toLocation) {
-      SetToLocation("");
-    }
-  };
-
-  const HandleToLocation = (event) => {
-    const newToLocation = event.target.value;
-    if (newToLocation === fromLocation) {
+  const handleToLocationChange = (event, newValue) => {
+    if (newValue === fromLocation) {
       toast.warning("The From and To locations cannot be the same.");
-      SetToLocation("");
+      setToLocation("");
     } else {
-      SetToLocation(newToLocation);
+      setToLocation(newValue);
     }
   };
+
   const today = dayjs();
 
   const handleFromDateChange = (date) => {
-    SetRideDate(date);
+    if (dayjs(date).isValid()) {
+      const formattedDate = dayjs(date).format("DD-MM-YYYY");
+      setRideDate(formattedDate);
+    } else {
+      toast.error("Invalid date selected");
+      setRideDate(null);
+    }
   };
+
+  const date_time = `${rideDate} ${rideTime}`;
 
   const handleFromTimeChange = (time) => {
-    SetRideTime(time);
+    if (dayjs(time).isValid()) {
+      const formattedTime = dayjs(time).format("HH:mm:ss");
+      setRideTime(formattedTime);
+    } else {
+      toast.error("Invalid time selected");
+      setRideTime(null);
+    }
   };
 
+  // Start Multi dates
+  const handleMoreDateChange = (date) => {
+    if (dayjs(date).isValid()) {
+      const formattedDate = dayjs(date).format("DD-MM-YYYY");
+      if (!rideMoreDates.includes(formattedDate)) {
+        setRideMoreDates([...rideMoreDates, formattedDate]);
+      } else {
+        toast.warning("Date already selected");
+      }
+    } else {
+      toast.warning("Invalid date selected");
+    }
+  };
+
+  const moreDates = rideMoreDates.join(",");
+
+  const handleRemoveDate = (dateToRemove) => {
+    setRideMoreDates(rideMoreDates.filter((date) => date !== dateToRemove));
+  };
+
+  // END
+
   const handleTravelMoreChange = () => {
-    SetTravelMore((prevState) => !prevState);
+    setTravelMore((prevState) => !prevState);
+    setRideMoreDates([]);
   };
 
   const handleTermsChange = () => {
@@ -185,11 +225,11 @@ const Passenger: React.FC<PassengerProps> = ({
   };
 
   const handleAgree = () => {
-    SetTerms(true);
+    setTerms(true);
     setOpenModal(false);
   };
   const handleCancelAggr = () => {
-    SetTerms(false);
+    setTerms(false);
     setOpenModal(false);
   };
 
@@ -224,8 +264,6 @@ const Passenger: React.FC<PassengerProps> = ({
     setSelectedProject(event.target.value);
   };
 
-  console.log("rideDate", rideDate);
-
   // Save API
   const { createDoc } = useFrappeCreateDoc();
 
@@ -240,16 +278,19 @@ const Passenger: React.FC<PassengerProps> = ({
         doctypename: "FM_Passenger_Vehicle_Request",
         employee_email: userEmailId,
         employee_name: userName,
-        // request_date_time
-        // mod:
+        request_date_time: date_time,
+        mod: travelMore,
+        mod_dates: moreDates,
+        purpose: purpose,
       };
-
       await createDoc("FM_Passenger_Vehicle_Request", body);
       toast.success("Request Created Successfully ");
       onCloseDrawer();
     } catch (error) {
       if (error.response) {
         const statusCode = error.response.status;
+        const serverMessage = error.response.data?._server_messages;
+
         if (statusCode === 400) {
           toast.error("Bad request. Please check your input.");
         } else if (statusCode === 401) {
@@ -258,6 +299,12 @@ const Passenger: React.FC<PassengerProps> = ({
           toast.error("Resource not found.");
         } else if (statusCode === 500) {
           toast.error("Internal server error. Please try again later.");
+        } else if (serverMessage) {
+          const parsedMessages = JSON.parse(serverMessage);
+          const errorMessage = parsedMessages
+            .map((msg) => JSON.parse(msg).message)
+            .join(", ");
+          toast.error(errorMessage);
         } else {
           toast.error(`Error: ${statusCode}`);
         }
@@ -266,11 +313,11 @@ const Passenger: React.FC<PassengerProps> = ({
           "No response received from server. Please try again later."
         );
       } else {
-        // Other errors
-        toast.error("Error occurred. Please try again later.");
+        toast.error(`${error.exception}`);
       }
     }
   };
+
   return (
     <>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -294,51 +341,16 @@ const Passenger: React.FC<PassengerProps> = ({
             </Box>
             <br />
             <br />
-            <Box display="flex" flexDirection="column" alignItems="center">
+            <Box
+              className="slideFromRight"
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+            >
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <ThemeProvider theme={ThemeColor}>
                   <Box
-                    width={{ xs: "100%", sm: "100%", md: "90%" }}
-                    marginBottom="16px"
-                    sx={{ display: "flex", justifyContent: "center" }}
-                  >
-                    <FormControl
-                      variant="outlined"
-                      sx={{ width: { xs: "100%", sm: "100%", md: "90%" } }}
-                    >
-                      <InputLabel>
-                        Select Ride Type {""}
-                        <Typography className="CodeStar" variant="Code">
-                          *
-                        </Typography>
-                      </InputLabel>
-                      <Select
-                        value={rideType}
-                        onChange={Changeride}
-                        label={<> Select Ride Type {""}</>}
-                        MenuProps={{
-                          PaperProps: {
-                            sx: {
-                              textAlign: "left",
-                            },
-                          },
-                        }}
-                      >
-                        <MenuItem value="Travel within Office">
-                          Travel within Office
-                        </MenuItem>
-                        <MenuItem value="Vendor Site Visit">
-                          Vendor Site Visit
-                        </MenuItem>
-                        <MenuItem value="For Advisors">For Advisors</MenuItem>
-                        <MenuItem value="Health Emergency">
-                          Health Emergency
-                        </MenuItem>
-                        <MenuItem value="Others">Others</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-                  <Box
+                    className="slideFromRight"
                     width={{ xs: "100%", sm: "100%", md: "90%" }}
                     marginBottom="16px"
                     sx={{ display: "flex", justifyContent: "center" }}
@@ -378,6 +390,7 @@ const Passenger: React.FC<PassengerProps> = ({
                     </FormControl>
                   </Box>
                   <Box
+                    className="slideFromRight delay-1"
                     width={{ xs: "100%", sm: "100%", md: "90%" }}
                     marginBottom="16px"
                     sx={{ display: "flex", justifyContent: "center" }}
@@ -387,15 +400,16 @@ const Passenger: React.FC<PassengerProps> = ({
                       sx={{ width: { xs: "100%", sm: "100%", md: "90%" } }}
                     >
                       <InputLabel>
-                        Select From Location {""}
+                        Select Ride Type {""}
                         <Typography className="CodeStar" variant="Code">
                           *
                         </Typography>
                       </InputLabel>
                       <Select
-                        value={fromLocation}
-                        onChange={HandleFromLocation}
-                        label={<> Select From Location {""}</>}
+                        value={rideType}
+                        disabled={!selectedProject}
+                        onChange={Changeride}
+                        label={<> Select Ride Type {""}</>}
                         MenuProps={{
                           PaperProps: {
                             sx: {
@@ -404,49 +418,104 @@ const Passenger: React.FC<PassengerProps> = ({
                           },
                         }}
                       >
-                        <MenuItem value="Research Park">Research Park</MenuItem>
-                        <MenuItem value="Thaiyur">Thaiyur</MenuItem>
-                        <MenuItem value="Shar">Shar</MenuItem>
+                        <MenuItem value="Travel within Office">
+                          Travel within Office
+                        </MenuItem>
+                        <MenuItem value="Vendor Site Visit">
+                          Vendor Site Visit
+                        </MenuItem>
+                        <MenuItem value="For Advisors">For Advisors</MenuItem>
+                        <MenuItem value="Health Emergency">
+                          Health Emergency
+                        </MenuItem>
                         <MenuItem value="Others">Others</MenuItem>
                       </Select>
                     </FormControl>
                   </Box>
                   <Box
+                    className="slideFromRight delay-2"
                     width={{ xs: "100%", sm: "100%", md: "90%" }}
+                    textAlign={"center"}
                     marginBottom="16px"
-                    sx={{ display: "flex", justifyContent: "center" }}
                   >
-                    <FormControl
-                      variant="outlined"
-                      sx={{ width: { xs: "100%", sm: "100%", md: "90%" } }}
-                    >
-                      <InputLabel>
-                        Select To Location {""}
-                        <Typography className="CodeStar" variant="Code">
-                          *
-                        </Typography>
-                      </InputLabel>
-                      <Select
-                        value={toLocation}
-                        onChange={HandleToLocation}
-                        label={<> Select From Location {""}</>}
-                        MenuProps={{
-                          PaperProps: {
-                            sx: {
-                              textAlign: "left",
-                            },
-                          },
-                        }}
-                      >
-                        <MenuItem value="Research Park">Research Park</MenuItem>
-                        <MenuItem value="Thaiyur">Thaiyur</MenuItem>
-                        <MenuItem value="Shar">Shar</MenuItem>
-                        <MenuItem value="Others">Others</MenuItem>
-                      </Select>
-                    </FormControl>
+                    <Autocomplete
+                      freeSolo
+                      disableClearable
+                      value={fromLocation}
+                      onChange={(event, newValue) => {
+                        setFromLocation(newValue);
+                        setToLocation("");
+                      }}
+                      inputValue={fromLocation}
+                      onInputChange={(event, newInputValue) => {
+                        setFromLocation(newInputValue);
+                        setToLocation("");
+                      }}
+                      disabled={!selectedProject || !rideType}
+                      options={["Research Park", "Thaiyur", "Shar"]}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label={
+                            <>
+                              Select From Location {""}
+                              <Typography variant="code" className="CodeStar">
+                                *
+                              </Typography>
+                            </>
+                          }
+                          variant="outlined"
+                          sx={{
+                            width: { xs: "100%", sm: "100%", md: "90%" },
+                            textAlign: "left",
+                          }}
+                        />
+                      )}
+                    />
                   </Box>
-                  {/* {JSON.stringify(rideDate)} */}
+
                   <Box
+                    className="slideFromRight delay-2"
+                    width={{ xs: "100%", sm: "100%", md: "90%" }}
+                    textAlign={"center"}
+                    marginBottom="16px"
+                  >
+                    <Autocomplete
+                      freeSolo
+                      disableClearable
+                      value={toLocation}
+                      onChange={(event, newValue) =>
+                        handleToLocationChange(event, newValue)
+                      }
+                      inputValue={toLocation}
+                      onInputChange={(event, newInputValue) =>
+                        handleToLocationChange(event, newInputValue)
+                      }
+                      disabled={!rideType || !selectedProject || !fromLocation}
+                      options={["Research Park", "Thaiyur", "Shar"]}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label={
+                            <>
+                              Select To Location {""}
+                              <Typography variant="code" className="CodeStar">
+                                *
+                              </Typography>
+                            </>
+                          }
+                          variant="outlined"
+                          sx={{
+                            width: { xs: "100%", sm: "100%", md: "90%" },
+                            textAlign: "left",
+                          }}
+                        />
+                      )}
+                    />
+                  </Box>
+
+                  <Box
+                    className="slideFromRight delay-3"
                     width={{ xs: "100%", sm: "100%", md: "90%" }}
                     marginBottom="16px"
                     textAlign={"center"}
@@ -457,7 +526,14 @@ const Passenger: React.FC<PassengerProps> = ({
                           From <code className="CodeStar">*</code>
                         </Typography>
                       }
-                      value={rideDate}
+                      value={dayjs(rideDate, "DD-MM-YYYY")}
+                      minDate={today}
+                      disabled={
+                        !rideType ||
+                        !selectedProject ||
+                        !fromLocation ||
+                        !toLocation
+                      }
                       sx={{
                         width: {
                           xs: "100%",
@@ -468,12 +544,17 @@ const Passenger: React.FC<PassengerProps> = ({
                       format="DD-MM-YYYY"
                       onChange={handleFromDateChange}
                       renderInput={(params) => (
-                        <TextField {...params} variant="outlined" />
+                        <TextField
+                          {...params}
+                          variant="outlined"
+                          placeholder="Select Date"
+                        />
                       )}
                     />
                   </Box>
 
                   <Box
+                    className="slideFromRight delay-3"
                     sx={{
                       width: {
                         xs: "90%",
@@ -489,6 +570,7 @@ const Passenger: React.FC<PassengerProps> = ({
                     >
                       <FormControlLabel
                         sx={{ marginLeft: { sm: "25px" } }}
+                        disabled={!rideType || !selectedProject || !rideDate}
                         control={
                           <Checkbox
                             checked={travelMore}
@@ -499,7 +581,55 @@ const Passenger: React.FC<PassengerProps> = ({
                       />
                     </FormGroup>
                   </Box>
+
+                  {travelMore === true && (
+                    <>
+                      <Box
+                        width={{ xs: "100%", sm: "100%", md: "90%" }}
+                        marginBottom="16px"
+                        textAlign={"center"}
+                      >
+                        <DatePicker
+                          label={
+                            <Typography>
+                              Select Date <code className="CodeStar">*</code>
+                            </Typography>
+                          }
+                          value={null}
+                          minDate={dayjs(rideDate, "DD-MM-YYYY")}
+                          sx={{
+                            width: {
+                              xs: "100%",
+                              sm: "100%",
+                              md: "90%",
+                            },
+                          }}
+                          format="DD-MM-YYYY"
+                          onChange={handleMoreDateChange}
+                          renderInput={(params) => (
+                            <TextField {...params} variant="outlined" />
+                          )}
+                        />
+
+                        <Box mt={2} className="slideFromRight">
+                          {rideMoreDates?.map((date, index) => (
+                            <Chip
+                              key={index}
+                              label={date}
+                              onDelete={() => handleRemoveDate(date)}
+                              sx={{
+                                margin: "2px",
+                                padding: "5px",
+                              }}
+                            />
+                          ))}
+                        </Box>
+                      </Box>
+                    </>
+                  )}
+
                   <Box
+                    className="slideFromRight delay-4"
                     width={{ xs: "100%", sm: "100%", md: "90%" }}
                     marginBottom="16px"
                     textAlign={"center"}
@@ -520,15 +650,61 @@ const Passenger: React.FC<PassengerProps> = ({
                           md: "90%",
                         },
                       }}
-                      value={rideTime}
+                      value={dayjs(rideTime, "HH:mm:ss")}
                       ampm={false}
+                      disabled={
+                        !rideType ||
+                        !selectedProject ||
+                        !fromLocation ||
+                        !toLocation ||
+                        !rideDate ||
+                        (travelMore && rideMoreDates.length === 0)
+                      }
                       onChange={handleFromTimeChange}
                       renderInput={(params) => <TextField {...params} />}
                       adapter={AdapterDayjs}
                     />
                   </Box>
-                  <br />
                   <Box
+                    className="slideFromRight delay-5"
+                    width={{ xs: "100%", sm: "100%", md: "90%" }}
+                    marginBottom="16px"
+                    textAlign={"center"}
+                  >
+                    <TextField
+                      label={
+                        <Typography>
+                          Purpose <code className="CodeStar"> *</code>
+                        </Typography>
+                      }
+                      multiline
+                      rows={2}
+                      variant="outlined"
+                      value={purpose}
+                      disabled={
+                        !rideType ||
+                        !selectedProject ||
+                        !fromLocation ||
+                        !toLocation ||
+                        !rideDate ||
+                        !rideTime
+                      }
+                      sx={{
+                        width: {
+                          xs: "100%",
+                          sm: "100%",
+                          md: "90%",
+                        },
+                      }}
+                      onChange={(e) => {
+                        setPurpose(e.target.value);
+                      }}
+                    />
+                  </Box>
+                  <br />
+
+                  <Box
+                    className="slideFromRight delay-5"
                     sx={{
                       width: {
                         xs: "90%",
@@ -543,11 +719,21 @@ const Passenger: React.FC<PassengerProps> = ({
                       sx={{ display: "flex", justifyContent: "center" }}
                     >
                       <FormControlLabel
-                        sx={{ color: "#71a375" }}
+                        sx={{ color: "#4D8C52" }}
                         control={
                           <Checkbox
                             checked={terms}
                             onChange={handleTermsChange}
+                            disabled={
+                              !rideType ||
+                              !selectedProject ||
+                              !fromLocation ||
+                              !toLocation ||
+                              !rideDate ||
+                              !rideTime ||
+                              !purpose ||
+                              (travelMore && rideMoreDates.length === 0)
+                            }
                           />
                         }
                         label="Terms & Conditions"
@@ -726,7 +912,7 @@ const Passenger: React.FC<PassengerProps> = ({
             >
               <Box>
                 <p>Name : {userName} </p>
-                <p>Date : </p>
+                <p>Date : {currentdate} </p>
               </Box>
               <Box>
                 <Button
