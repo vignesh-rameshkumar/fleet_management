@@ -11,8 +11,6 @@
     "copy-html-entry": "cp ../fleet_management/public/Fleet_Management/index.html ../fleet_management/www/Fleet_Management.html"
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
     "@coreui/coreui-pro": "^5.0.1",
     "@coreui/react-pro": "^5.0.0",
     "@date-io/dayjs": "^3.0.0",
@@ -35,9 +33,11 @@
     "moment": "^2.30.1",
     "papaparse": "^5.4.1",
     "qrcode": "^1.5.3",
+    "react": "^18.3.1",
     "react-apexcharts": "^1.4.1",
     "react-csv": "^2.2.2",
     "react-data-export": "^0.6.0",
+    "react-dom": "^18.3.1",
     "react-dropzone": "^14.2.3",
     "react-export-table-to-excel": "^1.0.6",
     "react-icons": "^5.0.1",

@@ -34,7 +34,8 @@
   "ride_start_time",
   "ride_end_time",
   "distance",
-  "duration"
+  "duration",
+  "doctypename"
  ],
  "fields": [
   {
@@ -191,11 +192,16 @@
    "fieldname": "to_location",
    "fieldtype": "Data",
    "label": "To Location"
+  },
+  {
+   "fieldname": "doctypename",
+   "fieldtype": "Data",
+   "label": "document Type Name"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-08 13:57:45.583436",
+ "modified": "2024-08-13 13:58:55.308891",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Group_Vehicle_Request",

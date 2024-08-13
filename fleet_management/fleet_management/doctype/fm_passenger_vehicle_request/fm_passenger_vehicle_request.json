@@ -32,7 +32,8 @@
   "ride_start_time",
   "ride_end_time",
   "distance",
-  "duration"
+  "duration",
+  "doctypename"
  ],
  "fields": [
   {
@@ -176,11 +177,16 @@
    "fieldname": "request_date_time",
    "fieldtype": "Datetime",
    "label": "Requesting Date & Time"
+  },
+  {
+   "fieldname": "doctypename",
+   "fieldtype": "Data",
+   "label": "Document Type Name"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-08 14:01:48.689652",
+ "modified": "2024-08-13 13:56:44.080672",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Passenger_Vehicle_Request",
