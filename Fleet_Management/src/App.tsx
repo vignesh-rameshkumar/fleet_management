@@ -17,6 +17,7 @@ import QuickAccess from "./pages/QuickAccess/QuickAccess.tsx";
 // Pages
 import GroupRide from "./pages/PL/GroupRide.tsx";
 import RequestApproval from "./pages/PL/RequestApproval.tsx";
+import TrackRequest from "./pages/TrackRequest/TrackRequest.tsx";
 
 interface EmployeeData {
   empID: string;
@@ -124,6 +125,17 @@ const App: React.FC = () => {
                   path="/Fleet_Management"
                   element={
                     <QuickAccess
+                      darkMode={darkMode}
+                      userEmailId={userEmailId}
+                      userName={userName}
+                      employeeID={employeeID}
+                    />
+                  }
+                />
+                <Route
+                  path="/Fleet_Management/trackrequest"
+                  element={
+                    <TrackRequest
                       darkMode={darkMode}
                       userEmailId={userEmailId}
                       userName={userName}

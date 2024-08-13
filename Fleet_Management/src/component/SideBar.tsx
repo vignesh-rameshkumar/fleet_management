@@ -177,6 +177,11 @@ const SideBar: React.FC<SideBarProps> = ({
           name: "Equipment",
           onClick: () => toggleDrawer(true, "Equipment"),
         },
+        {
+          path: "/Fleet_Management",
+          name: "Group Ride",
+          // onClick: () => toggleDrawer(true, "Equipment"),
+        },
       ],
     },
 
@@ -229,14 +234,19 @@ const SideBar: React.FC<SideBarProps> = ({
           name: "Equipment",
           onClick: () => toggleDrawer(true, "Equipment"),
         },
+        {
+          path: "/Fleet_Management",
+          name: "Group Ride",
+          // onClick: () => toggleDrawer(true, "Equipment"),
+        },
       ],
     },
 
-    {
-      path: "/Fleet_Management/groupride",
-      name: "Group Ride",
-      icon: <MdGroups3 />,
-    },
+    // {
+    //   path: "/Fleet_Management/groupride",
+    //   name: "Group Ride",
+    //   icon: <MdGroups3 />,
+    // },
     {
       path: "/Fleet_Management/travelroute",
       name: "Travel Route",
