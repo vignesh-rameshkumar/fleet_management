@@ -19,6 +19,8 @@ import {
   Modal,
   Chip,
 } from "@mui/material";
+
+import { HiPlusSm, HiMinusSm } from "react-icons/hi";
 import Autocomplete from "@mui/material/Autocomplete";
 import { createTheme } from "@mui/material/styles";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -31,7 +33,8 @@ import { useFrappeCreateDoc, useFrappeGetDocList } from "frappe-react-sdk";
 import { ThemeProvider } from "@mui/material";
 
 import dayjs from "dayjs";
-interface PassengerProps {
+
+interface GroupRideProps {
   darkMode: boolean;
   onCloseDrawer: () => void;
   userEmailId: string;
@@ -39,7 +42,7 @@ interface PassengerProps {
   userName: string;
 }
 
-const Passenger: React.FC<PassengerProps> = ({
+const GroupRide: React.FC<GroupRideProps> = ({
   darkMode,
   onCloseDrawer,
   userEmailId,
@@ -50,6 +53,8 @@ const Passenger: React.FC<PassengerProps> = ({
   const [fromLocation, setFromLocation] = useState("");
   const [toLocation, setToLocation] = useState("");
   const [purpose, setPurpose] = useState("");
+  const [passengerCount, setPassengerCount] = useState(1); // Default to 1 passenger
+
   const [rideDate, setRideDate] = useState(null);
   const [rideMoreDates, setRideMoreDates] = useState([]);
   const [currentdate, setCurrentDate] = useState(null);
@@ -154,6 +159,7 @@ const Passenger: React.FC<PassengerProps> = ({
     setTerms(false);
     setOpenModal(false);
     setRideTime(null);
+    setPassengerCount(1);
   };
 
   const Changeride = (event) => {
@@ -263,27 +269,38 @@ const Passenger: React.FC<PassengerProps> = ({
   const handleChange = (event) => {
     setSelectedProject(event.target.value);
   };
+  //   const [passengerCount, setPassengerCount] = useState(1); // Default to 1 passenger
 
+  const handleIncrement = () => {
+    setPassengerCount((prevCount) => prevCount + 1);
+  };
+
+  const handleDecrement = () => {
+    if (passengerCount > 1) {
+      setPassengerCount((prevCount) => prevCount - 1);
+    }
+  };
   // Save API
   const { createDoc } = useFrappeCreateDoc();
 
-  const CreateBookRequest = async () => {
+  const CreateGroupRequest = async () => {
     try {
       const body = {
-        type: rideType,
+        // type: rideType,
         project_name: selectedProject,
         from_location: fromLocation,
         to_location: toLocation,
         terms: terms,
-        doctypename: "FM_Passenger_Vehicle_Request",
+        doctypename: "FM_Group_Vehicle_Request",
         employee_email: userEmailId,
         employee_name: userName,
         request_date_time: date_time,
         mod: travelMore,
         mod_dates: moreDates,
         purpose: purpose,
+        passenger_count: passengerCount,
       };
-      await createDoc("FM_Passenger_Vehicle_Request", body);
+      await createDoc("FM_Group_Vehicle_Request", body);
       toast.success("Request Created Successfully ");
       setSelectedProject();
       handleCancel();
@@ -330,7 +347,8 @@ const Passenger: React.FC<PassengerProps> = ({
                 className="drawerTitle"
                 sx={{ color: darkMode ? "#fff" : "#5b5b5b" }}
               >
-                {rideType === "" ? "Book Ride" : rideType}
+                Group Ride
+                {/* {rideType === "" ? "Group Ride" : ` Group Ride - ${rideType}`} */}
               </Box>
               <Button
                 className="closeX"
@@ -390,7 +408,7 @@ const Passenger: React.FC<PassengerProps> = ({
                       </Select>
                     </FormControl>
                   </Box>
-                  <Box
+                  {/* <Box
                     className="slideFromRight delay-1"
                     width={{ xs: "100%", sm: "100%", md: "90%" }}
                     marginBottom="16px"
@@ -432,7 +450,7 @@ const Passenger: React.FC<PassengerProps> = ({
                         <MenuItem value="Others">Others</MenuItem>
                       </Select>
                     </FormControl>
-                  </Box>
+                  </Box> */}
                   <Box
                     className="slideFromRight delay-2"
                     width={{ xs: "100%", sm: "100%", md: "90%" }}
@@ -452,7 +470,7 @@ const Passenger: React.FC<PassengerProps> = ({
                         setFromLocation(newInputValue);
                         setToLocation("");
                       }}
-                      disabled={!selectedProject || !rideType}
+                      disabled={!selectedProject}
                       options={["Research Park", "Thaiyur", "Shar"]}
                       renderInput={(params) => (
                         <TextField
@@ -492,7 +510,7 @@ const Passenger: React.FC<PassengerProps> = ({
                       onInputChange={(event, newInputValue) =>
                         handleToLocationChange(event, newInputValue)
                       }
-                      disabled={!rideType || !selectedProject || !fromLocation}
+                      disabled={!selectedProject || !fromLocation}
                       options={["Research Park", "Thaiyur", "Shar"]}
                       renderInput={(params) => (
                         <TextField
@@ -531,10 +549,8 @@ const Passenger: React.FC<PassengerProps> = ({
                       value={rideDate ? dayjs(rideDate, "DD-MM-YYYY") : null}
                       minDate={today}
                       disabled={
-                        !rideType ||
-                        !selectedProject ||
-                        !fromLocation ||
-                        !toLocation
+                        // !rideType ||
+                        !selectedProject || !fromLocation || !toLocation
                       }
                       sx={{
                         width: {
@@ -573,7 +589,7 @@ const Passenger: React.FC<PassengerProps> = ({
                     >
                       <FormControlLabel
                         sx={{ marginLeft: { sm: "25px" } }}
-                        disabled={!rideType || !selectedProject || !rideDate}
+                        disabled={!selectedProject || !rideDate}
                         control={
                           <Checkbox
                             checked={travelMore}
@@ -658,7 +674,7 @@ const Passenger: React.FC<PassengerProps> = ({
                       format="HH:mm:ss"
                       ampm={false}
                       disabled={
-                        !rideType ||
+                        // !rideType ||
                         !selectedProject ||
                         !fromLocation ||
                         !toLocation ||
@@ -693,7 +709,7 @@ const Passenger: React.FC<PassengerProps> = ({
                       variant="outlined"
                       value={purpose}
                       disabled={
-                        !rideType ||
+                        // !rideType ||
                         !selectedProject ||
                         !fromLocation ||
                         !toLocation ||
@@ -712,8 +728,73 @@ const Passenger: React.FC<PassengerProps> = ({
                       }}
                     />
                   </Box>
-                  <br />
 
+                  <Box
+                    className="slideFromRight delay-5"
+                    width={{ xs: "100%", sm: "100%", md: "90%" }}
+                    marginBottom="16px"
+                    textAlign={"center"}
+                  >
+                    <Box
+                      display="flex"
+                      justifyContent="center"
+                      alignItems="center"
+                      mt={1}
+                    >
+                      <TextField
+                        value={passengerCount}
+                        variant="outlined"
+                        label="Number of Passengers"
+                        inputProps={{ style: { textAlign: "center" } }}
+                        sx={{
+                          width: "90%",
+                        }}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "150px",
+                                }}
+                              >
+                                <Typography>
+                                  Number of Passengers {""}
+                                </Typography>
+                                <IconButton
+                                  onClick={handleDecrement}
+                                  disabled={passengerCount <= 1}
+                                  size="small"
+                                >
+                                  <HiMinusSm />
+                                </IconButton>
+                              </Box>
+                            </InputAdornment>
+                          ),
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "60px",
+                                }}
+                              >
+                                <IconButton
+                                  onClick={handleIncrement}
+                                  size="small"
+                                >
+                                  <HiPlusSm />
+                                </IconButton>
+                              </Box>
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                  {/*  */}
                   <Box
                     className="slideFromRight delay-5"
                     sx={{
@@ -736,7 +817,7 @@ const Passenger: React.FC<PassengerProps> = ({
                             checked={terms}
                             onChange={handleTermsChange}
                             disabled={
-                              !rideType ||
+                              //   !rideType ||
                               !selectedProject ||
                               !fromLocation ||
                               !toLocation ||
@@ -761,7 +842,7 @@ const Passenger: React.FC<PassengerProps> = ({
                       Cancel
                     </Button>
 
-                    <Button className="saveBtn" onClick={CreateBookRequest}>
+                    <Button className="saveBtn" onClick={CreateGroupRequest}>
                       Submit
                     </Button>
                   </Box>
@@ -949,4 +1030,4 @@ const Passenger: React.FC<PassengerProps> = ({
   );
 };
 
-export default Passenger;
+export default GroupRide;

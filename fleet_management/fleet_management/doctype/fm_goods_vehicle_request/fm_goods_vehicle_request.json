@@ -35,7 +35,8 @@
   "break_points",
   "distance",
   "duration",
-  "doctypename"
+  "doctypename",
+  "description"
  ],
  "fields": [
   {
@@ -138,12 +139,12 @@
   },
   {
    "fieldname": "ride_start_time",
-   "fieldtype": "Datetime",
+   "fieldtype": "Data",
    "label": "Ride Start Date & Time"
   },
   {
    "fieldname": "ride_end_time",
-   "fieldtype": "Datetime",
+   "fieldtype": "Data",
    "label": "Ride End Date & Time"
   },
   {
@@ -172,7 +173,7 @@
   },
   {
    "fieldname": "request_date_time",
-   "fieldtype": "Datetime",
+   "fieldtype": "Data",
    "label": "Requesting Date & Time"
   },
   {
@@ -199,11 +200,16 @@
    "fieldname": "doctypename",
    "fieldtype": "Data",
    "label": "Document Type Name"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Data",
+   "label": "Description"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-13 13:56:03.876419",
+ "modified": "2024-08-14 16:37:18.722417",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Goods_Vehicle_Request",

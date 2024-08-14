@@ -15,7 +15,8 @@ export const locateContext = createContext({});
 import Preloader from "./component/Preloader.tsx";
 import QuickAccess from "./pages/QuickAccess/QuickAccess.tsx";
 // Pages
-import GroupRide from "./pages/PL/GroupRide.tsx";
+import GroupRide from "./pages/BookRide/GroupRide.tsx";
+
 import RequestApproval from "./pages/PL/RequestApproval.tsx";
 import TrackRequest from "./pages/TrackRequest/TrackRequest.tsx";
 

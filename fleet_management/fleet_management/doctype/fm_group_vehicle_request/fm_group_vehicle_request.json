@@ -50,8 +50,7 @@
    "fieldname": "type",
    "fieldtype": "Read Only",
    "in_list_view": 1,
-   "label": "Type",
-   "reqd": 1
+   "label": "Type"
   },
   {
    "fieldname": "employee_name",
@@ -150,17 +149,17 @@
   },
   {
    "fieldname": "ride_start_time",
-   "fieldtype": "Datetime",
+   "fieldtype": "Data",
    "label": "Ride Start Date & Time"
   },
   {
    "fieldname": "ride_end_time",
-   "fieldtype": "Datetime",
+   "fieldtype": "Data",
    "label": "Ride End Date & Time"
   },
   {
    "fieldname": "request_date_time",
-   "fieldtype": "Datetime",
+   "fieldtype": "Data",
    "label": "Requesting Date & Time"
   },
   {
@@ -175,7 +174,7 @@
   },
   {
    "fieldname": "approved_date_time",
-   "fieldtype": "Datetime",
+   "fieldtype": "Data",
    "label": "Approved Date & Time"
   },
   {
@@ -201,7 +200,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-13 13:58:55.308891",
+ "modified": "2024-08-14 19:07:38.892957",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Group_Vehicle_Request",

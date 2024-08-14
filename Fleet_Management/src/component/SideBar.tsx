@@ -34,6 +34,7 @@ import { BsBookmarkCheck } from "react-icons/bs";
 import Passenger from "../pages/BookRide/Passenger";
 import Goods from "../pages/BookRide/Goods";
 import Equipment from "../pages/BookRide/Equipment";
+import GroupRide from "../pages/BookRide/GroupRide";
 
 interface SideBarProps {
   onCloseDrawer: () => void;
@@ -180,7 +181,7 @@ const SideBar: React.FC<SideBarProps> = ({
         {
           path: "/Fleet_Management",
           name: "Group Ride",
-          // onClick: () => toggleDrawer(true, "Equipment"),
+          onClick: () => toggleDrawer(true, "GroupRide"),
         },
       ],
     },
@@ -237,7 +238,7 @@ const SideBar: React.FC<SideBarProps> = ({
         {
           path: "/Fleet_Management",
           name: "Group Ride",
-          // onClick: () => toggleDrawer(true, "Equipment"),
+          onClick: () => toggleDrawer(true, "GroupRide"),
         },
       ],
     },
@@ -682,6 +683,15 @@ const SideBar: React.FC<SideBarProps> = ({
           )}
           {currentDrawer === "Equipment" && (
             <Equipment
+              darkMode={darkMode}
+              onCloseDrawer={handleCloseDrawer}
+              userEmailId={userEmailId}
+              employeeID={employeeID}
+              userName={userName}
+            />
+          )}
+          {currentDrawer === "GroupRide" && (
+            <GroupRide
               darkMode={darkMode}
               onCloseDrawer={handleCloseDrawer}
               userEmailId={userEmailId}

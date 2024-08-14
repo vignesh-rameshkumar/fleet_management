@@ -13,8 +13,8 @@
   "employee_name",
   "employee_email",
   "department",
-  "from_location",
-  "to_location",
+  "from_time",
+  "to_time",
   "request_date_time",
   "mod",
   "mod_dates",
@@ -49,8 +49,7 @@
    "fieldname": "type",
    "fieldtype": "Read Only",
    "in_list_view": 1,
-   "label": "Type",
-   "reqd": 1
+   "label": "Type"
   },
   {
    "fieldname": "equipment_type",
@@ -144,17 +143,17 @@
   },
   {
    "fieldname": "ride_start_time",
-   "fieldtype": "Time",
+   "fieldtype": "Data",
    "label": "Ride Start Date & Time"
   },
   {
    "fieldname": "ride_end_time",
-   "fieldtype": "Time",
+   "fieldtype": "Data",
    "label": "Ride End Date & Time"
   },
   {
    "fieldname": "request_date_time",
-   "fieldtype": "Datetime",
+   "fieldtype": "Data",
    "label": "Requesting Date & Time"
   },
   {
@@ -174,28 +173,28 @@
   },
   {
    "fieldname": "approved_date_time",
-   "fieldtype": "Datetime",
+   "fieldtype": "Data",
    "label": "Approved Date & Time"
-  },
-  {
-   "fieldname": "from_location",
-   "fieldtype": "Data",
-   "label": "From Location"
-  },
-  {
-   "fieldname": "to_location",
-   "fieldtype": "Data",
-   "label": "To Location"
   },
   {
    "fieldname": "doctypename",
    "fieldtype": "Data",
    "label": "Document Type Name"
+  },
+  {
+   "fieldname": "from_time",
+   "fieldtype": "Data",
+   "label": "From Time"
+  },
+  {
+   "fieldname": "to_time",
+   "fieldtype": "Data",
+   "label": "To Time"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-13 13:59:37.422872",
+ "modified": "2024-08-14 17:41:25.921690",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Equipment_Vehicle_Request",
