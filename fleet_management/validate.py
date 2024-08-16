@@ -25,10 +25,10 @@ def fetch_and_append_employees(doc):
 def sync_to_fm_request_master(doc, method):
     # Define the mapping of doctypes and their specific fields to sync
     doctype_field_mapping = {
-        "FM_Passenger_Vehicle_Request": ["project_name", "employee_name", "type", "status", "reports_to", "reports_head", "bill_amount", "payment_status"],
-        "FM_Goods_Vehicle_Request": ["project_name", "employee_name", "type", "status", "reports_to", "reports_head", "bill_amount", "payment_status"],
-        "FM_Equipment_Vehicle_Request": ["project_name", "employee_name", "type", "status", "reports_to", "reports_head", "bill_amount", "payment_status"],
-        "FM_Group_Vehicle_Request": ["project_name", "employee_name", "type", "status", "reports_to", "reports_head", "bill_amount", "payment_status"]
+        "FM_Passenger_Vehicle_Request": ["project_name", "employee_name", "employee_email", "type", "status", "reports_to", "reports_head", "bill_amount", "payment_status"],
+        "FM_Goods_Vehicle_Request": ["project_name", "employee_name", "employee_email", "type", "status", "reports_to", "reports_head", "bill_amount", "payment_status"],
+        "FM_Equipment_Vehicle_Request": ["project_name", "employee_name", "employee_email", "type", "status", "reports_to", "reports_head", "bill_amount", "payment_status"],
+        "FM_Group_Vehicle_Request": ["project_name", "employee_name", "employee_email", "type", "status", "reports_to", "reports_head", "bill_amount", "payment_status"]
     }
     
     # Check if the current doctype is in the mapping

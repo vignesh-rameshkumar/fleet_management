@@ -11,6 +11,7 @@
   "request_id",
   "project_name",
   "employee_name",
+  "employee_email",
   "type",
   "status",
   "reports_to",
@@ -30,24 +31,28 @@
   {
    "fieldname": "project_name",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Project Name",
    "reqd": 1
   },
   {
    "fieldname": "employee_name",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Employee Name",
    "reqd": 1
   },
   {
    "fieldname": "type",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Type",
    "reqd": 1
   },
   {
    "fieldname": "status",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Request Status",
    "reqd": 1
   },
@@ -70,11 +75,17 @@
    "fieldname": "bill_amount",
    "fieldtype": "Data",
    "label": "Bill Amount"
+  },
+  {
+   "fieldname": "employee_email",
+   "fieldtype": "Data",
+   "label": "Employee Email",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-07 11:10:15.048812",
+ "modified": "2024-08-16 15:54:08.990016",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Request_Master",
