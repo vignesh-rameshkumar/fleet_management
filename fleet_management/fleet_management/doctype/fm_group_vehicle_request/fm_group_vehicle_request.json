@@ -193,14 +193,15 @@
    "label": "To Location"
   },
   {
+   "default": "FM_Group_Vehicle_Request",
    "fieldname": "doctypename",
-   "fieldtype": "Data",
-   "label": "document Type Name"
+   "fieldtype": "Read Only",
+   "label": "Document Type Name"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-14 19:07:38.892957",
+ "modified": "2024-08-17 11:59:54.714911",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Group_Vehicle_Request",

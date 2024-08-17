@@ -177,8 +177,9 @@
    "label": "Approved Date & Time"
   },
   {
+   "default": "FM_Equipment_Vehicle_Request",
    "fieldname": "doctypename",
-   "fieldtype": "Data",
+   "fieldtype": "Read Only",
    "label": "Document Type Name"
   },
   {
@@ -194,7 +195,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-14 17:41:25.921690",
+ "modified": "2024-08-17 12:01:20.290258",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Equipment_Vehicle_Request",

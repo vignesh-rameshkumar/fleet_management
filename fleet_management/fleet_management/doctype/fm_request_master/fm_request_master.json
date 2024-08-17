@@ -13,6 +13,7 @@
   "employee_name",
   "employee_email",
   "type",
+  "doctypename",
   "status",
   "reports_to",
   "reports_head",
@@ -81,11 +82,17 @@
    "fieldtype": "Data",
    "label": "Employee Email",
    "reqd": 1
+  },
+  {
+   "fieldname": "doctypename",
+   "fieldtype": "Data",
+   "label": "Document Type name",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-16 15:54:08.990016",
+ "modified": "2024-08-17 12:02:16.235576",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Request_Master",

@@ -179,14 +179,15 @@
    "label": "Requesting Date & Time"
   },
   {
+   "default": "FM_Passenger_Vehicle_Request",
    "fieldname": "doctypename",
-   "fieldtype": "Data",
+   "fieldtype": "Read Only",
    "label": "Document Type Name"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-13 15:58:45.006344",
+ "modified": "2024-08-17 11:58:37.740981",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Passenger_Vehicle_Request",
