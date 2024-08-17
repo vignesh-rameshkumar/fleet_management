@@ -1,11 +1,11 @@
 import { Box } from "@mui/material";
 import React from "react";
 
-interface RequestApprovalProps {
+interface RequestApprovalDLProps {
   darkMode: boolean;
 }
 
-const RequestApproval: React.FC<RequestApprovalProps> = ({ darkMode }) => {
+const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({ darkMode }) => {
   return (
     <>
       <div
@@ -15,10 +15,10 @@ const RequestApproval: React.FC<RequestApprovalProps> = ({ darkMode }) => {
           padding: "15px",
         }}
       >
-        <h2>PL Request Approval Coming Soon...</h2>
+        <h2>DL Request Approval Coming Soon...</h2>
       </div>
     </>
   );
 };
 
-export default RequestApproval;
+export default RequestApprovalDL;

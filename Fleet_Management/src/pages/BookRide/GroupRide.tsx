@@ -18,8 +18,9 @@ import {
   Select,
   Modal,
   Chip,
+  ListSubheader,
 } from "@mui/material";
-
+import ClearIcon from "@mui/icons-material/Clear";
 import { HiPlusSm, HiMinusSm } from "react-icons/hi";
 import Autocomplete from "@mui/material/Autocomplete";
 import { createTheme } from "@mui/material/styles";
@@ -53,6 +54,7 @@ const GroupRide: React.FC<GroupRideProps> = ({
   const [fromLocation, setFromLocation] = useState("");
   const [toLocation, setToLocation] = useState("");
   const [purpose, setPurpose] = useState("");
+
   const [passengerCount, setPassengerCount] = useState(1); // Default to 1 passenger
 
   const [rideDate, setRideDate] = useState(null);
@@ -245,6 +247,65 @@ const GroupRide: React.FC<GroupRideProps> = ({
 
   // ............ API Function ............
 
+  const handleIncrement = () => {
+    setSelectedEmployee([]);
+    setPassengerCount((prevCount) => prevCount + 1);
+  };
+
+  const handleDecrement = () => {
+    setSelectedEmployee([]);
+    if (passengerCount > 1) {
+      setPassengerCount((prevCount) => prevCount - 1);
+    }
+  };
+
+  const { data: Employee }: any = useFrappeGetDocList("Employee", {
+    fields: ["*"],
+    filters: [["status", "=", "Active"]],
+    limit: 100000,
+    orderBy: {
+      field: "modified",
+      order: "desc",
+    },
+  });
+
+  const [employeeName, setEmployeeName] = useState(Employee);
+
+  useEffect(() => {
+    setEmployeeName(Employee);
+  }, [Employee]);
+
+  const [selectedEmployee, setSelectedEmployee] = useState([]);
+
+  const [filter, setFilter] = useState("");
+
+  const handleSelectedEmployee = (event) => {
+    const value = event.target.value;
+
+    if (value?.length > passengerCount) {
+      toast.warning(`Not Allowed - Because Passenger is ${passengerCount}`);
+      return;
+    }
+
+    setSelectedEmployee(value);
+  };
+
+  const handleFilterChange = (event) => {
+    setFilter(event.target.value);
+  };
+
+  const clearSelection = () => {
+    setSelectedEmployee([]);
+  };
+
+  const filteredEmployees = Employee?.filter(
+    (employee) =>
+      employee.name.toLowerCase().includes(filter.toLowerCase()) ||
+      employee.employee_name.toLowerCase().includes(filter.toLowerCase())
+  );
+
+  // Project API
+
   const { data: RM_Project_Lead }: any = useFrappeGetDocList(
     "RM_Project_Lead",
     {
@@ -269,24 +330,16 @@ const GroupRide: React.FC<GroupRideProps> = ({
   const handleChange = (event) => {
     setSelectedProject(event.target.value);
   };
+
   //   const [passengerCount, setPassengerCount] = useState(1); // Default to 1 passenger
 
-  const handleIncrement = () => {
-    setPassengerCount((prevCount) => prevCount + 1);
-  };
-
-  const handleDecrement = () => {
-    if (passengerCount > 1) {
-      setPassengerCount((prevCount) => prevCount - 1);
-    }
-  };
   // Save API
   const { createDoc } = useFrappeCreateDoc();
 
   const CreateGroupRequest = async () => {
     try {
-      const body = {
-        // type: rideType,
+      // Step 1: Create Parent Document
+      const parentBody = {
         project_name: selectedProject,
         from_location: fromLocation,
         to_location: toLocation,
@@ -300,7 +353,25 @@ const GroupRide: React.FC<GroupRideProps> = ({
         purpose: purpose,
         passenger_count: passengerCount,
       };
-      await createDoc("FM_Group_Vehicle_Request", body);
+
+      // Create the parent document and get its name (or ID)
+      const parentResponse = await createDoc(
+        "FM_Group_Vehicle_Request",
+        parentBody
+      );
+
+      const parentName = parentResponse?.name; // Adjust according to the API response
+
+      for (const employeeId of selectedEmployee) {
+        const childBody = {
+          parent: parentName,
+          parentfield: "passenger_details",
+          parenttype: "FM_Group_Vehicle_Request", // Parent Doctype
+          employee_id: employeeId,
+        };
+
+        await createDoc("FM_Group_Ride_Members", childBody);
+      }
       toast.success("Request Created Successfully ");
       setSelectedProject();
       handleCancel();
@@ -331,10 +402,67 @@ const GroupRide: React.FC<GroupRideProps> = ({
           "No response received from server. Please try again later."
         );
       } else {
-        toast.error(`${error.exception}`);
+        toast.error(`Error: ${error.message}`);
       }
     }
   };
+
+  // const CreateGroupRequest = async () => {
+  //   try {
+  //     const body = {
+  //       project_name: selectedProject,
+  //       from_location: fromLocation,
+  //       to_location: toLocation,
+  //       terms: terms,
+  //       doctypename: "FM_Group_Vehicle_Request",
+  //       employee_email: userEmailId,
+  //       employee_name: userName,
+  //       request_date_time: date_time,
+  //       mod: travelMore,
+  //       mod_dates: moreDates,
+  //       purpose: purpose,
+  //       passenger_count: passengerCount,
+  //       // child doctype
+  //       employee_id: Employeeids,
+  //       parent: name,
+  //       parentfield: "passenger_details",
+  //       parenttype: "FM_Group_Ride_Members",
+  //     };
+  //     await createDoc("FM_Group_Vehicle_Request", body);
+  //     toast.success("Request Created Successfully ");
+  //     setSelectedProject();
+  //     handleCancel();
+  //   } catch (error) {
+  //     if (error.response) {
+  //       const statusCode = error.response.status;
+  //       const serverMessage = error.response.data?._server_messages;
+
+  //       if (statusCode === 400) {
+  //         toast.error("Bad request. Please check your input.");
+  //       } else if (statusCode === 401) {
+  //         toast.error("Unauthorized. Please log in.");
+  //       } else if (statusCode === 404) {
+  //         toast.error("Resource not found.");
+  //       } else if (statusCode === 500) {
+  //         toast.error("Internal server error. Please try again later.");
+  //       } else if (serverMessage) {
+  //         const parsedMessages = JSON.parse(serverMessage);
+  //         const errorMessage = parsedMessages
+  //           .map((msg) => JSON.parse(msg).message)
+  //           .join(", ");
+  //         toast.error(errorMessage);
+  //       } else {
+  //         toast.error(`Error: ${statusCode}`);
+  //       }
+  //     } else if (error.request) {
+  //       toast.error(
+  //         "No response received from server. Please try again later."
+  //       );
+  //     } else {
+  //       toast.error(`${error.exception}`);
+  //     }
+  //   }
+  // };
 
   return (
     <>
@@ -671,7 +799,7 @@ const GroupRide: React.FC<GroupRideProps> = ({
                       }}
                       // value={dayjs(rideTime, "HH:mm:ss")}
                       value={rideTime ? dayjs(rideTime, "HH:mm:ss") : null}
-                      format="HH:mm:ss"
+                      format="HH:mm"
                       ampm={false}
                       disabled={
                         // !rideType ||
@@ -794,6 +922,90 @@ const GroupRide: React.FC<GroupRideProps> = ({
                       />
                     </Box>
                   </Box>
+
+                  {/* No of passenger */}
+                  {/* {JSON.stringify(selectedEmployee, "selectedEmployee")} */}
+                  <Box
+                    className="slideFromRight"
+                    width={{ xs: "100%", sm: "100%", md: "90%" }}
+                    marginBottom="16px"
+                    sx={{ display: "flex", justifyContent: "center" }}
+                  >
+                    <FormControl
+                      variant="outlined"
+                      sx={{ width: { xs: "100%", sm: "100%", md: "90%" } }}
+                    >
+                      <InputLabel>
+                        Select Employee Name
+                        <Typography className="CodeStar" variant="Code">
+                          *
+                        </Typography>
+                      </InputLabel>
+                      <Select
+                        multiple
+                        value={selectedEmployee}
+                        onChange={handleSelectedEmployee}
+                        renderValue={(selected) => selected.join(", ")}
+                        label={
+                          <>
+                            Select Employee Name
+                            <Typography className="CodeStar" variant="Code">
+                              *
+                            </Typography>
+                          </>
+                        }
+                        MenuProps={{
+                          PaperProps: {
+                            style: {
+                              maxHeight: 300, // Limit the dropdown height if you have many options
+                            },
+                          },
+                        }}
+                      >
+                        <ListSubheader>
+                          <TextField
+                            size="small"
+                            placeholder="Search Employee"
+                            onChange={handleFilterChange}
+                            fullWidth
+                            autoFocus
+                            value={filter}
+                            sx={{ marginBottom: "8px" }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <IconButton
+                                    aria-label="clear filter"
+                                    onClick={() => setFilter("")}
+                                    edge="end"
+                                  >
+                                    <ClearIcon />
+                                  </IconButton>
+                                </InputAdornment>
+                              ),
+                            }}
+                          />
+                        </ListSubheader>
+                        {filteredEmployees?.length > 0 ? (
+                          filteredEmployees?.map((employee) => (
+                            <MenuItem key={employee.name} value={employee.name}>
+                              <Checkbox
+                                checked={
+                                  selectedEmployee?.indexOf(employee.name) > -1
+                                }
+                              />
+                              {employee.name} - {employee.employee_name}
+                            </MenuItem>
+                          ))
+                        ) : (
+                          <MenuItem disabled>
+                            No matching employees found
+                          </MenuItem>
+                        )}
+                      </Select>
+                    </FormControl>
+                  </Box>
+
                   {/*  */}
                   <Box
                     className="slideFromRight delay-5"
@@ -817,14 +1029,16 @@ const GroupRide: React.FC<GroupRideProps> = ({
                             checked={terms}
                             onChange={handleTermsChange}
                             disabled={
-                              //   !rideType ||
                               !selectedProject ||
                               !fromLocation ||
                               !toLocation ||
                               !rideDate ||
                               !rideTime ||
                               !purpose ||
-                              (travelMore && rideMoreDates.length === 0)
+                              (travelMore && rideMoreDates.length === 0) ||
+                              (passengerCount &&
+                                selectedEmployee.length === 0) ||
+                              passengerCount !== selectedEmployee.length
                             }
                           />
                         }
@@ -842,7 +1056,21 @@ const GroupRide: React.FC<GroupRideProps> = ({
                       Cancel
                     </Button>
 
-                    <Button className="saveBtn" onClick={CreateGroupRequest}>
+                    <Button
+                      className="saveBtn"
+                      disabled={
+                        !selectedProject ||
+                        !fromLocation ||
+                        !toLocation ||
+                        !rideDate ||
+                        !rideTime ||
+                        !purpose ||
+                        (travelMore && rideMoreDates.length === 0) ||
+                        (passengerCount && selectedEmployee.length === 0) ||
+                        passengerCount !== selectedEmployee.length
+                      }
+                      onClick={CreateGroupRequest}
+                    >
                       Submit
                     </Button>
                   </Box>

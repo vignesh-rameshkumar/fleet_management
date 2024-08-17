@@ -119,9 +119,6 @@ const SideBar: React.FC<SideBarProps> = ({
       let role = "User"; // Default role
 
       switch (true) {
-        case roles.includes("Super Admin") && roles.includes("Employee"):
-          role = "Super Admin";
-          break;
         case roles.includes("Employee") &&
           roles.includes("Project Lead") &&
           roles.includes("Department Head"):
@@ -133,11 +130,11 @@ const SideBar: React.FC<SideBarProps> = ({
         case roles.includes("Employee") && roles.includes("Department Head"):
           role = "Department Manager";
           break;
-        case roles.includes("Employee") && roles.includes("HR Manager"):
-          role = "HR Manager";
+        case roles.includes("Employee") && roles.includes("Fleet Manager"):
+          role = "Fleet Manager";
           break;
-        case roles.includes("Employee") && roles.includes("HR User"):
-          role = "HR User";
+        case roles.includes("Employee") && roles.includes("Driver"):
+          role = "Driver";
           break;
         case roles.includes("Employee"):
           role = "User";
@@ -208,7 +205,7 @@ const SideBar: React.FC<SideBarProps> = ({
     },
   ]);
 
-  // SideBar Menu items for User
+  // SideBar Menu items for PL
   const [plmenuItems, setPlMenuItems] = useState<MenuItem[]>([
     {
       name: "Quick Access",
@@ -243,11 +240,6 @@ const SideBar: React.FC<SideBarProps> = ({
       ],
     },
 
-    // {
-    //   path: "/Fleet_Management/groupride",
-    //   name: "Group Ride",
-    //   icon: <MdGroups3 />,
-    // },
     {
       path: "/Fleet_Management/travelroute",
       name: "Travel Route",
@@ -260,6 +252,63 @@ const SideBar: React.FC<SideBarProps> = ({
     },
     {
       path: "/Fleet_Management/requestapproval",
+      name: "Request Approval",
+      icon: <BsBookmarkCheck />,
+    },
+    {
+      path: "/Fleet_Management/calendar",
+      name: "Calender",
+      icon: <IoCalendarOutline />,
+    },
+  ]);
+
+  // SideBar Menu items for DL
+  const [dlmenuItems, setDlMenuItems] = useState<MenuItem[]>([
+    {
+      name: "Quick Access",
+      path: "/Fleet_Management",
+      icon: <IoHomeOutline />,
+    },
+    {
+      name: "Book Ride",
+      icon: <FaCar />,
+
+      submenu: [
+        {
+          path: "/Fleet_Management",
+          name: "Passenger",
+          onClick: () => toggleDrawer(true, "Passenger"),
+        },
+        {
+          path: "/Fleet_Management",
+          name: "Goods",
+          onClick: () => toggleDrawer(true, "Goods"),
+        },
+        {
+          path: "/Fleet_Management",
+          name: "Equipment",
+          onClick: () => toggleDrawer(true, "Equipment"),
+        },
+        {
+          path: "/Fleet_Management",
+          name: "Group Ride",
+          onClick: () => toggleDrawer(true, "GroupRide"),
+        },
+      ],
+    },
+
+    {
+      path: "/Fleet_Management/travelroute",
+      name: "Travel Route",
+      icon: <MdOutlineRoute />,
+    },
+    {
+      path: "/Fleet_Management/trackrequest",
+      name: "Track Request",
+      icon: <RiFocus3Line />,
+    },
+    {
+      path: "/Fleet_Management/requestapprovaldl",
       name: "Request Approval",
       icon: <BsBookmarkCheck />,
     },
@@ -322,6 +371,32 @@ const SideBar: React.FC<SideBarProps> = ({
     );
   };
 
+  // Department Manager Menu Item
+  useEffect(() => {
+    const activePath = location.pathname;
+
+    setDlMenuItems((prevState) =>
+      prevState.map((item) => ({
+        ...item,
+        isActive: item.path === activePath, // Set isActive true for matching path
+      }))
+    );
+  }, [location]);
+
+  const toggleActiveMenuDL = (index: number) => {
+    sessionStorage.setItem(
+      "activeMenuItemIndex",
+      JSON.stringify({ type: "dl", index })
+    );
+
+    setDlMenuItems((prevState) =>
+      prevState.map((item, i) => ({
+        ...item,
+        isActive: i === index, // Set isActive true for clicked item, false for others
+      }))
+    );
+  };
+
   //   -----------------
   const [isOpenSubMenu, setIsOpenSubMenu] = useState(
     new Array(usermenuItems.length).fill(false)
@@ -346,6 +421,9 @@ const SideBar: React.FC<SideBarProps> = ({
           break;
         case "pl":
           toggleActiveMenuPL(index);
+          break;
+        case "dl":
+          toggleActiveMenuDL(index);
           break;
 
         default:
@@ -518,6 +596,119 @@ const SideBar: React.FC<SideBarProps> = ({
                   onClick={() => {
                     item.submenu && toggleSubMenu(index);
                     toggleActiveMenuPL(index);
+                  }}
+                  sx={{
+                    display: "flex",
+
+                    alignItems: "center",
+                    textDecoration: "none",
+                    // color: "red",
+                    bgcolor: item.isActive
+                      ? darkMode
+                        ? "#4d8c52"
+                        : "#4D8C52"
+                      : "",
+                    "&:hover": {
+                      bgcolor: item.isActive
+                        ? darkMode
+                          ? "#4d8c52d1"
+                          : "#4d8c52d1"
+                        : darkMode
+                        ? "#363636"
+                        : "#f0f0f0",
+                      // color: darkMode ? "red" : "#000",
+                    },
+                  }}
+                  style={{
+                    color: item.isActive
+                      ? darkMode
+                        ? "#fff"
+                        : "#FFF" // Active and darkMode
+                      : darkMode
+                      ? "#fff"
+                      : "#323232", // Normal darkMode: red, Otherwise: black
+                  }}
+                >
+                  <div>
+                    {!isOpenMenu ? (
+                      <div className="menuicon">{item.icon}</div>
+                    ) : (
+                      <Box
+                        className="menuicons"
+                        sx={{
+                          padding: "5px",
+                          // width: "200px",
+                          // backgroundColor: "red",
+                          // display: "flex",
+                          // justifyContent: "space-evenly",
+                          // float: "left",
+                          animation: isOpenMenu
+                            ? `slideInLeft ${index * 0.2}s ease forwards`
+                            : "none",
+                        }}
+                      >
+                        {item.icon}
+                        <span className="menuName">{item.name}</span>
+                        {item.submenu && (
+                          <div className="arrow-container">
+                            <MdKeyboardArrowDown
+                              className={
+                                isOpenSubMenu[index]
+                                  ? "arrow-open"
+                                  : "arrow-closed"
+                              }
+                            />
+                          </div>
+                        )}
+                      </Box>
+                    )}
+                  </div>
+                </Box>
+                {item.submenu && isOpenSubMenu[index] && isOpenMenu && (
+                  <Box
+                    className="submenu"
+                    sx={{ bgcolor: darkMode ? "#222222" : "#e6fde8" }}
+                  >
+                    {item.submenu.map((subItem, subIndex) => (
+                      <Box
+                        key={subIndex}
+                        component={Link}
+                        to={subItem.path}
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          textDecoration: "none",
+                          color: "inherit",
+                          "&:hover": {
+                            bgcolor: darkMode ? "#363636" : "#f0f0f0",
+                            color: darkMode ? "#fff" : "#000",
+                          },
+                        }}
+                        onClick={subItem.onClick}
+                      >
+                        <div className="submenuName1">
+                          <span className="submenuName">{subItem.name}</span>
+                        </div>
+                      </Box>
+                    ))}
+                  </Box>
+                )}
+              </div>
+            ))}
+          </>
+        )}
+
+        {/* DL menu items */}
+        {employeeRole === "Department Manager" && (
+          <>
+            {dlmenuItems.map((item, index) => (
+              <div key={index} className="menu" onClick={item.onClick}>
+                <Box
+                  component={Link}
+                  to={item.path}
+                  onClick={() => {
+                    item.submenu && toggleSubMenu(index);
+                    toggleActiveMenuDL(index);
                   }}
                   sx={{
                     display: "flex",

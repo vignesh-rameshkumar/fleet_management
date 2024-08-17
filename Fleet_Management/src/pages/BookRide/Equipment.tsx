@@ -271,10 +271,8 @@ const Equipment: React.FC<EquipmentProps> = ({
       const body = {
         equipment_type: equipment,
         project_name: selectedProject,
-
         from_time: fromTime,
         to_time: toTime,
-
         terms: terms,
         doctypename: "FM_Equipment_Vehicle_Request",
         employee_email: userEmailId,
@@ -526,7 +524,7 @@ const Equipment: React.FC<EquipmentProps> = ({
                         },
                       }}
                       value={fromTime ? dayjs(fromTime, "HH:mm:ss") : null}
-                      format="HH:mm:ss"
+                      format="HH:mm"
                       ampm={false}
                       disabled={
                         !selectedProject ||
@@ -568,7 +566,7 @@ const Equipment: React.FC<EquipmentProps> = ({
                         },
                       }}
                       value={toTime ? dayjs(toTime, "HH:mm:ss") : null}
-                      format="HH:mm:ss"
+                      format="HH:mm"
                       ampm={false}
                       onChange={handleToTimeChange}
                       disabled={

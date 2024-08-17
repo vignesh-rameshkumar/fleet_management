@@ -138,6 +138,7 @@ const Goods: React.FC<GoodsProps> = ({
   const [description, setDescription] = useState("");
   const [address, setAddress] = useState("");
 
+  const [travelMore, setTravelMore] = useState(false);
   const [rideDate, setRideDate] = useState(null);
   const [rideMoreDates, setRideMoreDates] = useState([]);
   const [currentdate, setCurrentDate] = useState(null);
@@ -159,30 +160,34 @@ const Goods: React.FC<GoodsProps> = ({
     setRideDate(null);
     setTerms(false);
     setOpenModal(false);
-    setAddMore(false);
     setRideTime(null);
   };
 
-  // const handleOptionChange = (event: any) => {
-  //   setSelectedOption(event.target.value);
+  // Start Multi dates
+  const handleMoreDateChange = (date) => {
+    if (dayjs(date).isValid()) {
+      const formattedDate = dayjs(date).format("DD-MM-YYYY");
+      if (!rideMoreDates.includes(formattedDate)) {
+        setRideMoreDates([...rideMoreDates, formattedDate]);
+      } else {
+        toast.warning("Date already selected");
+      }
+    } else {
+      toast.warning("Invalid date selected");
+    }
+  };
 
-  //   if (event.target.value === "Pick Up") {
-  //     handPickup();
-  //   } else {
-  //     handleDrop();
-  //   }
-  // };
+  const moreDates = rideMoreDates.join(",");
 
-  // const handPickup = () => {
-  //   setDrop(false);
-  //   setPickup(true);
-  // };
+  const handleRemoveDate = (dateToRemove) => {
+    setRideMoreDates(rideMoreDates.filter((date) => date !== dateToRemove));
+  };
 
-  // const handleDrop = () => {
-  //   setPickup(false);
-  //   setDrop(true);
-  // };
-
+  // END
+  const handleTravelMoreChange = () => {
+    setTravelMore((prevState) => !prevState);
+    setRideMoreDates([]);
+  };
   const Changeride = (event) => {
     setRideType(event.target.value);
   };
@@ -242,7 +247,6 @@ const Goods: React.FC<GoodsProps> = ({
   const handleAddSection = (event) => {
     const checked = event.target.checked;
     if (checked) {
-      // Add a new section if checkbox is checked
       setSections([
         ...sections,
         { address: "", type: "", purpose: "", description: "" },
@@ -263,6 +267,8 @@ const Goods: React.FC<GoodsProps> = ({
     const newSections = sections.filter((_, i) => i !== index);
     setSections(newSections);
   };
+
+  console.log("sections", sections);
 
   // ............ API Function ............
 
@@ -296,9 +302,64 @@ const Goods: React.FC<GoodsProps> = ({
   // Save API
   const { createDoc } = useFrappeCreateDoc();
 
+  // const CreateRequestold = async () => {
+  //   try {
+  //     const body = {
+  //       type: rideType,
+  //       project_name: selectedProject,
+  //       from_location: fromLocation,
+  //       to_location: toLocation,
+  //       terms: terms,
+  //       doctypename: "FM_Goods_Vehicle_Request",
+  //       purpose: purpose,
+  //       description: description,
+  //       mod: travelMore,
+  //       mod_dates: moreDates,
+  //       employee_email: userEmailId,
+  //       employee_name: userName,
+  //       request_date_time: date_time,
+  //     };
+  //     await createDoc("FM_Goods_Vehicle_Request", body);
+  //     toast.success("Request Created Successfully ");
+  //     setSelectedProject();
+  //     handleCancel();
+  //   } catch (error) {
+  //     if (error.response) {
+  //       const statusCode = error.response.status;
+  //       const serverMessage = error.response.data?._server_messages;
+
+  //       if (statusCode === 400) {
+  //         toast.error("Bad request. Please check your input.");
+  //       } else if (statusCode === 401) {
+  //         toast.error("Unauthorized. Please log in.");
+  //       } else if (statusCode === 404) {
+  //         toast.error("Resource not found.");
+  //       } else if (statusCode === 500) {
+  //         toast.error("Internal server error. Please try again later.");
+  //       } else if (serverMessage) {
+  //         const parsedMessages = JSON.parse(serverMessage);
+  //         const errorMessage = parsedMessages
+  //           .map((msg) => JSON.parse(msg).message)
+  //           .join(", ");
+  //         toast.error(errorMessage, "Error");
+  //       } else {
+  //         toast.error(`Error: ${statusCode}`);
+  //       }
+  //     } else if (error.request) {
+  //       toast.error(
+  //         "No response received from server. Please try again later."
+  //       );
+  //     } else {
+  //       toast.error(`${error.exception}`, "Error");
+  //     }
+  //   }
+  // };
+  // New
+
   const CreateRequest = async () => {
     try {
-      const body = {
+      // Step 1: Create Parent Document
+      const parentBody = {
         type: rideType,
         project_name: selectedProject,
         from_location: fromLocation,
@@ -307,12 +368,40 @@ const Goods: React.FC<GoodsProps> = ({
         doctypename: "FM_Goods_Vehicle_Request",
         purpose: purpose,
         description: description,
-
+        mod: travelMore,
+        mod_dates: moreDates,
         employee_email: userEmailId,
         employee_name: userName,
         request_date_time: date_time,
       };
-      await createDoc("FM_Goods_Vehicle_Request", body);
+
+      // Create the parent document and get its name (or ID)
+      const parentResponse = await createDoc(
+        "FM_Goods_Vehicle_Request",
+        parentBody
+      );
+      const parentName = parentResponse?.name; // Adjust according to the API response
+
+      // Step 2: Create Child Documents
+      const BreakpointValue = sections.map((x) => ({
+        type: x.type,
+        address: x.address,
+        description: x.description,
+        purpose: x.purpose,
+      }));
+
+      // Iterate over BreakpointValue to create each child document
+      for (const breakpoint of BreakpointValue) {
+        const childBody = {
+          parent: parentName,
+          parentfield: "break_points",
+          parenttype: "FM_Goods_Vehicle_Request",
+          ...breakpoint, // Spread the properties of each breakpoint
+        };
+
+        await createDoc("FM_Goods_Breakpoints", childBody);
+      }
+
       toast.success("Request Created Successfully ");
       setSelectedProject();
       handleCancel();
@@ -343,10 +432,11 @@ const Goods: React.FC<GoodsProps> = ({
           "No response received from server. Please try again later."
         );
       } else {
-        toast.error(`${error.exception}`);
+        toast.error(`Error: ${error.message}`);
       }
     }
   };
+
   return (
     <>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -373,30 +463,6 @@ const Goods: React.FC<GoodsProps> = ({
             <br /> <br />
             <Box display="flex" flexDirection="column" alignItems="center">
               <ThemeProvider theme={ThemeColor}>
-                {/* <Box>
-                  {" "}
-                  <RadioGroup
-                    row
-                    value={selectedOption}
-                    onChange={handleOptionChange}
-                  >
-                    <FormControlLabel
-                      sx={{ marginRight: { sm: "120px" } }}
-                      value={"Pick Up"}
-                      control={<Radio />}
-                      label="Pick Up"
-                      onClick={handPickup}
-                    />
-                    <FormControlLabel
-                      value={"Drop"}
-                      control={<Radio />}
-                      label="Drop"
-                      onClick={handleDrop}
-                    />
-                  </RadioGroup>
-                </Box>
-                <br /> */}
-
                 <Box
                   className="slideFromRight"
                   width={{ xs: "100%", sm: "100%", md: "100%" }}
@@ -638,7 +704,7 @@ const Goods: React.FC<GoodsProps> = ({
                       }}
                       // value={dayjs(rideTime, "HH:mm:ss")}
                       value={rideTime ? dayjs(rideTime, "HH:mm:ss") : null}
-                      format="HH:mm:ss"
+                      format="HH:mm"
                       ampm={false}
                       onChange={handleFromTimeChange}
                       renderInput={(params) => (
@@ -651,6 +717,87 @@ const Goods: React.FC<GoodsProps> = ({
                       adapter={AdapterDayjs}
                     />
                   </Box>
+                  <Box
+                    className="slideFromRight delay-3"
+                    sx={{
+                      width: {
+                        xs: "90%",
+                        sm: "90%",
+                        md: "90%",
+                      },
+                    }}
+                    marginBottom="16px"
+                  >
+                    <FormGroup
+                      row
+                      sx={{ display: "flex", justifyContent: "left" }}
+                    >
+                      <FormControlLabel
+                        sx={{ marginLeft: { sm: "25px" }, marginLeft: "50px" }}
+                        control={
+                          <Checkbox
+                            checked={travelMore}
+                            onChange={handleTravelMoreChange}
+                          />
+                        }
+                        disabled={
+                          !selectedProject ||
+                          !rideDate ||
+                          !rideType ||
+                          !fromLocation ||
+                          !toLocation ||
+                          !rideTime
+                        }
+                        label="Need more than one day"
+                      />
+                    </FormGroup>
+                  </Box>
+
+                  {travelMore === true && (
+                    <>
+                      <Box
+                        sx={{ margin: "0 auto" }}
+                        width={{ xs: "100%", sm: "100%", md: "90%" }}
+                        textAlign={"center"}
+                      >
+                        <DatePicker
+                          label={
+                            <Typography>
+                              Select Date <code className="CodeStar">*</code>
+                            </Typography>
+                          }
+                          value={null}
+                          minDate={dayjs(rideDate, "DD-MM-YYYY")}
+                          sx={{
+                            width: {
+                              xs: "100%",
+                              sm: "100%",
+                              md: "90%",
+                            },
+                          }}
+                          format="DD-MM-YYYY"
+                          onChange={handleMoreDateChange}
+                          renderInput={(params) => (
+                            <TextField {...params} variant="outlined" />
+                          )}
+                        />
+
+                        <Box m={2} className="slideFromRight">
+                          {rideMoreDates?.map((date, index) => (
+                            <Chip
+                              key={index}
+                              label={date}
+                              onDelete={() => handleRemoveDate(date)}
+                              sx={{
+                                margin: "2px",
+                                padding: "5px",
+                              }}
+                            />
+                          ))}
+                        </Box>
+                      </Box>
+                    </>
+                  )}
 
                   <Box
                     className="slideFromRight delay-3"
@@ -670,6 +817,15 @@ const Goods: React.FC<GoodsProps> = ({
                       rows={2}
                       variant="outlined"
                       value={purpose}
+                      disabled={
+                        !selectedProject ||
+                        !rideDate ||
+                        !rideType ||
+                        !fromLocation ||
+                        !toLocation ||
+                        !rideTime ||
+                        (travelMore && rideMoreDates.length === 0)
+                      }
                       sx={{
                         width: {
                           xs: "100%",
@@ -702,6 +858,16 @@ const Goods: React.FC<GoodsProps> = ({
                       rows={3}
                       variant="outlined"
                       value={description}
+                      disabled={
+                        !selectedProject ||
+                        !rideDate ||
+                        !rideType ||
+                        !fromLocation ||
+                        !toLocation ||
+                        !rideTime ||
+                        !purpose ||
+                        (travelMore && rideMoreDates.length === 0)
+                      }
                       sx={{
                         width: {
                           xs: "100%",
@@ -859,8 +1025,11 @@ const Goods: React.FC<GoodsProps> = ({
                                 )
                               }
                             >
-                              <MenuItem value="Pick Up">Pick Up</MenuItem>
+                              <MenuItem value="Pickup">Pickup</MenuItem>
                               <MenuItem value="Drop">Drop</MenuItem>
+                              <MenuItem value="Pickup & Drop">
+                                Pickup & Drop
+                              </MenuItem>
                             </Select>
                           </FormControl>
                         </Box>
@@ -915,7 +1084,7 @@ const Goods: React.FC<GoodsProps> = ({
                             multiline
                             rows={1}
                             variant="outlined"
-                            value={section.description}
+                            value={section?.description}
                             sx={{
                               width: {
                                 xs: "100%",

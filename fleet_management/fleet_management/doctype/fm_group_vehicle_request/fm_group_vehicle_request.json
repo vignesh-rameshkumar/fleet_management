@@ -42,8 +42,7 @@
    "fieldname": "project_name",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Project Name",
-   "reqd": 1
+   "label": "Project Name"
   },
   {
    "default": "Group Ride",
@@ -56,16 +55,14 @@
    "fieldname": "employee_name",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Employee Name",
-   "reqd": 1
+   "label": "Employee Name"
   },
   {
    "default": "User",
    "fieldname": "employee_email",
    "fieldtype": "Read Only",
    "in_list_view": 1,
-   "label": "Employee Email",
-   "reqd": 1
+   "label": "Employee Email"
   },
   {
    "default": "0",
@@ -201,7 +198,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-17 11:59:54.714911",
+ "modified": "2024-08-17 14:23:57.162870",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Group_Vehicle_Request",

@@ -655,7 +655,7 @@ const Passenger: React.FC<PassengerProps> = ({
                       }}
                       // value={dayjs(rideTime, "HH:mm:ss")}
                       value={rideTime ? dayjs(rideTime, "HH:mm:ss") : null}
-                      format="HH:mm:ss"
+                      format="HH:mm"
                       ampm={false}
                       disabled={
                         !rideType ||
