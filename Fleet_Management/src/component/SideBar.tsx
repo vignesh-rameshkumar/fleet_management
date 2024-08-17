@@ -35,6 +35,7 @@ import Passenger from "../pages/BookRide/Passenger";
 import Goods from "../pages/BookRide/Goods";
 import Equipment from "../pages/BookRide/Equipment";
 import GroupRide from "../pages/BookRide/GroupRide";
+import TravelRoute from "../pages/BookRide/TravelRoute";
 
 interface SideBarProps {
   onCloseDrawer: () => void;
@@ -184,9 +185,10 @@ const SideBar: React.FC<SideBarProps> = ({
     },
 
     {
-      path: "/Fleet_Management/travelroute",
+      path: "/Fleet_Management",
       name: "Travel Route",
       icon: <MdOutlineRoute />,
+      onClick: () => toggleDrawer(true, "TravelRoute"),
     },
     {
       path: "/Fleet_Management/trackrequest",
@@ -241,9 +243,10 @@ const SideBar: React.FC<SideBarProps> = ({
     },
 
     {
-      path: "/Fleet_Management/travelroute",
+      path: "/Fleet_Management",
       name: "Travel Route",
       icon: <MdOutlineRoute />,
+      onClick: () => toggleDrawer(true, "TravelRoute"),
     },
     {
       path: "/Fleet_Management/trackrequest",
@@ -298,9 +301,10 @@ const SideBar: React.FC<SideBarProps> = ({
     },
 
     {
-      path: "/Fleet_Management/travelroute",
+      path: "/Fleet_Management",
       name: "Travel Route",
       icon: <MdOutlineRoute />,
+      onClick: () => toggleDrawer(true, "TravelRoute"),
     },
     {
       path: "/Fleet_Management/trackrequest",
@@ -883,6 +887,15 @@ const SideBar: React.FC<SideBarProps> = ({
           )}
           {currentDrawer === "GroupRide" && (
             <GroupRide
+              darkMode={darkMode}
+              onCloseDrawer={handleCloseDrawer}
+              userEmailId={userEmailId}
+              employeeID={employeeID}
+              userName={userName}
+            />
+          )}
+          {currentDrawer === "TravelRoute" && (
+            <TravelRoute
               darkMode={darkMode}
               onCloseDrawer={handleCloseDrawer}
               userEmailId={userEmailId}

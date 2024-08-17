@@ -13,7 +13,8 @@
   "pickup_point",
   "drop_point",
   "same_route",
-  "terms"
+  "terms",
+  "doctypename"
  ],
  "fields": [
   {
@@ -56,11 +57,16 @@
    "fieldtype": "Check",
    "in_list_view": 1,
    "label": "Terms and Conditions"
+  },
+  {
+   "fieldname": "doctypename",
+   "fieldtype": "Data",
+   "label": "Document Type "
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-07 12:43:02.565394",
+ "modified": "2024-08-17 17:43:51.702503",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Travel_Route_Request",
