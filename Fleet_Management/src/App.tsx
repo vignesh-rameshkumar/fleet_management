@@ -19,7 +19,7 @@ import GroupRide from "./pages/BookRide/GroupRide.tsx";
 
 import RequestApproval from "./pages/PL/RequestApproval.tsx";
 import RequestApprovalDL from "./pages/DL/RequestApprovalDL.tsx";
-
+import NotFoundPage from "./component/NotFoundPage.tsx";
 import TrackRequest from "./pages/TrackRequest/TrackRequest.tsx";
 
 interface EmployeeData {
@@ -122,65 +122,69 @@ const App: React.FC = () => {
             employeeID={employeeID}
           >
             <Routes>
-              <>
-                <Route path="/Auth" element={<Auth />} />
-                <Route
-                  path="/Fleet_Management"
-                  element={
-                    <QuickAccess
-                      darkMode={darkMode}
-                      userEmailId={userEmailId}
-                      userName={userName}
-                      employeeID={employeeID}
-                    />
-                  }
-                />
-                <Route
-                  path="/Fleet_Management/trackrequest"
-                  element={
-                    <TrackRequest
-                      darkMode={darkMode}
-                      userEmailId={userEmailId}
-                      userName={userName}
-                      employeeID={employeeID}
-                    />
-                  }
-                />
-                {/* Project Lead */}
-                <Route
-                  path="/Fleet_Management/groupride"
-                  element={
-                    <GroupRide
-                      darkMode={darkMode}
-                      userEmailId={userEmailId}
-                      userName={userName}
-                      employeeID={employeeID}
-                    />
-                  }
-                />
-                <Route
-                  path="/Fleet_Management/requestapproval"
-                  element={
-                    <RequestApproval
-                      darkMode={darkMode}
-                      userEmailId={userEmailId}
-                      userName={userName}
-                      employeeID={employeeID}
-                    />
-                  }
-                />
-                <Route
-                  path="/Fleet_Management/requestapprovaldl"
-                  element={
-                    <RequestApprovalDL
-                      darkMode={darkMode}
-                      userEmailId={userEmailId}
-                      userName={userName}
-                      employeeID={employeeID}
-                    />
-                  }
-                />
-              </>
+              {userName === "Guest" ? (
+                <Route path="*" element={<NotFoundPage />} />
+              ) : (
+                <>
+                  <Route path="/Auth" element={<Auth />} />
+                  <Route
+                    path="/Fleet_Management"
+                    element={
+                      <QuickAccess
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/Fleet_Management/trackrequest"
+                    element={
+                      <TrackRequest
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
+                  />
+                  {/* Project Lead */}
+                  <Route
+                    path="/Fleet_Management/groupride"
+                    element={
+                      <GroupRide
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/Fleet_Management/requestapproval"
+                    element={
+                      <RequestApproval
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/Fleet_Management/requestapprovaldl"
+                    element={
+                      <RequestApprovalDL
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
+                  />
+                </>
+              )}
             </Routes>
           </SideBar>
 
