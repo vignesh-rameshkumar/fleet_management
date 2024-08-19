@@ -1,6 +1,5 @@
 {
  "actions": [],
- "allow_rename": 1,
  "autoname": "field:request_id",
  "creation": "2024-07-29 19:46:53.891458",
  "default_view": "List",
@@ -90,9 +89,10 @@
    "reqd": 1
   }
  ],
+ "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-17 12:02:16.235576",
+ "modified": "2024-08-19 18:38:24.774847",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Request_Master",

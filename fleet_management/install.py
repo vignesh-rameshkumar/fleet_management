@@ -45,13 +45,13 @@ def create_roles_and_assign_permissions():
             print(f"Roles are created successfully.")
 
     for doctype in doctype_permissions["employee_access"]:
-        if doctype == "FM_Route_ID":
+        if doctype in ["FM_Route_ID", "FM_Request_Master"]:
             assign_permission(doctype, "Employee", ["read"])
         else:
             assign_permission(doctype, "Employee", ["read", "write", "create"])
 
     for doctype in doctype_permissions["fleet_manager_access"]:
-        if doctype == "FM_Travel_Route_Report":
+        if doctype in ["FM_Travel_Route_Report", "FM_Request_Master"]:
             assign_permission(doctype, "Fleet Manager", ["read", "export"])
         else:
             assign_permission(doctype, "Fleet Manager", ["read", "write", "create", "export"])

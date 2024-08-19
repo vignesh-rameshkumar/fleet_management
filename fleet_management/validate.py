@@ -22,6 +22,36 @@ def fetch_and_append_employees(doc):
                 'attendance': 'Absent'
             })
 
+def auto_append_route_points(doc, method):
+    if not doc.route:
+        doc.route = []
+    
+    update_needed = False
+    
+    # Check if start point needs to be added
+    if not doc.route or doc.route[0].get('location_name') != doc.start_point:
+        start_route = frappe.new_doc("FM_Route")
+        start_route.location_name = doc.start_point
+        start_route.parent = doc.name
+        start_route.parentfield = 'route'
+        start_route.parenttype = 'FM_Route_ID'
+        doc.route.insert(0, start_route)
+        update_needed = True
+    
+    # Check if end point needs to be added
+    if not doc.route or doc.route[-1].get('location_name') != doc.end_point:
+        end_route = frappe.new_doc("FM_Route")
+        end_route.location_name = doc.end_point
+        end_route.parent = doc.name
+        end_route.parentfield = 'route'
+        end_route.parenttype = 'FM_Route_ID'
+        doc.route.append(end_route)
+        update_needed = True
+    
+    # If an update was needed, add a message
+    if update_needed:
+        frappe.msgprint("Start point and/or end point have been appended to the route table.")
+
 def sync_to_fm_request_master(doc, method):
     # Define the mapping of doctypes and their specific fields to sync
     doctype_field_mapping = {
@@ -65,53 +95,35 @@ def sync_to_fm_request_master(doc, method):
 def before_insert(doc, method):
     if doc.project_name:
         if doc.project_name.lower() == 'general':
-            # For General project, set reports_to to blank
+            # For General project, set reports_to to blank and fetch reports_head from RM_Department
             doc.reports_to = ''
+            if doc.department:
+                doc.reports_head = frappe.db.get_value('RM_Department', 
+                                                       {'name': doc.department}, 
+                                                       'employee_email') or ''
+            else:
+                doc.reports_head = ''
         else:
             # Fetch Project Lead's email ID based on the project name
-            project_lead_email = frappe.db.get_value('RM_Project_Lead', 
-                                                     {'name': doc.project_name, 'project_status': 'Active'}, 
-                                                     'project_lead_email')
-            doc.reports_to = project_lead_email or ''
-        
-        # Fetch Department Lead's email ID
-        if doc.department:
-            department_lead_email = frappe.db.get_value('RM_Department', 
-                                                        {'name': doc.department}, 
-                                                        'employee_email')
-            doc.reports_head = department_lead_email or ''
-        else:
+            doc.reports_to = frappe.db.get_value('RM_Project_Lead', 
+                                                 {'name': doc.project_name, 'project_status': 'Active'}, 
+                                                 'project_lead_email') or ''
             doc.reports_head = ''
-        
-        # Remove duplicate email from reports_to if it's the same as reports_head
-        if doc.reports_to.strip() == doc.reports_head.strip():
-            doc.reports_head = ''
-        
-        # Set status based on department, reports_to and reports_head
-        if doc.reports_head == doc.employee_email:
-            doc.status = 'Department Lead Approved'
-        elif doc.reports_to == doc.employee_email:
-            doc.status = 'Project Lead Approved'
-        elif doc.reports_to and doc.reports_head:
-            doc.status = 'Pending'
-        elif not doc.reports_to or doc.reports_to == doc.reports_head:
+
+        # Set status based on reports_to and reports_head
+        if doc.employee_email in [doc.reports_to, doc.reports_head]:
             doc.status = 'Project Lead Approved'
         else:
-            # Default status if none of the above conditions are met
             doc.status = 'Pending'
     else:
-        # If no project is specified, ensure reports_to is empty
+        # If no project is specified
         doc.reports_to = ''
-        # Fetch Department Lead's email ID even if no project is specified
-        if doc.department:
-            department_lead_email = frappe.db.get_value('RM_Department', 
-                                                        {'name': doc.department}, 
-                                                        'employee_email')
-            doc.reports_head = department_lead_email or ''
-        else:
-            doc.reports_head = ''
-        # Set status based on department
-        doc.status = 'Department Lead Approved' if not doc.department else 'Pending'
+        doc.reports_head = ''
+        doc.status = 'Pending'
+
+    # Remove duplicate email from reports_to if it's the same as reports_head
+    if doc.reports_to.strip() == doc.reports_head.strip():
+        doc.reports_head = ''
 
 def autofill(doc, method):
     if doc.employee_email:

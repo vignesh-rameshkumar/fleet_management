@@ -37,6 +37,9 @@ doc_events = {
     },
     "FM_Travel_Route_Report": {
         "before_insert": "fleet_management.validate.report"
+    },
+    "FM_Route_ID": {
+        "before_save": "fleet_management.validate.auto_append_route_points"
     }
 }
 
