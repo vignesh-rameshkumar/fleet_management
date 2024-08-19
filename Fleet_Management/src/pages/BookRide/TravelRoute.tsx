@@ -327,39 +327,25 @@ const TravelRoute: React.FC<TravelRouteProps> = ({
   }, [FM_Travel_Route_Request]);
 
   // QR Code
-  const handleQR = async () => {
-    try {
-      const qrUrl = travelData[0].name;
-      // Generate QR code data URL
-      const qrCodeDataUrl = await QRCode.toDataURL(qrUrl);
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState(null);
 
-      const response = await fetch(qrCodeDataUrl);
-      const blob = await response.blob();
-      const blobUrl = URL.createObjectURL(blob);
-
-      // Create a link element for downloading the QR code
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      link.download = "qrcode.png";
-      const newTab = window.open(blobUrl, "_blank");
-
-      if (newTab) {
-        newTab.onload = () => {
-          newTab.document.body.appendChild(link);
-          link.click();
-          newTab.document.body.removeChild(link);
-          URL.revokeObjectURL(blobUrl);
-          newTab.close();
-        };
-      } else {
-        toast.error(
-          "Failed to open new tab. Please check your browser settings."
-        );
+  useEffect(() => {
+    const generateQR = async () => {
+      if (travelData[0]?.name === userEmailId) {
+        try {
+          const qrUrl = travelData[0].name;
+          // Generate QR code data URL
+          const qrCodeDataUrl = await QRCode.toDataURL(qrUrl);
+          setQrCodeDataUrl(qrCodeDataUrl);
+        } catch (error) {
+          toast.error("Error generating QR code");
+        }
       }
-    } catch (error) {
-      toast.error("Error generating or downloading QR code");
-    }
-  };
+    };
+
+    generateQR();
+  }, [travelData, userEmailId]);
+
   return (
     <>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -383,205 +369,237 @@ const TravelRoute: React.FC<TravelRouteProps> = ({
             </Box>
             <br />
             <br />
-            <Box
-              className="slideFromRight"
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-            >
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <ThemeProvider theme={ThemeColor}>
-                  {/* {JSON.stringify(selectedRouteId)} */}
-                  <Box
-                    className="slideFromRight"
-                    width={{ xs: "100%", sm: "100%", md: "90%" }}
-                    marginBottom="16px"
-                    sx={{ display: "flex", justifyContent: "center" }}
-                  >
-                    <FormControl
-                      variant="outlined"
-                      sx={{ width: { xs: "100%", sm: "100%", md: "90%" } }}
-                    >
-                      <InputLabel>
-                        Select Route ID {""}
-                        <Typography className="CodeStar" variant="Code">
-                          *
-                        </Typography>
-                      </InputLabel>
-                      <Select
-                        value={selectedRouteId}
-                        onChange={handleRouteId}
-                        label={
-                          <>
+
+            {qrCodeDataUrl !== null ? (
+              <>
+                <Box display="flex" flexDirection="column" alignItems="center">
+                  <p>This is QR Code</p>
+                  {qrCodeDataUrl && (
+                    <Box>
+                      <img src={qrCodeDataUrl} alt="QR Code" width={280} />
+                      <br />
+                      <Button
+                        sx={{
+                          marginLeft: "40px",
+                          bgcolor: "#71a375",
+                          color: "#fff",
+                          padding: "5px 20px",
+                          fontWeight: 600,
+                        }}
+                        // className="saveBtn"
+                        download="qrcode.png"
+                        onClick={qrCodeDataUrl}
+                      >
+                        Download QR Code
+                      </Button>
+                    </Box>
+                  )}
+                </Box>
+              </>
+            ) : (
+              <>
+                <Box
+                  className="slideFromRight"
+                  display="flex"
+                  flexDirection="column"
+                  alignItems="center"
+                >
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <ThemeProvider theme={ThemeColor}>
+                      {/* {JSON.stringify(selectedRouteId)} */}
+                      <Box
+                        className="slideFromRight"
+                        width={{ xs: "100%", sm: "100%", md: "90%" }}
+                        marginBottom="16px"
+                        sx={{ display: "flex", justifyContent: "center" }}
+                      >
+                        <FormControl
+                          variant="outlined"
+                          sx={{ width: { xs: "100%", sm: "100%", md: "90%" } }}
+                        >
+                          <InputLabel>
                             Select Route ID {""}
                             <Typography className="CodeStar" variant="Code">
                               *
                             </Typography>
-                          </>
-                        }
-                      >
-                        {routeId?.map((x) => (
-                          <MenuItem key={x?.name} value={x.name}>
-                            {x.start_point} - {x.end_point}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
+                          </InputLabel>
+                          <Select
+                            value={selectedRouteId}
+                            onChange={handleRouteId}
+                            label={
+                              <>
+                                Select Route ID {""}
+                                <Typography className="CodeStar" variant="Code">
+                                  *
+                                </Typography>
+                              </>
+                            }
+                          >
+                            {routeId?.map((x) => (
+                              <MenuItem key={x?.name} value={x.name}>
+                                {x.start_point} - {x.end_point}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Box>
 
-                  <Box
-                    className="slideFromRight"
-                    width={{ xs: "100%", sm: "100%", md: "90%" }}
-                    marginBottom="16px"
-                    sx={{ display: "flex", justifyContent: "center" }}
-                  >
-                    <FormControl
-                      variant="outlined"
-                      sx={{ width: { xs: "100%", sm: "100%", md: "90%" } }}
-                    >
-                      <InputLabel>
-                        Select Pick Up Point {""}
-                        <Typography className="CodeStar" variant="Code">
-                          *
-                        </Typography>
-                      </InputLabel>
-                      <Select
-                        value={selectedPickup}
-                        disabled={!selectedRouteId}
-                        onChange={handlePickId}
-                        label={
-                          <>
+                      <Box
+                        className="slideFromRight"
+                        width={{ xs: "100%", sm: "100%", md: "90%" }}
+                        marginBottom="16px"
+                        sx={{ display: "flex", justifyContent: "center" }}
+                      >
+                        <FormControl
+                          variant="outlined"
+                          sx={{ width: { xs: "100%", sm: "100%", md: "90%" } }}
+                        >
+                          <InputLabel>
                             Select Pick Up Point {""}
                             <Typography className="CodeStar" variant="Code">
                               *
                             </Typography>
-                          </>
-                        }
-                      >
-                        {pickUp?.map((x) => (
-                          <MenuItem key={x?.name} value={x}>
-                            {x}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
+                          </InputLabel>
+                          <Select
+                            value={selectedPickup}
+                            disabled={!selectedRouteId}
+                            onChange={handlePickId}
+                            label={
+                              <>
+                                Select Pick Up Point {""}
+                                <Typography className="CodeStar" variant="Code">
+                                  *
+                                </Typography>
+                              </>
+                            }
+                          >
+                            {pickUp?.map((x) => (
+                              <MenuItem key={x?.name} value={x}>
+                                {x}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Box>
 
-                  <Box
-                    className="slideFromRight"
-                    width={{ xs: "100%", sm: "100%", md: "90%" }}
-                    marginBottom="16px"
-                    sx={{ display: "flex", justifyContent: "center" }}
-                  >
-                    <FormControl
-                      variant="outlined"
-                      sx={{ width: { xs: "100%", sm: "100%", md: "90%" } }}
-                    >
-                      <InputLabel>
-                        Select Drop Point{" "}
-                        <Typography className="CodeStar" variant="Code">
-                          *
-                        </Typography>
-                      </InputLabel>
-                      <Select
-                        value={selectedDropPoint}
-                        disabled={!selectedRouteId || !selectedPickup}
-                        onChange={handleDropId}
-                        label={
-                          <>
+                      <Box
+                        className="slideFromRight"
+                        width={{ xs: "100%", sm: "100%", md: "90%" }}
+                        marginBottom="16px"
+                        sx={{ display: "flex", justifyContent: "center" }}
+                      >
+                        <FormControl
+                          variant="outlined"
+                          sx={{ width: { xs: "100%", sm: "100%", md: "90%" } }}
+                        >
+                          <InputLabel>
                             Select Drop Point{" "}
                             <Typography className="CodeStar" variant="Code">
                               *
                             </Typography>
-                          </>
-                        }
+                          </InputLabel>
+                          <Select
+                            value={selectedDropPoint}
+                            disabled={!selectedRouteId || !selectedPickup}
+                            onChange={handleDropId}
+                            label={
+                              <>
+                                Select Drop Point{" "}
+                                <Typography className="CodeStar" variant="Code">
+                                  *
+                                </Typography>
+                              </>
+                            }
+                          >
+                            {dropPoint?.map((x) => (
+                              <MenuItem key={x?.name} value={x}>
+                                {x}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Box>
+
+                      <Box
+                        className="slideFromRight delay-3"
+                        sx={{
+                          width: {
+                            xs: "90%",
+                            sm: "90%",
+                            md: "90%",
+                          },
+                        }}
+                        marginBottom="16px"
                       >
-                        {dropPoint?.map((x) => (
-                          <MenuItem key={x?.name} value={x}>
-                            {x}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box
-                    className="slideFromRight delay-3"
-                    sx={{
-                      width: {
-                        xs: "90%",
-                        sm: "90%",
-                        md: "90%",
-                      },
-                    }}
-                    marginBottom="16px"
-                  >
-                    <FormGroup
-                      row
-                      sx={{ display: "flex", justifyContent: "left" }}
-                    >
-                      <FormControlLabel
-                        sx={{ marginLeft: { sm: "25px" } }}
-                        control={
-                          <Checkbox
-                            disabled={!routeId || !pickUp || !dropPoint}
-                            checked={sameRoute}
-                            onChange={handleTravelMoreChange}
+                        <FormGroup
+                          row
+                          sx={{ display: "flex", justifyContent: "left" }}
+                        >
+                          <FormControlLabel
+                            sx={{ marginLeft: { sm: "25px" } }}
+                            control={
+                              <Checkbox
+                                disabled={!routeId || !pickUp || !dropPoint}
+                                checked={sameRoute}
+                                onChange={handleTravelMoreChange}
+                              />
+                            }
+                            label="Return Via Same Route"
                           />
-                        }
-                        label="Return Via Same Route"
-                      />
-                    </FormGroup>
-                  </Box>
+                        </FormGroup>
+                      </Box>
 
-                  <Box
-                    className="slideFromRight delay-4"
-                    sx={{
-                      width: {
-                        xs: "90%",
-                        sm: "90%",
-                        md: "90%",
-                      },
-                    }}
-                    marginBottom="16px"
-                  >
-                    <FormGroup
-                      row
-                      sx={{ display: "flex", justifyContent: "center" }}
-                    >
-                      <FormControlLabel
-                        sx={{ color: "#4D8C52" }}
-                        control={
-                          <Checkbox
-                            checked={terms}
-                            onChange={handleTermsChange}
-                            disabled={!routeId || !pickUp || !dropPoint}
+                      <Box
+                        className="slideFromRight delay-4"
+                        sx={{
+                          width: {
+                            xs: "90%",
+                            sm: "90%",
+                            md: "90%",
+                          },
+                        }}
+                        marginBottom="16px"
+                      >
+                        <FormGroup
+                          row
+                          sx={{ display: "flex", justifyContent: "center" }}
+                        >
+                          <FormControlLabel
+                            sx={{ color: "#4D8C52" }}
+                            control={
+                              <Checkbox
+                                checked={terms}
+                                onChange={handleTermsChange}
+                                disabled={!routeId || !pickUp || !dropPoint}
+                              />
+                            }
+                            label="Terms & Conditions"
                           />
-                        }
-                        label="Terms & Conditions"
-                      />
-                    </FormGroup>
-                  </Box>
-                </ThemeProvider>
-              </LocalizationProvider>
+                        </FormGroup>
+                      </Box>
+                    </ThemeProvider>
+                  </LocalizationProvider>
 
-              {terms === true && (
-                <Box display="flex" flexDirection="column" alignItems="center">
-                  <Box sx={{ display: "flex" }}>
-                    <Button className="cancelBtn" onClick={handleCancel}>
-                      Cancel
-                    </Button>
+                  {terms === true && (
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      alignItems="center"
+                    >
+                      <Box sx={{ display: "flex" }}>
+                        <Button className="cancelBtn" onClick={handleCancel}>
+                          Cancel
+                        </Button>
 
-                    <Button className="saveBtn" onClick={CreateBookRequest}>
-                      Submit
-                    </Button>
-                  </Box>
+                        <Button className="saveBtn" onClick={CreateBookRequest}>
+                          Submit
+                        </Button>
+                      </Box>
+                    </Box>
+                  )}
                 </Box>
-              )}
-            </Box>
-            <Button className="saveBtn" onClick={handleQR}>
-              QR Code
-            </Button>
+              </>
+            )}
           </div>
         </Box>
         {/* Model */}
