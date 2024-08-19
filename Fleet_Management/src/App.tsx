@@ -122,7 +122,7 @@ const App: React.FC = () => {
             employeeID={employeeID}
           >
             <Routes>
-              {userName === "Employee" ? (
+              {userName === "Guest" ? (
                 <Route path="*" element={<NotFoundPage />} />
               ) : (
                 <>
