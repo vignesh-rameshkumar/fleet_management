@@ -29,6 +29,7 @@ import { AiOutlineBars } from "react-icons/ai";
 import { IoHomeOutline } from "react-icons/io5";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { BsBookmarkCheck } from "react-icons/bs";
+import { IoCarSportOutline } from "react-icons/io5";
 
 // Pages
 import Passenger from "../pages/BookRide/Passenger";
@@ -158,7 +159,7 @@ const SideBar: React.FC<SideBarProps> = ({
     },
     {
       name: "Book Ride",
-      icon: <FaCar />,
+      icon: <IoCarSportOutline />,
 
       submenu: [
         {
@@ -216,7 +217,7 @@ const SideBar: React.FC<SideBarProps> = ({
     },
     {
       name: "Book Ride",
-      icon: <FaCar />,
+      icon: <IoCarSportOutline />,
 
       submenu: [
         {
@@ -274,7 +275,7 @@ const SideBar: React.FC<SideBarProps> = ({
     },
     {
       name: "Book Ride",
-      icon: <FaCar />,
+      icon: <IoCarSportOutline />,
 
       submenu: [
         {

@@ -298,7 +298,7 @@ const GroupRide: React.FC<GroupRideProps> = ({
     setSelectedEmployee([]);
   };
 
-  const filteredEmployees = Employee?.filter(
+  const filteredEmployees = employeeName?.filter(
     (employee) =>
       employee.name.toLowerCase().includes(filter.toLowerCase()) ||
       employee.employee_name.toLowerCase().includes(filter.toLowerCase())
@@ -402,7 +402,7 @@ const GroupRide: React.FC<GroupRideProps> = ({
           "No response received from server. Please try again later."
         );
       } else {
-        toast.error(`Error: ${error.message}`);
+        toast.error(`Error: ${error.exception}`);
       }
     }
   };

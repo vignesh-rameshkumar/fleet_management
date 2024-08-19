@@ -22,14 +22,12 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
-
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { ThemeProvider, createTheme } from "@mui/material";
-// import RequestApprovalDL from "../DL/RequestApprovalDL";
 
-interface RequestApprovalDLProps {
+interface BillsProps {
   darkMode: boolean;
   onCloseDrawer: () => void;
   userEmailId: string;
@@ -37,7 +35,7 @@ interface RequestApprovalDLProps {
   userName: string;
 }
 
-const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({
+const Bills: React.FC<BillsProps> = ({
   darkMode,
   onCloseDrawer,
   userEmailId,
@@ -80,16 +78,11 @@ const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({
   useEffect(() => {
     setProjectName(RM_Project_Lead);
   }, [RM_Project_Lead]);
-  console.log("userEmailId", userEmailId);
+
   const { data: FM_Request_Master, isLoading } = useFrappeGetDocList(
     "FM_Request_Master",
     {
       fields: ["*"],
-      filters: [
-        ["owner", "!=", userEmailId],
-        ["reports_head", "=", userEmailId],
-        ["status", "!=", "Cancelled"],
-      ],
       orderBy: {
         field: "modified",
         order: "desc",
@@ -103,21 +96,19 @@ const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({
       setTableData(FM_Request_Master);
     }
   }, [FM_Request_Master]);
-
-  // console.log("FM_Request_Master", FM_Request_Master);
-
   const doctypeName = drawerDetails.doctypename;
   const documentName = drawerDetails.request_id;
   // Fetch specific data only if doctypeName and documentName are defined
-  const { data: specificData } = useFrappeGetDocList(doctypeName || "", {
-    fields: ["*"],
-    orderBy: {
-      field: "modified",
-      order: "desc",
-    },
-    filters: documentName ? [["name", "=", documentName]] : [],
-    limit: 1,
-  });
+  const { data: specificData, isLoading: isLoadingSpecific } =
+    useFrappeGetDocList(doctypeName || "", {
+      fields: ["*"],
+      orderBy: {
+        field: "modified",
+        order: "desc",
+      },
+      filters: documentName ? [["name", "=", documentName]] : [],
+      limit: 1,
+    });
 
   // Update drawer data when specific data changes
   useEffect(() => {
@@ -135,6 +126,15 @@ const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({
     toggleDrawer(false);
   };
 
+  const today = dayjs();
+  const date_time = `${rideDate} ${rideTime}`;
+
+  useEffect(() => {
+    const today = dayjs().format("DD-MM-YYYY");
+    setCurrentDate(today);
+  }, []);
+
+  // Columns definition for the table
   const columns = [
     {
       key: "S_no",
@@ -191,19 +191,6 @@ const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({
       sorter: true,
     },
     {
-      key: "employee_name",
-      label: "Employee Name",
-      _style: {
-        width: "15%",
-        fontSize: "14px",
-        textAlign: "center",
-        color: darkMode ? "#FFF" : "#222222",
-        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
-      },
-      filter: true,
-      sorter: true,
-    },
-    {
       key: "project_name",
       label: "Project Name",
       _style: {
@@ -218,8 +205,21 @@ const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({
     },
 
     {
-      key: "status",
-      label: "Status",
+      key: "bill_amount",
+      label: "Coins Consumed",
+      _style: {
+        width: "15%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+      },
+      filter: true,
+      sorter: true,
+    },
+    {
+      key: "payment_status",
+      label: "Payment Status",
       _style: {
         width: "15%",
         fontSize: "14px",
@@ -246,40 +246,21 @@ const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({
       sorter: false,
     },
   ];
-  const [selectedRowItem, setSelectedRowItem] = useState(null);
 
-  const handleRowClick = (item) => {
-    setSelectedRowItem(item);
-    toggleDrawer(true);
-  };
-
-  const { updateDoc } = useFrappeUpdateDoc();
-
-  const handleapprove = async () => {
-    let doctypename = drawerDetails.doctypename;
-    let id = drawerDetails.name;
-
-    let updateData = {
-      status: "Project Lead Approved",
-    };
-
-    try {
-      await updateDoc(doctypename, id, updateData);
-      setTableData((prevAllData) => {
-        return prevAllData.map((item) => {
-          if (item.doctypename === doctypename && item.name === id) {
-            return { ...item, ...updateData };
-          }
-          return item;
-        });
-      });
-
-      toast.success("Approved Successfully");
-      toggleDrawer(false);
-    } catch (error) {
-      toast.error(`Error Approved doc: ${error.message}`);
-    }
-  };
+  if (isLoading || isLoadingSpecific) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <>
@@ -297,16 +278,17 @@ const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({
           marginBottom: "10px",
         }}
       >
-        Request Approval
+        Bills
       </Box>
 
       <div
         style={{
           backgroundColor: darkMode ? "#222222" : "#fff",
+
           padding: "15px",
         }}
       >
-        {/* {JSON.stringify(tableData)} */}
+        {/* {JSON.stringify(drawerData)} */}
         <CSmartTable
           cleaner
           clickableRows
@@ -321,13 +303,12 @@ const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({
           tableProps={{
             className: "add-this-class red-border",
             responsive: true,
-            striped: false,
+            striped: true,
             hover: true,
           }}
           tableBodyProps={{
             className: "align-middle tableData",
           }}
-          onRowClick={(item) => handleRowClick(item)}
           scopedColumns={{
             S_no: (_item: any, index: number) => {
               return <td>{index + 1}</td>;
@@ -335,28 +316,8 @@ const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({
             project_name: (item: any) => {
               return <td>{item?.project_name || "-"}</td>;
             },
-            status: (item: any) => {
-              return (
-                <td>
-                  <div
-                    style={{
-                      backgroundColor:
-                        item.status === "Project Lead Approved"
-                          ? "#a5d0a9"
-                          : "",
-                      padding: "6px 6px",
-                      width:
-                        item.status === "Project Lead Approved" ? "100px" : "",
-                      borderRadius: "20px",
-                      margin: "0 auto",
-                    }}
-                  >
-                    {item?.status === "Project Lead Approved"
-                      ? "Approved"
-                      : item?.status}
-                  </div>
-                </td>
-              );
+            bill_amount: (item: any) => {
+              return <td>{item?.bill_amount || "-"}</td>;
             },
 
             creation: (item: any) => {
@@ -421,7 +382,7 @@ const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({
                       className="drawerTitle"
                       sx={{ color: darkMode ? "#d1d1d1" : "#5b5b5b" }}
                     >
-                      {drawerDetails.type} - Request
+                      Request Type - {drawerDetails.type}
                     </Box>
                     <Button
                       className="closeX"
@@ -432,32 +393,6 @@ const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({
                     </Button>
                   </Box>
                   <Grid container spacing={2} sx={{ marginTop: 2 }}>
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: 600,
-                        }}
-                      >
-                        Employee Name
-                      </Typography>
-                      <Typography variant="body1">
-                        {drawerDetails.employee_name}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: 600,
-                        }}
-                      >
-                        Project Name
-                      </Typography>
-                      <Typography variant="body1">
-                        {drawerDetails.project_name}
-                      </Typography>
-                    </Grid>
                     {doctypeName !== "FM_Equipment_Vehicle_Request" && (
                       <>
                         <Grid item xs={12} sm={6}>
@@ -523,19 +458,6 @@ const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({
                         {new Date(drawerDetails.creation).toLocaleTimeString()}
                       </Typography>
                     </Grid>
-                    <Grid item xs={12}>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: 600,
-                        }}
-                      >
-                        Category
-                      </Typography>
-                      <Typography variant="body1">
-                        {drawerDetails.type}
-                      </Typography>
-                    </Grid>
 
                     {doctypeName === "FM_Equipment_Vehicle_Request" && (
                       <>
@@ -580,6 +502,59 @@ const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({
                         </Grid>
                       </>
                     )}
+
+                    <Grid item xs={6}>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontWeight: 600,
+                        }}
+                      >
+                        Project Name
+                      </Typography>
+                      <Typography variant="body1">
+                        {drawerDetails.project_name}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontWeight: 600,
+                        }}
+                      >
+                        Coins Consumed
+                      </Typography>
+                      <Typography variant="body1">
+                        {drawerDetails.bill_amount}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontWeight: 600,
+                        }}
+                      >
+                        Ride Type
+                      </Typography>
+                      <Typography variant="body1">
+                        {drawerDetails.allotment}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontWeight: 600,
+                        }}
+                      >
+                        Payment Status
+                      </Typography>
+                      <Typography variant="body1">
+                        {drawerDetails.payment_status}
+                      </Typography>
+                    </Grid>
 
                     {drawerData[0]?.mod === 1 && (
                       <>
@@ -646,23 +621,9 @@ const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({
             </Box>
           </>
         )}
-        <br />
-        {drawerDetails.status === "Pending" && (
-          <Box display="flex" flexDirection="column" alignItems="center">
-            <Box sx={{ display: "flex" }}>
-              <Button className="deleteBtn">Reject</Button>
-
-              <Button className="saveBtn" onClick={handleapprove}>
-                Approve
-              </Button>
-            </Box>
-          </Box>
-        )}
-
-        <br />
       </Drawer>
     </>
   );
 };
 
-export default RequestApprovalDL;
+export default Bills;

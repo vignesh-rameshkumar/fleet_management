@@ -432,7 +432,7 @@ const Goods: React.FC<GoodsProps> = ({
           "No response received from server. Please try again later."
         );
       } else {
-        toast.error(`Error: ${error.message}`);
+        toast.error(`Error: ${error.exception}`);
       }
     }
   };

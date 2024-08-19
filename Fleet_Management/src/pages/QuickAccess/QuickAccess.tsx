@@ -1,12 +1,17 @@
-import { Box } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Box, Drawer } from "@mui/material";
 import { bgcolor, border, display, margin, padding, width } from "@mui/system";
-import React from "react";
+
 import Bg from "../../assets/Bg.png";
 import { FaArrowRight } from "react-icons/fa6";
 import { BsJustify } from "react-icons/bs";
 import { MdDashboardCustomize } from "react-icons/md";
 import { FaArrowRightLong } from "react-icons/fa6";
-
+import { toast } from "react-toastify";
+import Passenger from "../BookRide/Passenger";
+import TravelRoute from "../BookRide/TravelRoute";
+import GroupRide from "../BookRide/GroupRide";
+import Equipment from "../BookRide/Equipment";
 interface QuickAccessProps {
   darkMode: boolean;
   onCloseDrawer: () => void;
@@ -22,6 +27,22 @@ const QuickAccess: React.FC<QuickAccessProps> = ({
   employeeID,
   userName,
 }) => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [currentDrawer, setCurrentDrawer] = useState<string>("");
+
+  const toggleDrawer = (open: boolean, drawerType: string) => {
+    setIsOpen(open);
+    setCurrentDrawer(drawerType);
+  };
+
+  const handleCloseDrawer = () => {
+    toggleDrawer(false, "");
+  };
+
+  const handleCome = () => {
+    toast.warning("Coming Soon...");
+  };
+
   const getGreeting = () => {
     const currentHour = new Date().getHours();
     if (currentHour < 12) {
@@ -91,7 +112,9 @@ const QuickAccess: React.FC<QuickAccessProps> = ({
                       boxShadow:
                         "0px 3.2px 7.2px 0px #00000021, 0px 0.6px 1.8px 0px #0000001C",
                       padding: "5px",
+                      cursor: "pointer",
                     }}
+                    onClick={() => toggleDrawer(true, "TravelRoute")}
                   >
                     <span style={{ background: "#88AB8A", padding: "5px" }}>
                       <MdDashboardCustomize size={40} color="#fff" />
@@ -117,7 +140,9 @@ const QuickAccess: React.FC<QuickAccessProps> = ({
                       boxShadow:
                         "0px 3.2px 7.2px 0px #00000021, 0px 0.6px 1.8px 0px #0000001C",
                       padding: "5px",
+                      cursor: "pointer",
                     }}
+                    onClick={() => toggleDrawer(true, "GroupRide")}
                   >
                     <span style={{ background: "#88AB8A", padding: "5px" }}>
                       <MdDashboardCustomize size={40} color="#fff" />
@@ -143,7 +168,9 @@ const QuickAccess: React.FC<QuickAccessProps> = ({
                       boxShadow:
                         "0px 3.2px 7.2px 0px #00000021, 0px 0.6px 1.8px 0px #0000001C",
                       padding: "5px",
+                      cursor: "pointer",
                     }}
+                    onClick={() => toggleDrawer(true, "Passenger")}
                   >
                     <span style={{ background: "#88AB8A", padding: "5px" }}>
                       <MdDashboardCustomize size={40} color="#fff" />
@@ -152,7 +179,7 @@ const QuickAccess: React.FC<QuickAccessProps> = ({
                     <Box
                       sx={{ flex: 1, textAlign: "left", paddingLeft: "20px" }}
                     >
-                      Book Ride - Travel Within Office
+                      Book Ride - Passenger
                     </Box>
 
                     <FaArrowRightLong
@@ -169,7 +196,9 @@ const QuickAccess: React.FC<QuickAccessProps> = ({
                       boxShadow:
                         "0px 3.2px 7.2px 0px #00000021, 0px 0.6px 1.8px 0px #0000001C",
                       padding: "5px",
+                      cursor: "pointer",
                     }}
+                    onClick={() => toggleDrawer(true, "Equipment")}
                   >
                     <span style={{ background: "#88AB8A", padding: "5px" }}>
                       <MdDashboardCustomize size={40} color="#fff" />
@@ -178,7 +207,7 @@ const QuickAccess: React.FC<QuickAccessProps> = ({
                     <Box
                       sx={{ flex: 1, textAlign: "left", paddingLeft: "20px" }}
                     >
-                      Update Travel Route
+                      Book Ride - Equipment
                     </Box>
 
                     <FaArrowRightLong
@@ -195,7 +224,9 @@ const QuickAccess: React.FC<QuickAccessProps> = ({
                       boxShadow:
                         "0px 3.2px 7.2px 0px #00000021, 0px 0.6px 1.8px 0px #0000001C",
                       padding: "5px",
+                      cursor: "pointer",
                     }}
+                    onClick={() => handleCome()}
                   >
                     <span style={{ background: "#88AB8A", padding: "5px" }}>
                       <MdDashboardCustomize size={40} color="#fff" />
@@ -221,6 +252,79 @@ const QuickAccess: React.FC<QuickAccessProps> = ({
           </Box>
         </div>
       </Box>
+
+      {/* Drawer */}
+
+      <Drawer
+        sx={{
+          "& .MuiPaper-root": {
+            backgroundColor: darkMode ? "#222222" : "#FFF",
+            color: darkMode ? "#fff" : "#000",
+            width: "50%",
+          },
+          "@media (max-width: 600px)": {
+            "& .MuiPaper-root": {
+              width: "80%",
+            },
+          },
+          "@media (max-width: 1024px)": {
+            "& .MuiPaper-root": {
+              width: "85%",
+            },
+          },
+        }}
+        anchor="right"
+        open={isOpen}
+        onClose={() => toggleDrawer(false, "")}
+      >
+        <Box sx={{ padding: "20px" }}>
+          {currentDrawer === "Passenger" && (
+            <Passenger
+              darkMode={darkMode}
+              onCloseDrawer={handleCloseDrawer}
+              userEmailId={userEmailId}
+              employeeID={employeeID}
+              userName={userName}
+            />
+          )}
+          {/* {currentDrawer === "Goods" && (
+            <Goods
+              darkMode={darkMode}
+              onCloseDrawer={handleCloseDrawer}
+              userEmailId={userEmailId}
+              employeeID={employeeID}
+              userName={userName}
+            />
+          )} */}
+          {currentDrawer === "Equipment" && (
+            <Equipment
+              darkMode={darkMode}
+              onCloseDrawer={handleCloseDrawer}
+              userEmailId={userEmailId}
+              employeeID={employeeID}
+              userName={userName}
+            />
+          )}
+          {currentDrawer === "GroupRide" && (
+            <GroupRide
+              darkMode={darkMode}
+              onCloseDrawer={handleCloseDrawer}
+              userEmailId={userEmailId}
+              employeeID={employeeID}
+              userName={userName}
+            />
+          )}
+          {currentDrawer === "TravelRoute" && (
+            <TravelRoute
+              darkMode={darkMode}
+              onCloseDrawer={handleCloseDrawer}
+              userEmailId={userEmailId}
+              employeeID={employeeID}
+              userName={userName}
+            />
+          )}
+        </Box>
+      </Drawer>
     </>
   );
 };

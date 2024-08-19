@@ -280,6 +280,34 @@ main {
   margin: 10px !important;
   cursor: not-allowed !important;
 }
+.deleteBtn {
+  background-color: #b3261e !important;
+  color: #ffffff !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  text-transform: capitalize !important;
+  padding: 5px 21px !important;
+  margin: 10px !important;
+  cursor: pointer;
+}
+.deleteBtn:hover {
+  background-color: #b3261eda !important;
+  color: #ffffff !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  text-transform: capitalize !important;
+  padding: 5px 21px !important;
+}
+.deleteBtn:disabled {
+  background-color: #e6e4e4 !important;
+  color: #b6b5b5 !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  text-transform: capitalize !important;
+  padding: 5px 21px !important;
+  margin: 10px !important;
+  cursor: not-allowed !important;
+}
 
 .closeX {
   padding: 2px !important;

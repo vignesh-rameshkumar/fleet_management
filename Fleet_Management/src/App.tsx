@@ -21,7 +21,7 @@ import RequestApproval from "./pages/PL/RequestApproval.tsx";
 import RequestApprovalDL from "./pages/DL/RequestApprovalDL.tsx";
 import NotFoundPage from "./component/NotFoundPage.tsx";
 import TrackRequest from "./pages/TrackRequest/TrackRequest.tsx";
-
+import Bills from "./pages/User/Bills.tsx";
 interface EmployeeData {
   empID: string;
   report: string;
@@ -142,6 +142,17 @@ const App: React.FC = () => {
                     path="/Fleet_Management/trackrequest"
                     element={
                       <TrackRequest
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/Fleet_Management/bills"
+                    element={
+                      <Bills
                         darkMode={darkMode}
                         userEmailId={userEmailId}
                         userName={userName}
