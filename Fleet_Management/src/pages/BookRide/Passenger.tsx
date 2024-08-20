@@ -445,12 +445,12 @@ const Passenger: React.FC<PassengerProps> = ({
                       value={fromLocation}
                       onChange={(event, newValue) => {
                         setFromLocation(newValue);
-                        setToLocation("");
+                        setToLocation(""); // Clear To Location when From Location changes
                       }}
                       inputValue={fromLocation}
                       onInputChange={(event, newInputValue) => {
                         setFromLocation(newInputValue);
-                        setToLocation("");
+                        setToLocation(""); // Clear To Location when From Location changes
                       }}
                       disabled={!selectedProject || !rideType}
                       options={["Research Park", "Thaiyur", "Shar"]}
@@ -459,7 +459,7 @@ const Passenger: React.FC<PassengerProps> = ({
                           {...params}
                           label={
                             <>
-                              Select From Location {""}
+                              Select From Location{" "}
                               <Typography variant="code" className="CodeStar">
                                 *
                               </Typography>
@@ -493,13 +493,15 @@ const Passenger: React.FC<PassengerProps> = ({
                         handleToLocationChange(event, newInputValue)
                       }
                       disabled={!rideType || !selectedProject || !fromLocation}
-                      options={["Research Park", "Thaiyur", "Shar"]}
+                      options={["Research Park", "Thaiyur", "Shar"].filter(
+                        (location) => location !== fromLocation
+                      )}
                       renderInput={(params) => (
                         <TextField
                           {...params}
                           label={
                             <>
-                              Select To Location {""}
+                              Select To Location{" "}
                               <Typography variant="code" className="CodeStar">
                                 *
                               </Typography>
@@ -653,7 +655,6 @@ const Passenger: React.FC<PassengerProps> = ({
                           md: "90%",
                         },
                       }}
-                      // value={dayjs(rideTime, "HH:mm:ss")}
                       value={rideTime ? dayjs(rideTime, "HH:mm:ss") : null}
                       format="HH:mm"
                       ampm={false}

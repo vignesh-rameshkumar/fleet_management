@@ -87,7 +87,7 @@ const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({
       fields: ["*"],
       filters: [
         ["owner", "!=", userEmailId],
-        ["reports_head", "=", userEmailId],
+        ["reports_to", "=", userEmailId],
         ["status", "!=", "Cancelled"],
       ],
       orderBy: {
@@ -248,9 +248,11 @@ const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({
   ];
   const [selectedRowItem, setSelectedRowItem] = useState(null);
 
-  const handleRowClick = (item) => {
-    setSelectedRowItem(item);
+  const handleRowClick = (item: any) => {
+    // setSelectedRowItem(item);
     toggleDrawer(true);
+    setView(true);
+    setDrawerDetails(item);
   };
 
   const { updateDoc } = useFrappeUpdateDoc();
@@ -288,8 +290,8 @@ const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          color: darkMode ? "#FFF" : "#222222",
-          backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+          color: "#FFF",
+          backgroundColor: "#4D8C52",
           padding: "10px",
           borderRadius: "5px",
           fontSize: "18px",

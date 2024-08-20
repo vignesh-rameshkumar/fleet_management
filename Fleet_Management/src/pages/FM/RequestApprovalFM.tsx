@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { CSmartTable } from "@coreui/react-pro";
-import {
-  Box,
-  Drawer,
-  Button,
-  Typography,
-  Grid,
-  CircularProgress,
-} from "@mui/material";
+import { Box, Drawer, Button, Typography, Grid } from "@mui/material";
 import { MdOutlineVisibility, MdDeleteForever } from "react-icons/md";
 import { useFrappeGetDocList, useFrappeUpdateDoc } from "frappe-react-sdk";
+import Autocomplete from "@mui/material/Autocomplete";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
+import { toast } from "react-toastify";
 
-interface BillsProps {
+interface RequestApprovalFMProps {
   darkMode: boolean;
   onCloseDrawer: () => void;
   userEmailId: string;
@@ -19,10 +16,12 @@ interface BillsProps {
   userName: string;
 }
 
-const Bills: React.FC<BillsProps> = ({
+const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
   darkMode,
   onCloseDrawer,
   userEmailId,
+  employeeID,
+  userName,
 }) => {
   // State
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -37,13 +36,33 @@ const Bills: React.FC<BillsProps> = ({
       filterInput.placeholder = "Request Type";
     }
   }, []);
+  // Fetching data
 
+  const { data: RM_Project_Lead }: any = useFrappeGetDocList(
+    "RM_Project_Lead",
+    {
+      fields: ["*"],
+      filters: [["project_status", "=", "Active"]],
+      limit: 100000,
+      orderBy: {
+        field: "modified",
+        order: "desc",
+      },
+    }
+  );
+  const [projectName, setProjectName] = useState(RM_Project_Lead);
+  useEffect(() => {
+    setProjectName(RM_Project_Lead);
+  }, [RM_Project_Lead]);
   const { data: FM_Request_Master, isLoading } = useFrappeGetDocList(
     "FM_Request_Master",
     {
       fields: ["*"],
-      filters: [["owner", "=", userEmailId]],
-
+      filters: [
+        ["owner", "!=", userEmailId],
+        // ["reports_head", "=", userEmailId],
+        ["status", "!=", "Cancelled"],
+      ],
       orderBy: {
         field: "modified",
         order: "desc",
@@ -58,18 +77,20 @@ const Bills: React.FC<BillsProps> = ({
     }
   }, [FM_Request_Master]);
 
+  // console.log("FM_Request_Master", FM_Request_Master);
+
   const doctypeName = drawerDetails.doctypename;
   const documentName = drawerDetails.request_id;
-  const { data: specificData, isLoading: isLoadingSpecific } =
-    useFrappeGetDocList(doctypeName || "", {
-      fields: ["*"],
-      orderBy: {
-        field: "modified",
-        order: "desc",
-      },
-      filters: documentName ? [["name", "=", documentName]] : [],
-      limit: 1,
-    });
+  // Fetch specific data only if doctypeName and documentName are defined
+  const { data: specificData } = useFrappeGetDocList(doctypeName || "", {
+    fields: ["*"],
+    orderBy: {
+      field: "modified",
+      order: "desc",
+    },
+    filters: documentName ? [["name", "=", documentName]] : [],
+    limit: 1,
+  });
 
   // Update drawer data when specific data changes
   useEffect(() => {
@@ -87,7 +108,6 @@ const Bills: React.FC<BillsProps> = ({
     toggleDrawer(false);
   };
 
-  // Columns definition for the table
   const columns = [
     {
       key: "S_no",
@@ -144,6 +164,19 @@ const Bills: React.FC<BillsProps> = ({
       sorter: true,
     },
     {
+      key: "employee_name",
+      label: "Employee Name",
+      _style: {
+        width: "15%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+      },
+      filter: true,
+      sorter: true,
+    },
+    {
       key: "project_name",
       label: "Project Name",
       _style: {
@@ -158,21 +191,8 @@ const Bills: React.FC<BillsProps> = ({
     },
 
     {
-      key: "bill_amount",
-      label: "Coins Consumed",
-      _style: {
-        width: "15%",
-        fontSize: "14px",
-        textAlign: "center",
-        color: darkMode ? "#FFF" : "#222222",
-        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
-      },
-      filter: true,
-      sorter: true,
-    },
-    {
-      key: "payment_status",
-      label: "Payment Status",
+      key: "status",
+      label: "Status",
       _style: {
         width: "15%",
         fontSize: "14px",
@@ -199,33 +219,42 @@ const Bills: React.FC<BillsProps> = ({
       sorter: false,
     },
   ];
-
-  // if (isLoading || isLoadingSpecific) {
-  //   return (
-  //     <Box
-  //       sx={{
-  //         display: "flex",
-  //         justifyContent: "center",
-  //         alignItems: "center",
-  //         minHeight: "100vh",
-  //       }}
-  //     >
-  //       <CircularProgress />
-  //     </Box>
-  //   );
-  // }
+  const [selectedRowItem, setSelectedRowItem] = useState(null);
 
   const handleRowClick = (item: any) => {
-    //setSelectedRowItem(item);
+    // setSelectedRowItem(item);
     toggleDrawer(true);
     setView(true);
     setDrawerDetails(item);
   };
 
-  const totalcoinAmount = tableData.reduce(
-    (acc, item) => acc + parseFloat(item.bill_amount || 0),
-    0
-  );
+  const { updateDoc } = useFrappeUpdateDoc();
+
+  const handleapprove = async () => {
+    let doctypename = drawerDetails.doctypename;
+    let id = drawerDetails.name;
+
+    let updateData = {
+      status: "Approved",
+    };
+
+    try {
+      await updateDoc(doctypename, id, updateData);
+      setTableData((prevAllData) => {
+        return prevAllData.map((item) => {
+          if (item.doctypename === doctypename && item.name === id) {
+            return { ...item, ...updateData };
+          }
+          return item;
+        });
+      });
+
+      toast.success("Approved Successfully");
+      toggleDrawer(false);
+    } catch (error) {
+      toast.error(`Error Approved doc: ${error.message}`);
+    }
+  };
 
   return (
     <>
@@ -243,7 +272,7 @@ const Bills: React.FC<BillsProps> = ({
           marginBottom: "10px",
         }}
       >
-        Bills
+        Request Approval
       </Box>
 
       <div
@@ -252,20 +281,7 @@ const Bills: React.FC<BillsProps> = ({
           padding: "15px",
         }}
       >
-        <Box
-          sx={{
-            color: "#000",
-            backgroundColor: "#a5d0a9",
-            padding: "10px 20px",
-            borderRadius: "5px",
-            float: "right",
-            marginBottom: "5px",
-            fontSize: "15px",
-            fontWeight: 600,
-          }}
-        >
-          Coins Consumed : {totalcoinAmount}
-        </Box>
+        {/* {JSON.stringify(tableData)} */}
         <CSmartTable
           cleaner
           clickableRows
@@ -280,13 +296,13 @@ const Bills: React.FC<BillsProps> = ({
           tableProps={{
             className: "add-this-class red-border",
             responsive: true,
-            striped: true,
+            striped: false,
             hover: true,
           }}
-          onRowClick={(item) => handleRowClick(item)}
           tableBodyProps={{
             className: "align-middle tableData",
           }}
+          onRowClick={(item) => handleRowClick(item)}
           scopedColumns={{
             S_no: (_item: any, index: number) => {
               return <td>{index + 1}</td>;
@@ -294,8 +310,26 @@ const Bills: React.FC<BillsProps> = ({
             project_name: (item: any) => {
               return <td>{item?.project_name || "-"}</td>;
             },
-            bill_amount: (item: any) => {
-              return <td>{item?.bill_amount || "-"}</td>;
+            status: (item: any) => {
+              return (
+                <td>
+                  <div
+                  // style={{
+                  //   backgroundColor:
+                  //     item.status === "Project Lead Approved"
+                  //       ? "#a5d0a9"
+                  //       : "",
+                  //   padding: "6px 6px",
+                  //   width:
+                  //     item.status === "Project Lead Approved" ? "100px" : "",
+                  //   borderRadius: "20px",
+                  //   margin: "0 auto",
+                  // }}
+                  >
+                    {item?.status}
+                  </div>
+                </td>
+              );
             },
 
             creation: (item: any) => {
@@ -360,7 +394,7 @@ const Bills: React.FC<BillsProps> = ({
                       className="drawerTitle"
                       sx={{ color: darkMode ? "#d1d1d1" : "#5b5b5b" }}
                     >
-                      Request Type - {drawerDetails.type}
+                      {drawerDetails.type} - Request
                     </Box>
                     <Button
                       className="closeX"
@@ -371,6 +405,32 @@ const Bills: React.FC<BillsProps> = ({
                     </Button>
                   </Box>
                   <Grid container spacing={2} sx={{ marginTop: 2 }}>
+                    <Grid item xs={6}>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontWeight: 600,
+                        }}
+                      >
+                        Employee Name
+                      </Typography>
+                      <Typography variant="body1">
+                        {drawerDetails.employee_name}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontWeight: 600,
+                        }}
+                      >
+                        Project Name
+                      </Typography>
+                      <Typography variant="body1">
+                        {drawerDetails.project_name}
+                      </Typography>
+                    </Grid>
                     {doctypeName !== "FM_Equipment_Vehicle_Request" && (
                       <>
                         <Grid item xs={12} sm={6}>
@@ -436,6 +496,19 @@ const Bills: React.FC<BillsProps> = ({
                         {new Date(drawerDetails.creation).toLocaleTimeString()}
                       </Typography>
                     </Grid>
+                    <Grid item xs={12}>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontWeight: 600,
+                        }}
+                      >
+                        Category
+                      </Typography>
+                      <Typography variant="body1">
+                        {drawerDetails.type}
+                      </Typography>
+                    </Grid>
 
                     {doctypeName === "FM_Equipment_Vehicle_Request" && (
                       <>
@@ -480,59 +553,6 @@ const Bills: React.FC<BillsProps> = ({
                         </Grid>
                       </>
                     )}
-
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: 600,
-                        }}
-                      >
-                        Project Name
-                      </Typography>
-                      <Typography variant="body1">
-                        {drawerDetails.project_name}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: 600,
-                        }}
-                      >
-                        Coins Consumed
-                      </Typography>
-                      <Typography variant="body1">
-                        {drawerDetails.bill_amount}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: 600,
-                        }}
-                      >
-                        Ride Type
-                      </Typography>
-                      <Typography variant="body1">
-                        {drawerDetails.allotment}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: 600,
-                        }}
-                      >
-                        Payment Status
-                      </Typography>
-                      <Typography variant="body1">
-                        {drawerDetails.payment_status}
-                      </Typography>
-                    </Grid>
 
                     {drawerData[0]?.mod === 1 && (
                       <>
@@ -599,9 +619,23 @@ const Bills: React.FC<BillsProps> = ({
             </Box>
           </>
         )}
+        <br />
+        {drawerDetails.status === "Project Lead Approved" && (
+          <Box display="flex" flexDirection="column" alignItems="center">
+            <Box sx={{ display: "flex" }}>
+              <Button className="deleteBtn">Reject</Button>
+
+              <Button className="saveBtn" onClick={handleapprove}>
+                Approve
+              </Button>
+            </Box>
+          </Box>
+        )}
+
+        <br />
       </Drawer>
     </>
   );
 };
 
-export default Bills;
+export default RequestApprovalFM;

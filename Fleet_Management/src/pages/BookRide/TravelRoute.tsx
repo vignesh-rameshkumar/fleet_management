@@ -452,7 +452,7 @@ const TravelRoute: React.FC<TravelRouteProps> = ({
                             />
                           </Button>
                           <Button
-                            className="cancelBtn"
+                            className="deleteBtn"
                             onClick={() => {
                               setOpen(true);
                             }}
@@ -460,7 +460,6 @@ const TravelRoute: React.FC<TravelRouteProps> = ({
                             Delete {""}
                             <MdDeleteOutline
                               size={25}
-                              color="red"
                               style={{ marginLeft: "10px" }}
                             />
                           </Button>
@@ -916,7 +915,7 @@ const TravelRoute: React.FC<TravelRouteProps> = ({
         >
           <DialogContent>
             <DialogContentText id="alert-dialog-slide-description">
-              Are you sure you want to delete ?
+              Are you sure want to delete ?
             </DialogContentText>
           </DialogContent>
           <DialogActions>

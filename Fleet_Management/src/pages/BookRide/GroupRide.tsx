@@ -331,8 +331,6 @@ const GroupRide: React.FC<GroupRideProps> = ({
     setSelectedProject(event.target.value);
   };
 
-  //   const [passengerCount, setPassengerCount] = useState(1); // Default to 1 passenger
-
   // Save API
   const { createDoc } = useFrappeCreateDoc();
 
@@ -639,7 +637,10 @@ const GroupRide: React.FC<GroupRideProps> = ({
                         handleToLocationChange(event, newInputValue)
                       }
                       disabled={!selectedProject || !fromLocation}
-                      options={["Research Park", "Thaiyur", "Shar"]}
+                      // options={["Research Park", "Thaiyur", "Shar"]}
+                      options={["Research Park", "Thaiyur", "Shar"].filter(
+                        (location) => location !== fromLocation
+                      )}
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -871,6 +872,13 @@ const GroupRide: React.FC<GroupRideProps> = ({
                     >
                       <TextField
                         value={passengerCount}
+                        disabled={
+                          !selectedProject ||
+                          !fromLocation ||
+                          !toLocation ||
+                          !rideDate ||
+                          (travelMore && rideMoreDates.length === 0)
+                        }
                         variant="outlined"
                         label="Number of Passengers"
                         inputProps={{ style: { textAlign: "center" } }}
@@ -926,7 +934,7 @@ const GroupRide: React.FC<GroupRideProps> = ({
                   {/* No of passenger */}
                   {/* {JSON.stringify(selectedEmployee, "selectedEmployee")} */}
                   <Box
-                    className="slideFromRight"
+                    className="slideFromRight delay-5"
                     width={{ xs: "100%", sm: "100%", md: "90%" }}
                     marginBottom="16px"
                     sx={{ display: "flex", justifyContent: "center" }}
@@ -943,6 +951,14 @@ const GroupRide: React.FC<GroupRideProps> = ({
                       </InputLabel>
                       <Select
                         multiple
+                        disabled={
+                          !selectedProject ||
+                          !fromLocation ||
+                          !toLocation ||
+                          !rideDate ||
+                          (travelMore && rideMoreDates.length === 0) ||
+                          !passengerCount
+                        }
                         value={selectedEmployee}
                         onChange={handleSelectedEmployee}
                         renderValue={(selected) => selected.join(", ")}

@@ -22,6 +22,10 @@ import RequestApprovalDL from "./pages/DL/RequestApprovalDL.tsx";
 import NotFoundPage from "./component/NotFoundPage.tsx";
 import TrackRequest from "./pages/TrackRequest/TrackRequest.tsx";
 import Bills from "./pages/User/Bills.tsx";
+import RequestApprovalFM from "./pages/FM/RequestApprovalFM.tsx";
+
+// import Calendar from "./component/Calendar.tsx";
+
 interface EmployeeData {
   empID: string;
   report: string;
@@ -122,7 +126,7 @@ const App: React.FC = () => {
             employeeID={employeeID}
           >
             <Routes>
-              {userName === "Guest" ? (
+              {userName === "Employee" ? (
                 <Route path="*" element={<NotFoundPage />} />
               ) : (
                 <>
@@ -160,6 +164,17 @@ const App: React.FC = () => {
                       />
                     }
                   />
+                  {/* <Route
+                    path="/Fleet_Management/calendar"
+                    element={
+                      <Calendar
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
+                  /> */}
                   {/* Project Lead */}
                   <Route
                     path="/Fleet_Management/groupride"
@@ -187,6 +202,18 @@ const App: React.FC = () => {
                     path="/Fleet_Management/requestapprovaldl"
                     element={
                       <RequestApprovalDL
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
+                  />
+                  {/* Fleet manager */}
+                  <Route
+                    path="/Fleet_Management/requestapprovalfm"
+                    element={
+                      <RequestApprovalFM
                         darkMode={darkMode}
                         userEmailId={userEmailId}
                         userName={userName}

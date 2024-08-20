@@ -539,6 +539,7 @@ const Goods: React.FC<GoodsProps> = ({
                       </InputLabel>
                       <Select
                         value={rideType}
+                        disabled={!selectedProject}
                         onChange={Changeride}
                         label={<> Select Type {""}</>}
                         MenuProps={{
@@ -554,6 +555,7 @@ const Goods: React.FC<GoodsProps> = ({
                       </Select>
                     </FormControl>
                   </Box>
+
                   <Box
                     className="slideFromRight delay-1"
                     width={{ xs: "100%", sm: "100%", md: "90%" }}
@@ -566,6 +568,7 @@ const Goods: React.FC<GoodsProps> = ({
                       freeSolo
                       disableClearable
                       value={fromLocation}
+                      disabled={!selectedProject || !rideType}
                       onChange={(event, newValue) => {
                         setFromLocation(newValue);
                         setToLocation("");
@@ -611,6 +614,7 @@ const Goods: React.FC<GoodsProps> = ({
                       freeSolo
                       disableClearable
                       value={toLocation}
+                      disabled={!selectedProject || !rideType || !fromLocation}
                       onChange={(event, newValue) =>
                         handleToLocationChange(event, newValue)
                       }
@@ -618,7 +622,10 @@ const Goods: React.FC<GoodsProps> = ({
                       onInputChange={(event, newInputValue) =>
                         handleToLocationChange(event, newInputValue)
                       }
-                      options={["Research Park", "Thaiyur", "Shar"]}
+                      // options={["Research Park", "Thaiyur", "Shar"]}
+                      options={["Research Park", "Thaiyur", "Shar"].filter(
+                        (location) => location !== fromLocation
+                      )}
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -656,6 +663,12 @@ const Goods: React.FC<GoodsProps> = ({
                       }
                       value={rideDate ? dayjs(rideDate, "DD-MM-YYYY") : null}
                       minDate={today}
+                      disabled={
+                        !selectedProject ||
+                        !rideType ||
+                        !fromLocation ||
+                        !toLocation
+                      }
                       sx={{
                         width: {
                           xs: "100%",
@@ -704,6 +717,13 @@ const Goods: React.FC<GoodsProps> = ({
                       }}
                       // value={dayjs(rideTime, "HH:mm:ss")}
                       value={rideTime ? dayjs(rideTime, "HH:mm:ss") : null}
+                      disabled={
+                        !selectedProject ||
+                        !rideType ||
+                        !fromLocation ||
+                        !toLocation ||
+                        !rideDate
+                      }
                       format="HH:mm"
                       ampm={false}
                       onChange={handleFromTimeChange}
@@ -1152,6 +1172,17 @@ const Goods: React.FC<GoodsProps> = ({
                         sx={{ color: "#4D8C52" }}
                         control={
                           <Checkbox
+                            disabled={
+                              !selectedProject ||
+                              !rideDate ||
+                              !rideType ||
+                              !fromLocation ||
+                              !toLocation ||
+                              !rideTime ||
+                              !purpose ||
+                              !description ||
+                              (travelMore && rideMoreDates.length === 0)
+                            }
                             checked={terms}
                             onChange={handleTermsChange}
                           />
