@@ -55,10 +55,10 @@ def auto_append_route_points(doc, method):
 def sync_to_fm_request_master(doc, method):
     # Define the mapping of doctypes and their specific fields to sync
     doctype_field_mapping = {
-        "FM_Passenger_Vehicle_Request": ["project_name", "employee_name", "employee_email", "type", "doctypename", "status", "reports_to", "reports_head", "bill_amount", "payment_status"],
-        "FM_Goods_Vehicle_Request": ["project_name", "employee_name", "employee_email", "type", "doctypename", "status", "reports_to", "reports_head", "bill_amount", "payment_status"],
-        "FM_Equipment_Vehicle_Request": ["project_name", "employee_name", "employee_email", "type", "doctypename", "status", "reports_to", "reports_head", "bill_amount", "payment_status"],
-        "FM_Group_Vehicle_Request": ["project_name", "employee_name", "employee_email", "type", "doctypename", "status", "reports_to", "reports_head", "bill_amount", "payment_status"]
+        "FM_Passenger_Vehicle_Request": ["project_name", "employee_name", "employee_email", "type", "doctypename", "status", "reports_to", "reason", "bill_amount", "payment_status"],
+        "FM_Goods_Vehicle_Request": ["project_name", "employee_name", "employee_email", "type", "doctypename", "status", "reports_to", "reason", "bill_amount", "payment_status"],
+        "FM_Equipment_Vehicle_Request": ["project_name", "employee_name", "employee_email", "type", "doctypename", "status", "reports_to", "reason", "bill_amount", "payment_status"],
+        "FM_Group_Vehicle_Request": ["project_name", "employee_name", "employee_email", "type", "doctypename", "status", "reports_to", "reason", "bill_amount", "payment_status"]
     }
     
     # Check if the current doctype is in the mapping
@@ -95,30 +95,27 @@ def sync_to_fm_request_master(doc, method):
 def before_insert(doc, method):
     if doc.project_name:
         if doc.project_name.lower() == 'general':
-            # For General project, set reports_to to blank and fetch reports_head from RM_Department
-            doc.reports_to = ''
+            # For General project, fetch department lead's email
             if doc.department:
-                doc.reports_head = frappe.db.get_value('RM_Department', 
-                                                       {'name': doc.department}, 
-                                                       'employee_email') or ''
+                doc.reports_to = frappe.db.get_value('RM_Department', 
+                                                     {'name': doc.department}, 
+                                                     'employee_email') or ''
             else:
-                doc.reports_head = ''
+                doc.reports_to = ''
         else:
             # Fetch Project Lead's email ID based on the project name
             doc.reports_to = frappe.db.get_value('RM_Project_Lead', 
                                                  {'name': doc.project_name, 'project_status': 'Active'}, 
                                                  'project_lead_email') or ''
-            doc.reports_head = ''
 
-        # Set status based on reports_to and reports_head
-        if doc.employee_email in [doc.reports_to, doc.reports_head]:
+        # Set status based on reports_to
+        if doc.employee_email == doc.reports_to:
             doc.status = 'Project Lead Approved'
         else:
             doc.status = 'Pending'
     else:
         # If no project is specified
         doc.reports_to = ''
-        doc.reports_head = ''
         doc.status = 'Pending'
 
     # Remove duplicate email from reports_to if it's the same as reports_head

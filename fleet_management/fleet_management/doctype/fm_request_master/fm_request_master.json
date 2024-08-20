@@ -67,9 +67,9 @@
    "label": "PL Email"
   },
   {
-   "fieldname": "reports_head",
+   "fieldname": "reason",
    "fieldtype": "Data",
-   "label": "DL Email"
+   "label": "Reject Reason"
   },
   {
    "fieldname": "bill_amount",

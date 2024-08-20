@@ -23,7 +23,7 @@
   "status",
   "approved_date_time",
   "reports_to",
-  "reports_head",
+  "reason",
   "vehicle_no",
   "driver_name_no",
   "allotment",
@@ -99,11 +99,6 @@
    "fieldname": "reports_to",
    "fieldtype": "Read Only",
    "label": "PL Email"
-  },
-  {
-   "fieldname": "reports_head",
-   "fieldtype": "Read Only",
-   "label": "DL Email"
   },
   {
    "fieldname": "vehicle_no",
@@ -206,11 +201,16 @@
    "fieldname": "description",
    "fieldtype": "Data",
    "label": "Description"
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Data",
+   "label": "Reject Reason"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-17 12:00:53.370155",
+ "modified": "2024-08-20 15:23:29.097568",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Goods_Vehicle_Request",
