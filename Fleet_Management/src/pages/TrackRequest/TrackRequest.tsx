@@ -6,18 +6,41 @@ import {
   Button,
   Typography,
   Grid,
+  IconButton,
   CircularProgress,
   FormControl,
-  InputLabel,
+  InputAdornment,
   MenuItem,
   TextField,
   FormControlLabel,
   FormGroup,
   Checkbox,
   Select,
+  Chip,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  ListSubheader,
+  InputLabel,
 } from "@mui/material";
+import { MdAddCircle } from "react-icons/md";
+import { MdClose } from "react-icons/md";
+import ClearIcon from "@mui/icons-material/Clear";
+
 import { MdOutlineVisibility, MdDeleteForever } from "react-icons/md";
-import { useFrappeGetDocList, useFrappeUpdateDoc } from "frappe-react-sdk";
+import {
+  useFrappeGetDocList,
+  useFrappeUpdateDoc,
+  useFrappeGetDoc,
+} from "frappe-react-sdk";
 import Autocomplete from "@mui/material/Autocomplete";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
@@ -26,6 +49,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { ThemeProvider, createTheme } from "@mui/material";
+import { HiPlusSm, HiMinusSm } from "react-icons/hi";
+import { red } from "@mui/material/colors";
 
 interface TrackRequestProps {
   darkMode: boolean;
@@ -128,6 +153,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
   const [view, setView] = useState<boolean>(false);
   const [edit, setEdit] = useState<boolean>(false);
   const [rideType, setRideType] = useState("");
+  const [rideTypegoods, setRideTypegoods] = useState("");
   const [fromLocation, setFromLocation] = useState("");
   const [toLocation, setToLocation] = useState("");
   const [purpose, setPurpose] = useState("");
@@ -144,7 +170,18 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
   const [fromTime, setFromTime] = useState(null);
   const [toTime, setToTime] = useState(null);
   const [description, setDescription] = useState("");
-
+  const [documentName, setDocumnetName] = useState("");
+  const [doctypeNames, setDoctypeNames] = useState("");
+  const [sections, setSections] = useState([]);
+  const [isAddMoreChecked, setIsAddMoreChecked] = useState(false);
+  const [editIndex, setEditIndex] = useState(null);
+  const [editedBreakPoint, setEditedBreakPoint] = useState({});
+  const [addGoods, setAddGoods] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState([]);
+  const [passengerCount, setPassengerCount] = useState(1);
+  const [filter, setFilter] = useState("");
+  const [editedPassenger, setEditedPassenger] = useState({});
   // Fetching data
 
   const { data: RM_Project_Lead }: any = useFrappeGetDocList(
@@ -163,7 +200,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
   useEffect(() => {
     setProjectName(RM_Project_Lead);
   }, [RM_Project_Lead]);
-
+  // console.log("sections", sections);
   const { data: FM_Request_Master, isLoading } = useFrappeGetDocList(
     "FM_Request_Master",
     {
@@ -181,11 +218,9 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
       setTableData(FM_Request_Master);
     }
   }, [FM_Request_Master]);
-  const doctypeName = drawerDetails.doctypename;
-  const documentName = drawerDetails.request_id;
-  // Fetch specific data only if doctypeName and documentName are defined
+  // Fetch specific data only if doctypeNames and documentName are defined
   const { data: specificData, isLoading: isLoadingSpecific } =
-    useFrappeGetDocList(doctypeName || "", {
+    useFrappeGetDocList(doctypeNames || "", {
       fields: ["*"],
       orderBy: {
         field: "modified",
@@ -202,13 +237,47 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
     }
   }, [specificData]);
 
+  const { data: Employee }: any = useFrappeGetDocList("Employee", {
+    fields: ["*"],
+    filters: [["status", "=", "Active"]],
+    limit: 100000,
+    orderBy: {
+      field: "modified",
+      order: "desc",
+    },
+  });
+
+  const [employeeName, setEmployeeName] = useState(Employee);
+
+  useEffect(() => {
+    setEmployeeName(Employee);
+  }, [Employee]);
+  const filteredEmployees = Employee?.filter(
+    (employee) =>
+      employee.name.toLowerCase().includes(filter.toLowerCase()) ||
+      employee.employee_name.toLowerCase().includes(filter.toLowerCase())
+  );
+  // get child docytypes from group ride
+  const { data: FM_Group_Vehicle_Request }: any = useFrappeGetDoc(
+    doctypeNames,
+    documentName
+  );
+  // Initialize state for group ride data
+  const [groupRideData, setGroupRideData] = useState(FM_Group_Vehicle_Request);
+
+  // Update groupRideData state when FM_Group_Vehicle_Request data changes
+  useEffect(() => {
+    if (FM_Group_Vehicle_Request) {
+      setGroupRideData(FM_Group_Vehicle_Request);
+    }
+  }, [FM_Group_Vehicle_Request]);
   // Handle drawer toggle
   const toggleDrawer = (open: boolean) => {
     setIsOpen(open);
   };
   const handleCancel = () => {
-    onCloseDrawer();
     setRideType("");
+    setRideTypegoods("");
     setFromLocation("");
     setToLocation("");
     setRideDate(null);
@@ -227,6 +296,40 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
   const handleChange = (event) => {
     setSelectedProject(event.target.value);
   };
+  const handleAddSection = (event) => {
+    const checked = event.target.checked;
+    if (checked) {
+      setSections([
+        ...sections,
+        { address: "", type: "", purpose: "", description: "" },
+      ]);
+    } else {
+      setSections([]);
+    }
+    setIsAddMoreChecked(checked);
+  };
+
+  const handleSectionChange = (index, field, value) => {
+    const newSections = [...sections];
+    newSections[index][field] = value;
+    setSections(newSections);
+  };
+  const handleClose = () => setAddGoods(false);
+
+  const handleRemoveSection = (index) => {
+    const newSections = sections.filter((_, i) => i !== index);
+    setSections(newSections);
+  };
+  const handleSelectedEmployee = (event) => {
+    const value = event.target.value;
+
+    if (value?.length > passengerCount) {
+      toast.warning(`Not Allowed - Because Passenger is ${passengerCount}`);
+      return;
+    }
+
+    setSelectedEmployee(value);
+  };
   const handleFromTimeChange = (time) => {
     if (dayjs(time).isValid()) {
       const formattedTime = dayjs(time).format("HH:mm:ss");
@@ -236,18 +339,83 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
       setRideTime(null);
     }
   };
-  const handleFromDateChange = (date) => {
-    if (dayjs(date).isValid()) {
-      const formattedDate = dayjs(date).format("DD-MM-YYYY");
-      setRideDate(formattedDate);
+  const handleToTimeChange = (time) => {
+    if (dayjs(time).isValid()) {
+      const formattedTime = dayjs(time).format("HH:mm:ss");
+      setToTime(formattedTime);
     } else {
-      toast.error("Invalid date selected");
-      setRideDate(null);
+      toast.error("Invalid time selected");
+      setToTime(null);
     }
+  };
+
+  const handleFromDateChange = (date) => {
+    if (date && dayjs(date).isValid()) {
+      const formattedDate = dayjs(date).format("DD-MM-YYYY");
+      setRideDate(formattedDate); // Set the valid date
+    } else {
+      setRideDate(null); // Clear the date if invalid
+    }
+  };
+  const handleEditClick = (index, breakPoint) => {
+    setEditIndex(index);
+    setEditedBreakPoint(breakPoint);
+  };
+  const handleEditClickGroupRide = (index, passenger) => {
+    setEditIndex(index);
+    setEditedPassenger({
+      ...passenger,
+      name: passenger.name,
+    });
+  };
+
+  const handleSaveClick = async () => {
+    // console.log("EditedData:", editedBreakPoint);
+
+    try {
+      await handleGroupRideData(editedBreakPoint);
+      toast.success("Document updated successfully");
+    } catch (error) {
+      console.error("Error updating document:", error);
+      toast.error("Failed to update document");
+    }
+
+    setEditIndex(null);
+  };
+  const handleSaveClickGroupRide = async () => {
+    // console.log("EditedData:", editedPassenger);
+
+    try {
+      await handleGroupRideDataPassenger(editedPassenger);
+      toast.success("Document updated successfully");
+    } catch (error) {
+      console.error("Error updating document:", error);
+      toast.error("Failed to update document");
+    }
+
+    setEditIndex(null);
+  };
+
+  const handleInputChange = (e, field) => {
+    setEditedBreakPoint({
+      ...editedBreakPoint,
+      [field]: e.target.value,
+    });
+  };
+  const handleInputChangeGroupRide = (e, field) => {
+    setEditedPassenger({
+      ...editedPassenger,
+      [field]: e.target.value,
+    });
   };
   const Changeride = (event) => {
     setRideType(event.target.value);
   };
+
+  const changeRideGoods = (event) => {
+    setRideTypegoods(event.target.value);
+  };
+
   const handleCloseDrawer = () => {
     toggleDrawer(false);
   };
@@ -263,6 +431,20 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
       setToLocation(newValue);
     }
   };
+  const handleFilterChange = (event) => {
+    setFilter(event.target.value);
+  };
+  const handleIncrement = () => {
+    setSelectedEmployee([]);
+    setPassengerCount((prevCount) => prevCount + 1);
+  };
+
+  const handleDecrement = () => {
+    setSelectedEmployee([]);
+    if (passengerCount > 1) {
+      setPassengerCount((prevCount) => prevCount - 1);
+    }
+  };
   const handleMoreDateChange = (date) => {
     if (dayjs(date).isValid()) {
       const formattedDate = dayjs(date).format("DD-MM-YYYY");
@@ -275,6 +457,64 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
       toast.warning("Invalid date selected");
     }
   };
+  const handleGroupRideData = async () => {
+    // Check if editedBreakPoint has data and name is available
+    if (!editedBreakPoint || !editedBreakPoint.name) {
+      console.error("Error: No edited data available or missing 'name' field");
+      return;
+    }
+
+    const childDocument = {
+      parent: documentName,
+      parentfield: "break_points",
+      parenttype: "FM_Goods_Vehicle_Request",
+      ...editedBreakPoint, // Spread the properties from the editedBreakPoint state
+    };
+
+    try {
+      // Update the document based on the name in editedBreakPoint
+      await updateDoc(
+        "FM_Goods_Breakpoints",
+        editedBreakPoint.name,
+        childDocument
+      );
+      toast.success("Document updated successfully");
+    } catch (error) {
+      console.error("Error updating document:", error);
+      toast.error("Failed to update document");
+    }
+  };
+  const handleGroupRideDataPassenger = async () => {
+    // Check if editedPassenger has data and name is available
+    if (!editedPassenger || !editedPassenger.name) {
+      // console.error("Error: No edited data available or missing 'name' field");
+      return;
+    }
+
+    const childDocument = {
+      parent: documentName,
+      parentfield: "passenger_details",
+      parenttype: "FM_Group_Vehicle_Request",
+      ...editedPassenger, // Spread the properties from the editedPassenger state
+    };
+
+    try {
+      // Update the document based on the name in editedPassenger
+      await updateDoc(
+        "FM_Group_Ride_Members",
+        editedPassenger.name,
+        childDocument
+      );
+      toast.success("Document updated successfully");
+    } catch (error) {
+      console.error("Error updating document:", error);
+      toast.error("Failed to update document");
+    }
+  };
+
+  const handleRemoveDate = (dateToRemove) => {
+    setRideMoreDates(rideMoreDates.filter((date) => date !== dateToRemove));
+  };
   const today = dayjs();
   const date_time = `${rideDate} ${rideTime}`;
 
@@ -282,38 +522,33 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
     const today = dayjs().format("DD-MM-YYYY");
     setCurrentDate(today);
   }, []);
+  const moreDates = rideMoreDates.join(",");
+
   useEffect(() => {
     if (drawerDetails) {
       setSelectedProject(drawerDetails.project_name || "");
       setRideType(drawerDetails.type || "");
+      setRideTypegoods(drawerDetails.type || "");
       setFromLocation(drawerData[0]?.from_location || "");
       setToLocation(drawerData[0]?.to_location || "");
       setEquipment(drawerData[0]?.equipment || "");
       setFromTime(drawerData[0]?.from_time || "");
       setToTime(drawerData[0]?.to_time || "");
       setDescription(drawerData[0]?.description || "");
+      setDocumnetName(drawerDetails?.request_id || null);
+      setDoctypeNames(drawerDetails?.doctypename || null);
       // Parse the creation date and time
-      const creationDateTime = drawerDetails.creation || null;
-
-      if (creationDateTime) {
-        // Assuming drawerDetails.creation is in the format "DD-MM-YYYY HH:mm:ss"
-        const parsedDateTime = dayjs(creationDateTime, "DD-MM-YYYY HH:mm:ss");
-        const datePart = parsedDateTime.isValid()
-          ? parsedDateTime.format("DD-MM-YYYY")
-          : null; // If the date is invalid, use null
-
-        const timePart = parsedDateTime.isValid()
-          ? parsedDateTime.format("HH:mm:ss")
-          : null; // If the time is invalid, use null
-
-        setRideDate(datePart);
-        setRideTime(timePart);
+      const requestDateTime = drawerData[0]?.request_date_time || null;
+      if (requestDateTime) {
+        const [datePart, timePart] = requestDateTime.split(" ");
+        setRideDate(datePart || null); // Set the date part
+        setRideTime(timePart || null); // Set the time part
       } else {
-        setRideDate(null);
-        setRideTime(null);
+        setRideDate(null); // Clear if no date available
+        setRideTime(null); // Clear if no time available
       }
       setTravelMore(drawerData[0]?.mod || "");
-      setRideMoreDates(drawerData[0]?.mod_dates || []);
+      // setRideMoreDates(drawerData[0]?.mod_dates || []);
       setPurpose(drawerData[0]?.purpose);
       setInitialValues({
         type: rideType,
@@ -325,14 +560,13 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
         employee_name: userName,
         request_date_time: date_time,
         mod: travelMore,
-        // mod_dates: moreDates,
+        mod_dates: moreDates,
         purpose: purpose,
         // date: datePart,
         // time: timePart
       });
     }
   }, [drawerDetails, drawerData]);
-
   //update
   const { updateDoc, loading, error } = useFrappeUpdateDoc();
   // Define the type for your state values
@@ -346,7 +580,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
     employee_name: string;
     request_date_time: string | null;
     mod: boolean;
-    mod_dates: any[]; // Adjust type as necessary
+    mod_dates: string;
     purpose: string;
     date: string | null;
     time: string | null;
@@ -378,7 +612,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
       employee_name: userName,
       request_date_time: date_time,
       mod: travelMore,
-      // mod_dates: moreDates,
+      mod_dates: moreDates,
       purpose: purpose,
       date: rideDate,
       time: rideTime,
@@ -401,7 +635,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
     }
 
     try {
-      await updateDoc(doctypeName, documentName, updateData);
+      await updateDoc(doctypeNames, documentName, updateData);
       toast.success("Updated successfully");
       // Optionally close the drawer or handle post-update logic
       return true;
@@ -649,7 +883,9 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                         Request Date:
                       </Typography>
                       <Typography variant="body1">
-                        {new Date(drawerDetails.creation).toLocaleDateString()}
+                        {drawerData[0]?.request_date_time
+                          ? drawerData[0]?.request_date_time.split(" ")[0] // Extracts the date part
+                          : "N/A"}{" "}
                       </Typography>
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -657,10 +893,12 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                         Request Time:
                       </Typography>
                       <Typography variant="body1">
-                        {new Date(drawerDetails.creation).toLocaleTimeString()}
+                        {drawerData[0]?.request_date_time
+                          ? drawerData[0]?.request_date_time.split(" ")[1] // Extracts the time part
+                          : "N/A"}{" "}
                       </Typography>
                     </Grid>
-                    {doctypeName !== "FM_Equipment_Vehicle_Request" && (
+                    {doctypeNames !== "FM_Equipment_Vehicle_Request" && (
                       <>
                         <Grid item xs={12} sm={6}>
                           <Typography
@@ -686,7 +924,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                         </Grid>
                       </>
                     )}
-                    {doctypeName === "FM_Equipment_Vehicle_Request" && (
+                    {doctypeNames === "FM_Equipment_Vehicle_Request" && (
                       <>
                         <Grid item xs={12} sm={6}>
                           <Typography
@@ -740,6 +978,52 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                         {drawerData[0]?.purpose}
                       </Typography>
                     </Grid>
+
+                    {/* Rest of your code */}
+                    {doctypeNames === "FM_Group_Vehicle_Request" &&
+                      groupRideData && (
+                        <Box sx={{ padding: "30px" }}>
+                          <Grid container spacing={2}>
+                            {groupRideData.passenger_details &&
+                              groupRideData.passenger_details.length > 0 &&
+                              groupRideData.passenger_details.map(
+                                (passenger, index) => (
+                                  <Grid
+                                    container
+                                    spacing={8}
+                                    key={index}
+                                    sx={{ mb: 2 }}
+                                  >
+                                    <Grid item xs={12} sm={6}>
+                                      <Typography
+                                        variant="body1"
+                                        sx={{ fontWeight: "bold" }}
+                                      >
+                                        Passenger Employee ID:
+                                      </Typography>
+                                      <Typography variant="body1">
+                                        {passenger.employee_id}
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                      <Typography
+                                        variant="body1"
+                                        sx={{ fontWeight: "bold" }}
+                                      >
+                                        Passenger Employee Name:
+                                      </Typography>
+                                      <Typography variant="body1">
+                                        {passenger.employee_name}
+                                      </Typography>
+                                    </Grid>
+                                  </Grid>
+                                )
+                              )}
+                          </Grid>
+                        </Box>
+                      )}
+                    {/* Rest of your code */}
+
                     {drawerData[0]?.mod === 1 && (
                       <>
                         <Grid item xs={12}>
@@ -759,7 +1043,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                       </>
                     )}
 
-                    {doctypeName === "FM_Goods_Vehicle_Request" && (
+                    {doctypeNames === "FM_Goods_Vehicle_Request" && (
                       <>
                         <Grid item xs={12}>
                           <Typography
@@ -772,9 +1056,64 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                             {drawerData[0]?.description || "N/A"}
                           </Typography>
                         </Grid>
+                        {groupRideData?.break_points &&
+                          groupRideData.break_points.length > 0 &&
+                          groupRideData.break_points.map(
+                            (breakPoint, index) => (
+                              <Box sx={{ padding: "34px" }}>
+                                <Grid container spacing={10} key={index}>
+                                  <Grid item xs={12} sm={6}>
+                                    <Typography
+                                      variant="body1"
+                                      sx={{ fontWeight: "bold" }}
+                                    >
+                                      Address:
+                                    </Typography>
+                                    <Typography variant="body1">
+                                      {breakPoint.address || "N/A"}
+                                    </Typography>
+                                  </Grid>
+                                  <Grid item xs={12} sm={6}>
+                                    <Typography
+                                      variant="body1"
+                                      sx={{ fontWeight: "bold" }}
+                                    >
+                                      Description:
+                                    </Typography>
+                                    <Typography variant="body1">
+                                      {breakPoint.description || "N/A"}
+                                    </Typography>
+                                  </Grid>
+                                  <Grid item xs={12} sm={6}>
+                                    <Typography
+                                      variant="body1"
+                                      sx={{ fontWeight: "bold" }}
+                                    >
+                                      Purpose:
+                                    </Typography>
+                                    <Typography variant="body1">
+                                      {breakPoint.purpose || "N/A"}
+                                    </Typography>
+                                  </Grid>
+                                  <Grid item xs={12} sm={6}>
+                                    <Typography
+                                      variant="body1"
+                                      sx={{ fontWeight: "bold" }}
+                                    >
+                                      Type:
+                                    </Typography>
+                                    <Typography variant="body1">
+                                      {breakPoint.type || "N/A"}
+                                    </Typography>
+                                  </Grid>
+                                </Grid>
+                              </Box>
+                            )
+                          )}
                       </>
                     )}
                   </Grid>
+
                   {drawerDetails.status === "Pending" && (
                     <Box
                       sx={{
@@ -865,48 +1204,92 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                       </Select>
                     </FormControl>
                   </Box>
-                  <Box
-                    className="slideFromRight delay-1"
-                    width={{ xs: "100%", sm: "100%", md: "90%" }}
-                    marginBottom="16px"
-                    sx={{ display: "flex", justifyContent: "center" }}
-                  >
-                    <FormControl
-                      variant="outlined"
-                      sx={{ width: { xs: "100%", sm: "100%", md: "90%" } }}
-                    >
-                      <InputLabel>
-                        Select Ride Type {""}
-                        <Typography className="CodeStar" variant="Code">
-                          *
-                        </Typography>
-                      </InputLabel>
-                      <Select
-                        value={rideType}
-                        onChange={Changeride}
-                        label={<> Select Ride Type {""}</>}
-                        MenuProps={{
-                          PaperProps: {
-                            sx: {
-                              textAlign: "left",
-                            },
-                          },
-                        }}
+                  {doctypeNames === "FM_Passenger_Vehicle_Request" && (
+                    <>
+                      <Box
+                        className="slideFromRight delay-1"
+                        width={{ xs: "100%", sm: "100%", md: "90%" }}
+                        marginBottom="16px"
+                        sx={{ display: "flex", justifyContent: "center" }}
                       >
-                        <MenuItem value="Travel within Office">
-                          Travel within Office
-                        </MenuItem>
-                        <MenuItem value="Vendor Site Visit">
-                          Vendor Site Visit
-                        </MenuItem>
-                        <MenuItem value="For Advisors">For Advisors</MenuItem>
-                        <MenuItem value="Health Emergency">
-                          Health Emergency
-                        </MenuItem>
-                        <MenuItem value="Others">Others</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
+                        <FormControl
+                          variant="outlined"
+                          sx={{ width: { xs: "100%", sm: "100%", md: "90%" } }}
+                        >
+                          <InputLabel>
+                            Select Ride Type {""}
+                            <Typography className="CodeStar" variant="Code">
+                              *
+                            </Typography>
+                          </InputLabel>
+                          <Select
+                            value={rideType}
+                            onChange={Changeride}
+                            label={<> Select Ride Type {""}</>}
+                            MenuProps={{
+                              PaperProps: {
+                                sx: {
+                                  textAlign: "left",
+                                },
+                              },
+                            }}
+                          >
+                            <MenuItem value="Travel within Office">
+                              Travel within Office
+                            </MenuItem>
+                            <MenuItem value="Vendor Site Visit">
+                              Vendor Site Visit
+                            </MenuItem>
+                            <MenuItem value="For Advisors">
+                              For Advisors
+                            </MenuItem>
+                            <MenuItem value="Health Emergency">
+                              Health Emergency
+                            </MenuItem>
+                            <MenuItem value="Others">Others</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </Box>
+                    </>
+                  )}
+                  {doctypeNames === "FM_Goods_Vehicle_Request" && (
+                    <>
+                      <Box
+                        className="slideFromRight delay-1"
+                        width={{ xs: "100%", sm: "100%", md: "90%" }}
+                        marginBottom="16px"
+                        sx={{ display: "flex", justifyContent: "center" }}
+                      >
+                        <FormControl
+                          variant="outlined"
+                          sx={{ width: { xs: "100%", sm: "100%", md: "90%" } }}
+                        >
+                          <InputLabel>
+                            Select Ride Type {""}
+                            <Typography className="CodeStar" variant="Code">
+                              *
+                            </Typography>
+                          </InputLabel>
+                          <Select
+                            value={rideTypegoods}
+                            onChange={changeRideGoods}
+                            label={<> Select Ride Type {""}</>}
+                            MenuProps={{
+                              PaperProps: {
+                                sx: {
+                                  textAlign: "left",
+                                },
+                              },
+                            }}
+                          >
+                            <MenuItem value="Pickup">Pickup</MenuItem>
+                            <MenuItem value="Drop">Drop</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </Box>
+                    </>
+                  )}
+
                   <Box
                     className="slideFromRight delay-2"
                     width={{ xs: "100%", sm: "100%", md: "90%" }}
@@ -947,7 +1330,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                       )}
                     />
                   </Box>
-                  {doctypeName !== "FM_Equipment_Vehicle_Request" && (
+                  {doctypeNames !== "FM_Equipment_Vehicle_Request" && (
                     <>
                       <Box
                         className="slideFromRight delay-2"
@@ -998,7 +1381,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                     className="slideFromRight delay-3"
                     width={{ xs: "100%", sm: "100%", md: "90%" }}
                     marginBottom="16px"
-                    textAlign={"center"}
+                    textAlign="center"
                   >
                     <DatePicker
                       label={
@@ -1006,8 +1389,8 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                           Date <code className="CodeStar">*</code>
                         </Typography>
                       }
-                      value={rideDate ? dayjs(rideDate, "DD-MM-YYYY") : null}
-                      minDate={dayjs()}
+                      // value={rideDate ? dayjs(rideDate, "DD-MM-YYYY") : null}
+                      minDate={today}
                       sx={{
                         width: {
                           xs: "100%",
@@ -1022,7 +1405,8 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                           {...params}
                           variant="outlined"
                           placeholder="Select Date"
-                          error={!rideDate}
+                          error={!rideDate} // Shows error if rideDate is not set
+                          helperText={!rideDate && "This field is required"} // Error message
                         />
                       )}
                     />
@@ -1070,7 +1454,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                               Select Date <code className="CodeStar">*</code>
                             </Typography>
                           }
-                          value={null} // value is reset to null for a new date selection
+                          value={null}
                           minDate={dayjs(rideDate, "DD-MM-YYYY")}
                           sx={{
                             width: {
@@ -1087,23 +1471,17 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                         />
 
                         <Box mt={2} className="slideFromRight">
-                          {rideMoreDates.length > 0 ? (
-                            rideMoreDates.map((date, index) => (
-                              <Chip
-                                key={index}
-                                label={dayjs(date).format("DD-MM-YYYY")}
-                                onDelete={() => handleRemoveDate(date)}
-                                sx={{
-                                  margin: "2px",
-                                  padding: "5px",
-                                }}
-                              />
-                            ))
-                          ) : (
-                            <Typography>
-                              No additional dates selected
-                            </Typography>
-                          )}
+                          {rideMoreDates?.map((date, index) => (
+                            <Chip
+                              key={index}
+                              label={date}
+                              onDelete={() => handleRemoveDate(date)}
+                              sx={{
+                                margin: "2px",
+                                padding: "5px",
+                              }}
+                            />
+                          ))}
                         </Box>
                       </Box>
                     </>
@@ -1131,7 +1509,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                           md: "90%",
                         },
                       }}
-                      value={rideTime ? dayjs(rideTime, "HH:mm:ss") : null}
+                      // value={rideTime ? dayjs(rideTime, "HH:mm:ss") : null}
                       format="HH:mm:ss"
                       ampm={false}
                       onChange={handleFromTimeChange}
@@ -1162,14 +1540,6 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                       rows={2}
                       variant="outlined"
                       value={purpose}
-                      // d={
-                      //   !rideType ||
-                      //   !selectedProject ||
-                      //   !fromLocation ||
-                      //   !toLocation ||
-                      //   !rideDate ||
-                      //   !rideTime
-                      // }
                       sx={{
                         width: {
                           xs: "100%",
@@ -1182,7 +1552,500 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                       }}
                     />
                   </Box>
-                  {doctypeName === "FM_Equipment_Vehicle_Request" && (
+                  {doctypeNames === "FM_Group_Vehicle_Request" &&
+                    groupRideData && (
+                      <TableContainer
+                        sx={{
+                          width: "100%",
+                          maxWidth: 584,
+                          marginTop: "16px",
+                          borderRadius: "2px",
+                          overflowX: "auto",
+                        }}
+                      >
+                        <Table
+                          sx={{ minWidth: 550 }}
+                          aria-label="passengers table"
+                        >
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Passenger ID</TableCell>
+                              <TableCell>Passenger Name</TableCell>
+                              <TableCell>Document Name</TableCell>
+                              <TableCell align="right">Actions</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {groupRideData.passenger_details.map(
+                              (passenger, index) => (
+                                <TableRow key={index}>
+                                  <TableCell>
+                                    {editIndex === index ? (
+                                      <Autocomplete
+                                        options={filteredEmployees}
+                                        getOptionLabel={(option) =>
+                                          option.name || "N/A"
+                                        }
+                                        value={
+                                          filteredEmployees.find(
+                                            (emp) =>
+                                              emp.name === editedPassenger.name
+                                          ) || null
+                                        }
+                                        onInputChange={(event, newInputValue) =>
+                                          setFilter(newInputValue)
+                                        }
+                                        onChange={(event, newValue) =>
+                                          handleInputChangeGroupRide(
+                                            {
+                                              target: {
+                                                value: newValue?.name || "",
+                                              },
+                                            },
+                                            "employee_id"
+                                          )
+                                        }
+                                        renderInput={(params) => (
+                                          <TextField
+                                            {...params}
+                                            label="Employee ID"
+                                          />
+                                        )}
+                                      />
+                                    ) : (
+                                      passenger.employee_id || "N/A"
+                                    )}
+                                  </TableCell>
+                                  <TableCell>
+                                    {editIndex === index ? (
+                                      <Autocomplete
+                                        options={filteredEmployees}
+                                        getOptionLabel={(option) =>
+                                          option.employee_name || "N/A"
+                                        }
+                                        value={
+                                          filteredEmployees.find(
+                                            (emp) =>
+                                              emp.employee_name ===
+                                              editedPassenger.employee_name
+                                          ) || null
+                                        }
+                                        onInputChange={(event, newInputValue) =>
+                                          setFilter(newInputValue)
+                                        }
+                                        onChange={(event, newValue) =>
+                                          handleInputChangeGroupRide(
+                                            {
+                                              target: {
+                                                value:
+                                                  newValue?.employee_name || "",
+                                              },
+                                            },
+                                            "employee_name"
+                                          )
+                                        }
+                                        renderInput={(params) => (
+                                          <TextField
+                                            {...params}
+                                            label="Employee Name"
+                                          />
+                                        )}
+                                      />
+                                    ) : (
+                                      passenger.employee_name || "N/A"
+                                    )}
+                                  </TableCell>
+                                  <TableCell>
+                                    {passenger.name || "N/A"}
+                                  </TableCell>
+                                  <TableCell align="right">
+                                    {editIndex === index ? (
+                                      <Button
+                                        variant="contained"
+                                        onClick={handleSaveClickGroupRide}
+                                      >
+                                        Save
+                                      </Button>
+                                    ) : (
+                                      <Button
+                                        variant="outlined"
+                                        onClick={() =>
+                                          handleEditClickGroupRide(
+                                            index,
+                                            passenger
+                                          )
+                                        }
+                                      >
+                                        Edit
+                                      </Button>
+                                    )}
+                                  </TableCell>
+                                </TableRow>
+                              )
+                            )}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    )}
+
+                  {doctypeNames === "FM_Goods_Vehicle_Request" && (
+                    <>
+                      <Box
+                        className="slideFromRight delay-4"
+                        width={{ xs: "100%", sm: "100%", md: "90%" }}
+                        textAlign={"center"}
+                        sx={{
+                          margin: "0 auto",
+                        }}
+                      >
+                        <TextField
+                          label={
+                            <Typography>
+                              Description <code className="CodeStar"> *</code>
+                            </Typography>
+                          }
+                          multiline
+                          rows={3}
+                          variant="outlined"
+                          value={description}
+                          sx={{
+                            width: {
+                              xs: "100%",
+                              sm: "100%",
+                              md: "90%",
+                            },
+                          }}
+                          onChange={(e) => {
+                            setDescription(e.target.value);
+                          }}
+                        />
+                      </Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "flex-end",
+                          marginBottom: 2,
+                          marginLeft: "auto",
+                        }}
+                      >
+                        <IconButton
+                          aria-label="add"
+                          sx={{ color: "primary.main" }}
+                          onClick={() => setAddGoods(true)}
+                        >
+                          <MdAddCircle size={40} />
+                        </IconButton>
+                      </Box>
+                      {groupRideData?.break_points &&
+                        groupRideData.break_points.length > 0 && (
+                          <TableContainer
+                            sx={{
+                              width: "100%",
+                              maxWidth: 600,
+                              marginTop: "16px",
+                              borderRadius: "2px",
+                              overflowX: "auto",
+                            }}
+                          >
+                            <Table
+                              sx={{ minWidth: 650 }}
+                              aria-label="breakpoints table"
+                            >
+                              <TableHead>
+                                <TableRow>
+                                  <TableCell>Address</TableCell>
+                                  <TableCell>Description</TableCell>
+                                  <TableCell>Purpose</TableCell>
+                                  <TableCell>Type</TableCell>
+                                  <TableCell>Name</TableCell>
+                                  <TableCell>Actions</TableCell>
+                                </TableRow>
+                              </TableHead>
+                              <TableBody>
+                                {groupRideData.break_points.map(
+                                  (breakPoint, index) => (
+                                    <TableRow key={index}>
+                                      <TableCell>
+                                        {editIndex === index ? (
+                                          <TextField
+                                            value={editedBreakPoint.address}
+                                            onChange={(e) =>
+                                              handleInputChange(e, "address")
+                                            }
+                                          />
+                                        ) : (
+                                          breakPoint.address || "N/A"
+                                        )}
+                                      </TableCell>
+                                      <TableCell>
+                                        {editIndex === index ? (
+                                          <TextField
+                                            value={editedBreakPoint.description}
+                                            onChange={(e) =>
+                                              handleInputChange(
+                                                e,
+                                                "description"
+                                              )
+                                            }
+                                          />
+                                        ) : (
+                                          breakPoint.description || "N/A"
+                                        )}
+                                      </TableCell>
+                                      <TableCell>
+                                        {editIndex === index ? (
+                                          <TextField
+                                            value={editedBreakPoint.purpose}
+                                            onChange={(e) =>
+                                              handleInputChange(e, "purpose")
+                                            }
+                                          />
+                                        ) : (
+                                          breakPoint.purpose || "N/A"
+                                        )}
+                                      </TableCell>
+                                      <TableCell>
+                                        {editIndex === index ? (
+                                          <Select
+                                            value={editedBreakPoint.type}
+                                            onChange={(e) =>
+                                              handleInputChange(e, "type")
+                                            }
+                                            fullWidth
+                                          >
+                                            <MenuItem value="Pickup">
+                                              Pickup
+                                            </MenuItem>
+                                            <MenuItem value="Drop">
+                                              Drop
+                                            </MenuItem>
+                                            <MenuItem value="Pickup & Drop">
+                                              Pickup & Drop
+                                            </MenuItem>
+                                          </Select>
+                                        ) : (
+                                          breakPoint.type || "N/A"
+                                        )}
+                                      </TableCell>
+                                      <TableCell>
+                                        {/* Name Field - Read Only */}
+                                        {breakPoint.name || "N/A"}
+                                      </TableCell>
+                                      <TableCell align="right">
+                                        {editIndex === index ? (
+                                          <Button
+                                            variant="contained"
+                                            onClick={handleSaveClick}
+                                          >
+                                            Save
+                                          </Button>
+                                        ) : (
+                                          <Button
+                                            variant="outlined"
+                                            onClick={() =>
+                                              handleEditClick(index, breakPoint)
+                                            }
+                                          >
+                                            Edit
+                                          </Button>
+                                        )}
+                                      </TableCell>
+                                    </TableRow>
+                                  )
+                                )}
+                              </TableBody>
+                            </Table>
+                          </TableContainer>
+                        )}
+
+                      {addGoods && (
+                        <Dialog
+                          open={addGoods}
+                          onClose={() => setAddGoods(false)}
+                          fullWidth
+                          maxWidth="md"
+                        >
+                          <DialogTitle>
+                            Add Breakpoints
+                            <IconButton
+                              aria-label="close"
+                              onClick={handleAddSection}
+                              sx={{
+                                position: "absolute",
+                                top: 8,
+                                right: 8,
+                                color: "grey.500",
+                              }}
+                            >
+                              <MdClose size={24} />
+                            </IconButton>
+                          </DialogTitle>
+                          <DialogContent>
+                            <Box
+                              width="100%"
+                              textAlign="center"
+                              sx={{ margin: "0 auto" }}
+                            >
+                              {/* {JSON.stringify(sections)} */}
+                              {sections.map((section, index) => (
+                                <Box
+                                  className="slideFromRight"
+                                  key={index}
+                                  sx={{ marginBottom: "16px" }}
+                                >
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      justifyContent: "space-between",
+                                      alignItems: "center",
+                                      marginBottom: "8px",
+                                    }}
+                                  >
+                                    <Typography>
+                                      Section : {index + 1}
+                                    </Typography>
+                                    <IconButton
+                                      aria-label="delete"
+                                      sx={{ color: "red" }}
+                                      onClick={() => handleRemoveSection(index)}
+                                    >
+                                      <MdDeleteForever color="red" size={25} />
+                                    </IconButton>
+                                  </Box>
+
+                                  <TextField
+                                    label={
+                                      <Typography>
+                                        Address{" "}
+                                        <code className="CodeStar"> *</code>
+                                      </Typography>
+                                    }
+                                    variant="outlined"
+                                    value={section.address}
+                                    sx={{ width: "100%", marginBottom: "16px" }}
+                                    onChange={(e) =>
+                                      handleSectionChange(
+                                        index,
+                                        "address",
+                                        e.target.value
+                                      )
+                                    }
+                                  />
+
+                                  <FormControl
+                                    variant="outlined"
+                                    sx={{ width: "100%", marginBottom: "16px" }}
+                                  >
+                                    <InputLabel>
+                                      Select Type{" "}
+                                      <Typography
+                                        className="CodeStar"
+                                        variant="Code"
+                                      >
+                                        *
+                                      </Typography>
+                                    </InputLabel>
+                                    <Select
+                                      label={
+                                        <Typography>
+                                          Select Type{" "}
+                                          <code className="CodeStar"> *</code>
+                                        </Typography>
+                                      }
+                                      variant="outlined"
+                                      value={section.type}
+                                      onChange={(e) =>
+                                        handleSectionChange(
+                                          index,
+                                          "type",
+                                          e.target.value
+                                        )
+                                      }
+                                    >
+                                      <MenuItem value="Pickup">Pickup</MenuItem>
+                                      <MenuItem value="Drop">Drop</MenuItem>
+                                      <MenuItem value="Pickup & Drop">
+                                        Pickup & Drop
+                                      </MenuItem>
+                                    </Select>
+                                  </FormControl>
+
+                                  <TextField
+                                    label={
+                                      <Typography>
+                                        Purpose{" "}
+                                        <code className="CodeStar"> *</code>
+                                      </Typography>
+                                    }
+                                    multiline
+                                    rows={1}
+                                    variant="outlined"
+                                    value={section.purpose}
+                                    sx={{ width: "100%", marginBottom: "16px" }}
+                                    onChange={(e) =>
+                                      handleSectionChange(
+                                        index,
+                                        "purpose",
+                                        e.target.value
+                                      )
+                                    }
+                                  />
+
+                                  <TextField
+                                    label={
+                                      <Typography>
+                                        Description{" "}
+                                        <code className="CodeStar"> *</code>
+                                      </Typography>
+                                    }
+                                    multiline
+                                    rows={1}
+                                    variant="outlined"
+                                    value={section.description}
+                                    sx={{ width: "100%", marginBottom: "16px" }}
+                                    onChange={(e) =>
+                                      handleSectionChange(
+                                        index,
+                                        "description",
+                                        e.target.value
+                                      )
+                                    }
+                                  />
+
+                                  {/* "Add More Breakpoints" Checkbox */}
+                                  {index === sections.length - 1 && (
+                                    <FormGroup
+                                      row
+                                      sx={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                      }}
+                                    >
+                                      <FormControlLabel
+                                        control={
+                                          <Checkbox
+                                            onChange={handleAddSection}
+                                          />
+                                        }
+                                        label="Add More Breakpoints"
+                                      />
+                                    </FormGroup>
+                                  )}
+                                </Box>
+                              ))}
+                            </Box>
+                          </DialogContent>
+                          <DialogActions>
+                            <Button onClick={handleClose} color="primary">
+                              Close
+                            </Button>
+                          </DialogActions>
+                        </Dialog>
+                      )}
+                    </>
+                  )}
+
+                  {doctypeNames === "FM_Equipment_Vehicle_Request" && (
                     <>
                       <Box
                         className="slideFromRight delay-2"
@@ -1312,7 +2175,13 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                 </ThemeProvider>
               </LocalizationProvider>
               <Box sx={{ display: "flex", marginTop: "20px" }}>
-                <Button className="cancelBtn" onClick={handleCancel}>
+                <Button
+                  className="cancelBtn"
+                  onClick={() => {
+                    onCloseDrawer();
+                    handleCancel();
+                  }}
+                >
                   Cancel
                 </Button>
 
@@ -1331,6 +2200,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
       </Drawer>
     </>
   );
+  
 };
 
 export default TrackRequest;

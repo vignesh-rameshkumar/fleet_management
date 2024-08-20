@@ -302,60 +302,6 @@ const Goods: React.FC<GoodsProps> = ({
   // Save API
   const { createDoc } = useFrappeCreateDoc();
 
-  // const CreateRequestold = async () => {
-  //   try {
-  //     const body = {
-  //       type: rideType,
-  //       project_name: selectedProject,
-  //       from_location: fromLocation,
-  //       to_location: toLocation,
-  //       terms: terms,
-  //       doctypename: "FM_Goods_Vehicle_Request",
-  //       purpose: purpose,
-  //       description: description,
-  //       mod: travelMore,
-  //       mod_dates: moreDates,
-  //       employee_email: userEmailId,
-  //       employee_name: userName,
-  //       request_date_time: date_time,
-  //     };
-  //     await createDoc("FM_Goods_Vehicle_Request", body);
-  //     toast.success("Request Created Successfully ");
-  //     setSelectedProject();
-  //     handleCancel();
-  //   } catch (error) {
-  //     if (error.response) {
-  //       const statusCode = error.response.status;
-  //       const serverMessage = error.response.data?._server_messages;
-
-  //       if (statusCode === 400) {
-  //         toast.error("Bad request. Please check your input.");
-  //       } else if (statusCode === 401) {
-  //         toast.error("Unauthorized. Please log in.");
-  //       } else if (statusCode === 404) {
-  //         toast.error("Resource not found.");
-  //       } else if (statusCode === 500) {
-  //         toast.error("Internal server error. Please try again later.");
-  //       } else if (serverMessage) {
-  //         const parsedMessages = JSON.parse(serverMessage);
-  //         const errorMessage = parsedMessages
-  //           .map((msg) => JSON.parse(msg).message)
-  //           .join(", ");
-  //         toast.error(errorMessage, "Error");
-  //       } else {
-  //         toast.error(`Error: ${statusCode}`);
-  //       }
-  //     } else if (error.request) {
-  //       toast.error(
-  //         "No response received from server. Please try again later."
-  //       );
-  //     } else {
-  //       toast.error(`${error.exception}`, "Error");
-  //     }
-  //   }
-  // };
-  // New
-
   const CreateRequest = async () => {
     try {
       // Step 1: Create Parent Document
@@ -401,7 +347,6 @@ const Goods: React.FC<GoodsProps> = ({
 
         await createDoc("FM_Goods_Breakpoints", childBody);
       }
-
       toast.success("Request Created Successfully ");
       setSelectedProject();
       handleCancel();

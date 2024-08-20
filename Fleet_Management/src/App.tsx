@@ -33,6 +33,8 @@ interface EmployeeData {
 }
 
 const App: React.FC = () => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [currentDrawer, setCurrentDrawer] = useState<string>("");
   const [darkMode, setDarkMode] = useState(false);
   const [isOpenMenu, setIsOpenMenu] = useState(true);
   const [empdetail, setEmpdetail] = useState({
@@ -92,7 +94,13 @@ const App: React.FC = () => {
   const userEmailId = cookieData["user_id"];
   const userName = cookieData["full_name"];
   const userImage = cookieData["user_image"];
-
+  const toggleDrawer = (open: boolean, drawerType: string) => {
+    setIsOpen(open);
+    setCurrentDrawer(drawerType);
+  };
+  const handleCloseDrawer = () => {
+    toggleDrawer(false, "");
+  };
   return (
     <FrappeProvider socketPort={import.meta.env.VITE_SOCKET_PORT ?? ""}>
       {loading && <Preloader />}
@@ -150,6 +158,7 @@ const App: React.FC = () => {
                         userEmailId={userEmailId}
                         userName={userName}
                         employeeID={employeeID}
+                        onCloseDrawer={handleCloseDrawer}
                       />
                     }
                   />
