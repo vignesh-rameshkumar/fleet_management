@@ -26,7 +26,7 @@ doc_events = {
     "FM_Equipment_Vehicle_Request": {
         "on_insert": "fleet_management.validate.sync_to_fm_request_master",
         "on_update": "fleet_management.validate.sync_to_fm_request_master",
-        "before_save": "fleet_management.validate.before_save",
+        "before_save": "fleet_management.validate.before_save_eq",
         "before_insert": "fleet_management.validate.call"
     },
     "FM_Group_Vehicle_Request": {
