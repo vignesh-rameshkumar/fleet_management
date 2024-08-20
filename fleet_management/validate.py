@@ -118,9 +118,9 @@ def before_insert(doc, method):
         doc.reports_to = ''
         doc.status = 'Pending'
 
-    # Remove duplicate email from reports_to if it's the same as reports_head
-    if doc.reports_to.strip() == doc.reports_head.strip():
-        doc.reports_head = ''
+    # # Remove duplicate email from reports_to if it's the same as reports_head
+    # if doc.reports_to.strip() == doc.reports_head.strip():
+    #     doc.reports_head = ''
 
 def autofill(doc, method):
     if doc.employee_email:

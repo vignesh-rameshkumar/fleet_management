@@ -15,7 +15,7 @@
   "doctypename",
   "status",
   "reports_to",
-  "reports_head",
+  "reason",
   "bill_amount",
   "payment_status"
  ],
