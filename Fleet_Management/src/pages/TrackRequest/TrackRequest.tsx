@@ -744,7 +744,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
     },
   ];
 
-  if (isLoading || isLoadingSpecific) {
+  if (isLoading) {
     return (
       <Box
         sx={{
@@ -2180,8 +2180,8 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                 <Button
                   className="cancelBtn"
                   onClick={() => {
-                    onCloseDrawer();
                     handleCancel();
+                    handleCloseDrawer();
                   }}
                 >
                   Cancel
@@ -2191,6 +2191,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                   className="saveBtn"
                   onClick={() => {
                     handleUpdate();
+                    handleCloseDrawer();
                   }}
                 >
                   Update
