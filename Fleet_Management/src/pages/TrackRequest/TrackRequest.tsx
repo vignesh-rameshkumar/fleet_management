@@ -204,6 +204,8 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
   const { data: FM_Request_Master, isLoading } = useFrappeGetDocList(
     "FM_Request_Master",
     {
+      filters: [["owner", "=", userEmailId]],
+
       fields: ["*"],
       orderBy: {
         field: "modified",
@@ -766,7 +768,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
           padding: "15px",
         }}
       >
-        {/* {JSON.stringify(drawerDetails)} */}
+        {/* {JSON.stringify(tableData)} */}
         <CSmartTable
           cleaner
           clickableRows
@@ -2200,7 +2202,6 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
       </Drawer>
     </>
   );
-  
 };
 
 export default TrackRequest;

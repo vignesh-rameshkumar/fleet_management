@@ -23,6 +23,8 @@ import NotFoundPage from "./component/NotFoundPage.tsx";
 import TrackRequest from "./pages/TrackRequest/TrackRequest.tsx";
 import Bills from "./pages/User/Bills.tsx";
 import RequestApprovalFM from "./pages/FM/RequestApprovalFM.tsx";
+import Vehicle from "./pages/FM/Vehicle.tsx";
+import Driver from "./pages/FM/Driver.tsx";
 
 // import Calendar from "./component/Calendar.tsx";
 
@@ -223,6 +225,28 @@ const App: React.FC = () => {
                     path="/Fleet_Management/requestapprovalfm"
                     element={
                       <RequestApprovalFM
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/Fleet_Management/managefleet/vehicle"
+                    element={
+                      <Vehicle
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/Fleet_Management/managefleet/driver"
+                    element={
+                      <Driver
                         darkMode={darkMode}
                         userEmailId={userEmailId}
                         userName={userName}

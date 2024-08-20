@@ -398,19 +398,19 @@ const SideBar: React.FC<SideBarProps> = ({
 
       submenu: [
         {
-          path: "/Fleet_Management",
+          path: "/Fleet_Management/managefleet/vehicle",
           name: "Vehicle",
         },
         {
-          path: "/Fleet_Management",
+          path: "/Fleet_Management/managefleet/driver",
           name: "Driver",
         },
         {
-          path: "/Fleet_Management",
+          path: "/Fleet_Management/managefleet/logs",
           name: "Logs",
         },
         {
-          path: "/Fleet_Management",
+          path: "/Fleet_Management/managefleet/reports",
           name: "Reports",
         },
       ],
