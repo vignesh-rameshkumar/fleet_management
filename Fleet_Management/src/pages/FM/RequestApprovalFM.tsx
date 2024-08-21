@@ -1,13 +1,35 @@
 import React, { useState, useEffect } from "react";
 import { CSmartTable } from "@coreui/react-pro";
-import { Box, Drawer, Button, Typography, Grid } from "@mui/material";
+import {
+  Box,
+  Drawer,
+  Button,
+  Radio,
+  RadioGroup,
+  InputAdornment,
+  Typography,
+  Grid,
+  FormControlLabel,
+  ThemeProvider,
+  MenuItem,
+  TextField,
+  FormGroup,
+  Checkbox,
+  FormControl,
+  InputLabel,
+  Select,
+} from "@mui/material";
 import { MdOutlineVisibility, MdDeleteForever } from "react-icons/md";
 import { useFrappeGetDocList, useFrappeUpdateDoc } from "frappe-react-sdk";
 import Autocomplete from "@mui/material/Autocomplete";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { toast } from "react-toastify";
 
+import { createTheme } from "@mui/material/styles";
 interface RequestApprovalFMProps {
   darkMode: boolean;
   onCloseDrawer: () => void;
@@ -29,6 +51,20 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
   const [tableData, setTableData] = useState<any[]>([]);
   const [drawerData, setDrawerData] = useState<any[]>([]);
   const [view, setView] = useState<boolean>(false);
+  const [approvalDate, setApprovalDate] = useState(null);
+  const [selectedVehicle, setSelectedVehicle] = useState();
+
+  const [approvalTime, setApprovalTime] = useState(null);
+  const [selectedOption, setSelectedOption] = useState();
+  const [internal, setInternal] = useState(false);
+  const [external, setExternal] = useState(false);
+  const [editShow, setEditShow] = useState(false);
+  const [requestShow, setRequestShow] = useState(false);
+  const [externalVehicleNo, setExternalVehicleNo] = useState("");
+  const [externalDriverNo, setExternalDriverNo] = useState("");
+  const [externalVehicleOTP, setExternalVehicleOTP] = useState("");
+
+  const today = dayjs();
 
   useEffect(() => {
     const filterInput = document.querySelector(".form-control");
@@ -36,78 +72,109 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
       filterInput.placeholder = "Request Type";
     }
   }, []);
-  // Fetching data
 
-  const { data: RM_Project_Lead }: any = useFrappeGetDocList(
-    "RM_Project_Lead",
-    {
-      fields: ["*"],
-      filters: [["project_status", "=", "Active"]],
-      limit: 100000,
-      orderBy: {
-        field: "modified",
-        order: "desc",
+  const handleFromDateChange = (date) => {
+    if (dayjs(date).isValid()) {
+      const formattedDate = dayjs(date).format("DD-MM-YYYY");
+      setApprovalDate(formattedDate);
+    } else {
+      toast.error("Invalid date selected");
+      setApprovalDate(null);
+    }
+  };
+  const handleFromTimeChange = (time) => {
+    if (dayjs(time).isValid()) {
+      const formattedTime = dayjs(time).format("HH:mm");
+      setApprovalTime(formattedTime);
+    } else {
+      toast.error("Invalid time selected");
+      setApprovalTime(null);
+    }
+  };
+  const handleUpdateChange = () => {
+    setEditShow(!editShow);
+    setApprovalTime(null);
+    setApprovalDate(null);
+  };
+
+  const ThemeColor = createTheme({
+    palette: {
+      primary: {
+        main: darkMode ? "#d1d1d1" : "#2D5831",
       },
-    }
-  );
-  const [projectName, setProjectName] = useState(RM_Project_Lead);
-  useEffect(() => {
-    setProjectName(RM_Project_Lead);
-  }, [RM_Project_Lead]);
-  const { data: FM_Request_Master, isLoading } = useFrappeGetDocList(
-    "FM_Request_Master",
-    {
-      fields: ["*"],
-      filters: [
-        ["owner", "!=", userEmailId],
-        // ["reports_head", "=", userEmailId],
-        ["status", "!=", "Cancelled"],
-      ],
-      orderBy: {
-        field: "modified",
-        order: "desc",
-      },
-    }
-  );
-
-  // Set table data when the fetched data changes
-  useEffect(() => {
-    if (FM_Request_Master) {
-      setTableData(FM_Request_Master);
-    }
-  }, [FM_Request_Master]);
-
-  // console.log("FM_Request_Master", FM_Request_Master);
-
-  const doctypeName = drawerDetails.doctypename;
-  const documentName = drawerDetails.request_id;
-  // Fetch specific data only if doctypeName and documentName are defined
-  const { data: specificData } = useFrappeGetDocList(doctypeName || "", {
-    fields: ["*"],
-    orderBy: {
-      field: "modified",
-      order: "desc",
     },
-    filters: documentName ? [["name", "=", documentName]] : [],
-    limit: 1,
+    components: {
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+            "& fieldset": {
+              borderColor: darkMode ? "#d1d1d1" : "",
+              color: darkMode ? "#d1d1d1" : "#000",
+            },
+            "&:hover fieldset": {
+              borderColor: darkMode ? "#d1d1d1" : "#3f9747",
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: darkMode ? "#d1d1d1" : "#3f9747",
+            },
+            "& input::placeholder": {
+              color: darkMode ? "#d1d1d1" : "#000", // Set placeholder color to red when darkMode is true
+            },
+            "& input": {
+              color: darkMode ? "#d1d1d1" : "#5b5b5b", // Set typing text color to red when darkMode is true
+            },
+          },
+        },
+      },
+      MuiMenuItem: {
+        styleOverrides: {
+          root: {
+            backgroundColor: "#EFFFEF !important",
+            color: darkMode ? "#5b5b5b" : "#5b5b5b", // Set typing text color to red when darkMode is true
+            "&:hover": {
+              backgroundColor: "#4D8C52 !important",
+              color: "#fff",
+            },
+          },
+        },
+      },
+
+      MuiInputLabel: {
+        styleOverrides: {
+          root: {
+            color: darkMode ? "#d1d1d1" : "#5b5b5b", // Set input label color to red when darkMode is true
+          },
+        },
+      },
+      MuiInputBase: {
+        styleOverrides: {
+          input: {
+            "&::placeholder": {
+              color: darkMode ? "#d1d1d1" : "#000",
+            },
+            color: darkMode ? "#d1d1d1" : "#5b5b5b",
+          },
+        },
+      },
+
+      MuiSvgIcon: {
+        styleOverrides: {
+          root: {
+            color: darkMode ? "#d1d1d1" : "#5b5b5b", // Set date picker icon color to red when darkMode is true
+          },
+        },
+      },
+      MuiRadio: {
+        styleOverrides: {
+          root: {
+            "&$checked": {
+              color: "#d1d1d1", // Change the border color when the radio button is checked
+            },
+          },
+        },
+      },
+    },
   });
-
-  // Update drawer data when specific data changes
-  useEffect(() => {
-    if (specificData) {
-      setDrawerData(specificData);
-    }
-  }, [specificData]);
-
-  // Handle drawer toggle
-  const toggleDrawer = (open: boolean) => {
-    setIsOpen(open);
-  };
-
-  const handleCloseDrawer = () => {
-    toggleDrawer(false);
-  };
-
   const columns = [
     {
       key: "S_no",
@@ -219,6 +286,148 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
       sorter: false,
     },
   ];
+
+  // Fetching data
+
+  // Project API
+
+  const { data: RM_Project_Lead }: any = useFrappeGetDocList(
+    "RM_Project_Lead",
+    {
+      fields: ["*"],
+      filters: [["project_status", "=", "Active"]],
+      limit: 100000,
+      orderBy: {
+        field: "modified",
+        order: "desc",
+      },
+    }
+  );
+
+  const [projectName, setProjectName] = useState(RM_Project_Lead);
+
+  useEffect(() => {
+    setProjectName(RM_Project_Lead);
+  }, [RM_Project_Lead]);
+
+  const [selectedProject, setSelectedProject] = useState();
+
+  const handleChange = (event) => {
+    setSelectedProject(event.target.value);
+  };
+  const handleCloseDrawer = () => {
+    toggleDrawer(false);
+    setApprovalTime(null);
+    setApprovalDate(null);
+    setSelectedVehicle();
+    setSelectedDriver();
+    setSelectedOption();
+    setInternal(false);
+    setExternal(false);
+    setEditShow(false);
+    setExternalVehicleNo("");
+    setExternalDriverNo("");
+    setExternalVehicleOTP("");
+  };
+
+  // Vehicle API
+  const { data: FM_Vehicle_Details }: any = useFrappeGetDocList(
+    "FM_Vehicle_Details",
+    {
+      fields: ["*"],
+      filters: [["status", "=", "Online"]],
+      limit: 100000,
+      orderBy: {
+        field: "modified",
+        order: "desc",
+      },
+    }
+  );
+
+  const [vehicleName, setVehicleName] = useState(FM_Vehicle_Details);
+
+  useEffect(() => {
+    setVehicleName(FM_Vehicle_Details);
+  }, [FM_Vehicle_Details]);
+
+  const handleVehicle = (event) => {
+    setSelectedVehicle(event.target.value);
+  };
+
+  // Driver Details
+
+  const { data: FM_Driver_Details }: any = useFrappeGetDocList(
+    "FM_Driver_Details",
+    {
+      fields: ["*"],
+      filters: [["status", "=", "Online"]],
+      limit: 100000,
+      orderBy: {
+        field: "modified",
+        order: "desc",
+      },
+    }
+  );
+
+  const [driverName, setdriverName] = useState(FM_Driver_Details);
+
+  useEffect(() => {
+    setdriverName(FM_Driver_Details);
+  }, [FM_Driver_Details]);
+
+  const [selectedDriver, setSelectedDriver] = useState();
+
+  const handleDriver = (event) => {
+    setSelectedDriver(event.target.value);
+  };
+
+  const { data: FM_Request_Master, isLoading } = useFrappeGetDocList(
+    "FM_Request_Master",
+    {
+      fields: ["*"],
+      filters: [
+        ["owner", "!=", userEmailId],
+        ["status", "!=", "Cancelled"],
+      ],
+      orderBy: {
+        field: "modified",
+        order: "desc",
+      },
+    }
+  );
+
+  // Set table data when the fetched data changes
+  useEffect(() => {
+    if (FM_Request_Master) {
+      setTableData(FM_Request_Master);
+    }
+  }, [FM_Request_Master]);
+
+  const doctypeName = drawerDetails.doctypename;
+  const documentName = drawerDetails.request_id;
+  const { data: specificData } = useFrappeGetDocList(doctypeName || "", {
+    fields: ["*"],
+    orderBy: {
+      field: "modified",
+      order: "desc",
+    },
+    filters: documentName ? [["name", "=", documentName]] : [],
+    limit: 1,
+  });
+
+  useEffect(() => {
+    if (specificData) {
+      setDrawerData(specificData);
+    }
+  }, [specificData]);
+
+  // Handle drawer toggle
+  const toggleDrawer = (open: boolean) => {
+    setIsOpen(open);
+    setSelectedOption("Internal");
+    setInternal(true);
+  };
+
   const [selectedRowItem, setSelectedRowItem] = useState(null);
 
   const handleRowClick = (item: any) => {
@@ -226,16 +435,31 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
     toggleDrawer(true);
     setView(true);
     setDrawerDetails(item);
+    setSelectedOption("Internal");
+    setInternal(true);
   };
 
   const { updateDoc } = useFrappeUpdateDoc();
 
+  const Approvel_date_time = `${approvalDate} ${approvalTime}`;
+  const Req_date_time = dayjs(drawerDetails.creation).format(
+    "DD-MM-YYYY HH:mm"
+  );
+
+  // console.log("Req_date_time", Req_date_time);
   const handleapprove = async () => {
     let doctypename = drawerDetails.doctypename;
     let id = drawerDetails.name;
 
     let updateData = {
       status: "Approved",
+      driver_name_no: selectedDriver ? selectedDriver : externalDriverNo,
+      vehicle_no: selectedVehicle ? selectedVehicle : externalVehicleNo,
+      allotment: selectedOption,
+      otp: externalVehicleOTP,
+
+      approved_date_time:
+        approvalDate && approvalTime ? Approvel_date_time : Req_date_time,
     };
 
     try {
@@ -250,9 +474,63 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
       });
 
       toast.success("Approved Successfully");
-      toggleDrawer(false);
+
+      handleCloseDrawer();
     } catch (error) {
       toast.error(`Error Approved doc: ${error.message}`);
+    }
+  };
+
+  const handleOptionChange = (event: any) => {
+    setSelectedOption(event.target.value);
+
+    if (event.target.value === "Internal") {
+      handleInternalChange();
+    } else {
+      handleexternalChange();
+    }
+  };
+  // useEffect(() => {
+  //   setSelectedOption("Internal");
+  //   setInternal(true);
+  // }, []);
+
+  const handleInternalChange = () => {
+    setExternal(false);
+    setInternal(true);
+    setExternalVehicleNo("");
+    setExternalDriverNo("");
+    setExternalVehicleOTP("");
+  };
+
+  const handleexternalChange = () => {
+    setInternal(false);
+    setExternal(true);
+    setEditShow(false);
+    setSelectedVehicle();
+    setSelectedDriver();
+  };
+
+  const handleVehicleValidation = (e: any) => {
+    const vehicleNo = e.target.value;
+    const vehicleNoPattern = /^[A-Z0-9-]{0,10}$/; // Allow empty input and up to 10 characters
+    setExternalVehicleNo(vehicleNo);
+    if (vehicleNo && !vehicleNoPattern.test(vehicleNo)) {
+      toast.warning(
+        "Invalid vehicle number. Please enter a valid vehicle number (e.g., TN00AV1234)."
+      );
+    }
+  };
+
+  const handlePhoneNoValidation = (e: any) => {
+    const phoneNo = e.target.value;
+    if (phoneNo.length <= 10 && /^[0-9]*$/.test(phoneNo)) {
+      setExternalDriverNo(phoneNo);
+    }
+    if (phoneNo.length === 10 && !/^[0-9]{10}$/.test(phoneNo)) {
+      toast.warning(
+        "Invalid Phone Number. Please enter a 10-digit phone number (e.g., 0123456789)."
+      );
     }
   };
 
@@ -281,7 +559,7 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
           padding: "15px",
         }}
       >
-        {/* {JSON.stringify(tableData)} */}
+        {JSON.stringify(drawerData)}
         <CSmartTable
           cleaner
           clickableRows
@@ -614,18 +892,437 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
                       }}
                     ></Box>
                   )}
+                  <br />
+
+                  {/* Option  */}
+
+                  <Box>
+                    <ThemeProvider theme={ThemeColor}>
+                      <Box>Select an Option</Box>
+                      <Box>
+                        {" "}
+                        <RadioGroup
+                          row
+                          value={selectedOption}
+                          onChange={handleOptionChange}
+                        >
+                          <FormControlLabel
+                            sx={{ marginRight: { sm: "120px" } }}
+                            value={"Internal"}
+                            control={<Radio />}
+                            label="Internal"
+                            onClick={handleInternalChange}
+                          />
+                          <FormControlLabel
+                            value={"External"}
+                            control={<Radio />}
+                            label="External"
+                            onClick={handleexternalChange}
+                          />
+                        </RadioGroup>
+                      </Box>
+                      {internal && (
+                        <>
+                          <Box
+                            sx={{
+                              border: "1px solid #d1d1d1",
+                              width: "90%",
+                              margin: "0 auto",
+                              padding: "10px 30px",
+                              borderRadius: "5px",
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                              }}
+                            >
+                              <Box sx={{ color: "#383838", fontSize: "14px" }}>
+                                <span>
+                                  If the date and time are acceptable, approve
+                                  it ,If changes are needed, use the edit option
+                                </span>
+                              </Box>
+                              <Box>
+                                <Button
+                                  className="saveBtn"
+                                  onClick={handleUpdateChange}
+                                >
+                                  Edit
+                                </Button>
+                              </Box>
+                            </Box>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                              }}
+                            >
+                              <Box marginBottom="16px">
+                                <Typography variant="body1">
+                                  Start Date
+                                </Typography>
+                                <Typography
+                                  variant="body1"
+                                  sx={{
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  {`${new Date(drawerDetails.creation)
+                                    .getDate()
+                                    .toString()
+                                    .padStart(2, "0")}-${(
+                                    new Date(
+                                      drawerDetails.creation
+                                    ).getMonth() + 1
+                                  )
+                                    .toString()
+                                    .padStart(2, "0")}-${new Date(
+                                    drawerDetails.creation
+                                  ).getFullYear()}`}
+                                </Typography>
+                              </Box>
+                              <Box marginBottom="16px">
+                                <Typography variant="body1">
+                                  End Time
+                                </Typography>
+                                <Typography
+                                  variant="body1"
+                                  sx={{
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  {new Date(
+                                    drawerDetails.creation
+                                  ).toLocaleTimeString()}
+                                </Typography>
+                              </Box>
+                            </Box>
+                            {editShow && (
+                              <>
+                                <LocalizationProvider
+                                  dateAdapter={AdapterDayjs}
+                                >
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      justifyContent: "space-between",
+                                    }}
+                                  >
+                                    {" "}
+                                    <Box
+                                      width={{
+                                        xs: "100%",
+                                        sm: "100%",
+                                        md: "90%",
+                                      }}
+                                      marginBottom="16px"
+                                      textAlign={"center"}
+                                    >
+                                      <DatePicker
+                                        label={
+                                          <Typography>
+                                            Select Start Date{" "}
+                                            <code className="CodeStar">*</code>
+                                          </Typography>
+                                        }
+                                        value={
+                                          approvalDate
+                                            ? dayjs(approvalDate, "DD-MM-YYYY")
+                                            : null
+                                        }
+                                        minDate={today}
+                                        sx={{
+                                          width: {
+                                            xs: "100%",
+                                            sm: "100%",
+                                            md: "90%",
+                                          },
+                                        }}
+                                        format="DD-MM-YYYY"
+                                        onChange={handleFromDateChange}
+                                        renderInput={(params) => (
+                                          <TextField
+                                            {...params}
+                                            variant="outlined"
+                                            placeholder=" Select Start Date"
+                                            error={false}
+                                          />
+                                        )}
+                                      />
+                                    </Box>
+                                    <Box
+                                      width={{
+                                        xs: "100%",
+                                        sm: "100%",
+                                        md: "90%",
+                                      }}
+                                      marginBottom="16px"
+                                      textAlign={"center"}
+                                    >
+                                      <TimePicker
+                                        label={
+                                          <>
+                                            Select Start Time{" "}
+                                            <Typography
+                                              variant="code"
+                                              className="CodeStar"
+                                            >
+                                              *
+                                            </Typography>
+                                          </>
+                                        }
+                                        sx={{
+                                          width: {
+                                            xs: "100%",
+                                            sm: "100%",
+                                            md: "90%",
+                                          },
+                                        }}
+                                        value={
+                                          approvalTime
+                                            ? dayjs(approvalTime, "HH:mm")
+                                            : null
+                                        }
+                                        format="HH:mm"
+                                        ampm={false}
+                                        onChange={handleFromTimeChange}
+                                        renderInput={(params) => (
+                                          <TextField
+                                            {...params}
+                                            placeholder=" Select Start Time"
+                                            error={false}
+                                          />
+                                        )}
+                                        adapter={AdapterDayjs}
+                                      />
+                                    </Box>
+                                  </Box>
+                                </LocalizationProvider>
+                              </>
+                            )}
+                          </Box>
+                          <br />
+                          <Box
+                            className={"Box"}
+                            sx={{
+                              gap: "10px",
+                              margin: "0 auto",
+                              width: {
+                                xs: "90%",
+                                sm: "90%",
+                                md: "90%",
+                              },
+                            }}
+                          >
+                            <Box
+                              width={{ xs: "100%", sm: "100%", md: "90%" }}
+                              marginBottom="16px"
+                            >
+                              <FormControl
+                                variant="outlined"
+                                sx={{
+                                  width: { xs: "100%", sm: "100%", md: "90%" },
+                                }}
+                              >
+                                <InputLabel>
+                                  Vehicle Assign{""}
+                                  <Typography
+                                    className="CodeStar"
+                                    variant="Code"
+                                  >
+                                    *
+                                  </Typography>
+                                </InputLabel>
+                                <Select
+                                  value={selectedVehicle}
+                                  onChange={handleVehicle}
+                                  label={
+                                    <>
+                                      Select Vehicle{""}
+                                      <Typography
+                                        className="CodeStar"
+                                        variant="Code"
+                                      >
+                                        *
+                                      </Typography>
+                                    </>
+                                  }
+                                >
+                                  {vehicleName?.map((x) => (
+                                    <MenuItem key={x?.name} value={x.name}>
+                                      {x.name}
+                                    </MenuItem>
+                                  ))}
+                                </Select>
+                              </FormControl>
+                            </Box>
+                            <Box
+                              width={{ xs: "100%", sm: "100%", md: "90%" }}
+                              marginBottom="16px"
+                            >
+                              <FormControl
+                                variant="outlined"
+                                sx={{
+                                  width: { xs: "100%", sm: "100%", md: "90%" },
+                                }}
+                              >
+                                <InputLabel>
+                                  Driver Assign {""}
+                                  <Typography
+                                    className="CodeStar"
+                                    variant="Code"
+                                  >
+                                    *
+                                  </Typography>
+                                </InputLabel>
+                                <Select
+                                  value={selectedDriver}
+                                  onChange={handleDriver}
+                                  label={
+                                    <>
+                                      Select Driver{""}
+                                      <Typography
+                                        className="CodeStar"
+                                        variant="Code"
+                                      >
+                                        *
+                                      </Typography>
+                                    </>
+                                  }
+                                >
+                                  {driverName?.map((x) => (
+                                    <MenuItem
+                                      key={x?.name}
+                                      value={x.employee_name}
+                                    >
+                                      {x.employee_name}
+                                    </MenuItem>
+                                  ))}
+                                </Select>
+                              </FormControl>
+                            </Box>
+                          </Box>
+                        </>
+                      )}
+                      {external && (
+                        <>
+                          <Box
+                            sx={{
+                              border: "1px solid #d1d1d1",
+                              width: "90%",
+                              margin: "0 auto",
+                              padding: "10px 30px",
+                              borderRadius: "5px",
+                            }}
+                          >
+                            <Box sx={{ display: "flex" }}>
+                              <Box>
+                                <TextField
+                                  label={
+                                    <Typography>
+                                      Vehicle Number{" "}
+                                      <code className="CodeStar"> *</code>
+                                    </Typography>
+                                  }
+                                  variant="outlined"
+                                  value={externalVehicleNo}
+                                  sx={{
+                                    width: {
+                                      xs: "100%",
+                                      sm: "100%",
+                                      md: "90%",
+                                    },
+                                  }}
+                                  onChange={(e) => {
+                                    handleVehicleValidation(e);
+                                  }}
+                                />
+                              </Box>
+                              <Box>
+                                <TextField
+                                  label={
+                                    <Typography>
+                                      Driver Phone Number{" "}
+                                      <code className="CodeStar"> *</code>
+                                    </Typography>
+                                  }
+                                  variant="outlined"
+                                  value={externalDriverNo}
+                                  sx={{
+                                    width: {
+                                      xs: "100%",
+                                      sm: "100%",
+                                      md: "90%",
+                                    },
+                                  }}
+                                  onChange={(e) => {
+                                    handlePhoneNoValidation(e);
+                                  }}
+                                />
+                              </Box>
+                            </Box>
+                            <Box
+                              sx={{
+                                width: {
+                                  xs: "100%",
+                                  sm: "100%",
+                                  md: "47%",
+                                },
+                                marginTop: "16px",
+                              }}
+                            >
+                              <TextField
+                                label={
+                                  <Typography>
+                                    OTP <code className="CodeStar"> *</code>
+                                  </Typography>
+                                }
+                                variant="outlined"
+                                value={externalVehicleOTP}
+                                sx={{
+                                  width: {
+                                    xs: "100%",
+                                    sm: "100%",
+                                    md: "90%",
+                                  },
+                                }}
+                                onChange={(e) => {
+                                  setExternalVehicleOTP(e.target.value);
+                                }}
+                              />
+                            </Box>
+                          </Box>
+                        </>
+                      )}
+                    </ThemeProvider>
+                  </Box>
                 </div>
               </Box>
             </Box>
           </>
         )}
-        <br />
-        {drawerDetails.status === "Project Lead Approved" && (
+
+        {drawerDetails?.status === "Project Lead Approved" && (
           <Box display="flex" flexDirection="column" alignItems="center">
             <Box sx={{ display: "flex" }}>
               <Button className="deleteBtn">Reject</Button>
-
-              <Button className="saveBtn" onClick={handleapprove}>
+              <Button
+                className="saveBtn"
+                disabled={
+                  (selectedOption === "Internal" &&
+                    (!selectedVehicle ||
+                      !selectedDriver ||
+                      (editShow === true &&
+                        (!approvalDate || !approvalTime)))) ||
+                  (selectedOption === "External" &&
+                    (!externalVehicleOTP ||
+                      !externalDriverNo ||
+                      !externalVehicleNo))
+                }
+                onClick={handleapprove}
+              >
                 Approve
               </Button>
             </Box>
