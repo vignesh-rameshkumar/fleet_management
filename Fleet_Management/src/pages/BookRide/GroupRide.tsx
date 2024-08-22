@@ -261,7 +261,10 @@ const GroupRide: React.FC<GroupRideProps> = ({
 
   const { data: Employee }: any = useFrappeGetDocList("Employee", {
     fields: ["*"],
-    filters: [["status", "=", "Active"]],
+    filters: [
+      ["status", "=", "Active"],
+      ["company_email", "!=", userEmailId],
+    ],
     limit: 100000,
     orderBy: {
       field: "modified",
@@ -270,7 +273,7 @@ const GroupRide: React.FC<GroupRideProps> = ({
   });
 
   const [employeeName, setEmployeeName] = useState(Employee);
-
+  // console.log("employeeName", employeeName);
   useEffect(() => {
     setEmployeeName(Employee);
   }, [Employee]);
@@ -671,7 +674,7 @@ const GroupRide: React.FC<GroupRideProps> = ({
                     <DatePicker
                       label={
                         <Typography>
-                          Date <code className="CodeStar">*</code>
+                          Select Date <code className="CodeStar">*</code>
                         </Typography>
                       }
                       // value={dayjs(rideDate, "DD-MM-YYYY")}
@@ -892,7 +895,7 @@ const GroupRide: React.FC<GroupRideProps> = ({
                                 sx={{
                                   display: "flex",
                                   alignItems: "center",
-                                  gap: "150px",
+                                  gap: "200px",
                                 }}
                               >
                                 <Typography>

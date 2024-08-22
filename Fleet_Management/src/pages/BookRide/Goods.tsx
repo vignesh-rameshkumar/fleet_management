@@ -603,7 +603,7 @@ const Goods: React.FC<GoodsProps> = ({
                     <DatePicker
                       label={
                         <Typography>
-                          From <code className="CodeStar">*</code>
+                          Select Date <code className="CodeStar">*</code>
                         </Typography>
                       }
                       value={rideDate ? dayjs(rideDate, "DD-MM-YYYY") : null}
@@ -646,7 +646,7 @@ const Goods: React.FC<GoodsProps> = ({
                     <TimePicker
                       label={
                         <>
-                          Time{" "}
+                          Select Time{" "}
                           <Typography variant="code" className="CodeStar">
                             *
                           </Typography>

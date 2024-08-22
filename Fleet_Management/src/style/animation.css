@@ -63,21 +63,21 @@
 }
 
 .delay-1 {
-  animation-delay: 0.2s; /* Soft delay */
+  animation-delay: 0.01s; /* Soft delay */
 }
 
 .delay-2 {
-  animation-delay: 0.3s; /* Soft delay */
+  animation-delay: 0.03s; /* Soft delay */
 }
 
 .delay-3 {
-  animation-delay: 0.4s; /* Soft delay */
+  animation-delay: 0.06s; /* Soft delay */
 }
 .delay-4 {
-  animation-delay: 0.5s; /* Soft delay */
+  animation-delay: 0.08s; /* Soft delay */
 }
 .delay-5 {
-  animation-delay: 0.6s; /* Soft delay */
+  animation-delay: 0.1s; /* Soft delay */
 }
 
 @keyframes slideFromTop {

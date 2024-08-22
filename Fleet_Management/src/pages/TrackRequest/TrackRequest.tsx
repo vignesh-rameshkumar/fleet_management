@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { CSmartTable } from "@coreui/react-pro";
+import { VscError } from "react-icons/vsc";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import { MdOutlineDoneOutline } from "react-icons/md";
+
 import {
   Box,
   Drawer,
@@ -10,6 +16,7 @@ import {
   CircularProgress,
   FormControl,
   InputAdornment,
+  DialogContentText,
   MenuItem,
   TextField,
   FormControlLabel,
@@ -34,6 +41,8 @@ import {
 import { MdAddCircle } from "react-icons/md";
 import { MdClose } from "react-icons/md";
 import ClearIcon from "@mui/icons-material/Clear";
+import { FaRegEdit } from "react-icons/fa";
+import { SiTicktick } from "react-icons/si";
 
 import { MdOutlineVisibility, MdDeleteForever } from "react-icons/md";
 import {
@@ -49,8 +58,6 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { ThemeProvider, createTheme } from "@mui/material";
-import { HiPlusSm, HiMinusSm } from "react-icons/hi";
-import { red } from "@mui/material/colors";
 
 interface TrackRequestProps {
   darkMode: boolean;
@@ -67,6 +74,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
   employeeID,
   userName,
 }) => {
+  // ThemeColour
   const ThemeColor = createTheme({
     palette: {
       primary: {
@@ -172,6 +180,10 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
   const [description, setDescription] = useState("");
   const [documentName, setDocumnetName] = useState("");
   const [doctypeNames, setDoctypeNames] = useState("");
+  const [btnShow, setBtnShow] = useState(false);
+
+  const [selectedItem, setSelectedItem] = useState(null);
+
   const [sections, setSections] = useState([]);
   const [isAddMoreChecked, setIsAddMoreChecked] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
@@ -183,6 +195,12 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
   const [filter, setFilter] = useState("");
   const [editedPassenger, setEditedPassenger] = useState({});
   // Fetching data
+  useEffect(() => {
+    const filterInput = document.querySelector(".form-control");
+    if (filterInput) {
+      filterInput.placeholder = "Request Type";
+    }
+  }, []);
 
   const { data: RM_Project_Lead }: any = useFrappeGetDocList(
     "RM_Project_Lead",
@@ -200,11 +218,12 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
   useEffect(() => {
     setProjectName(RM_Project_Lead);
   }, [RM_Project_Lead]);
-  // console.log("sections", sections);
+
   const { data: FM_Request_Master, isLoading } = useFrappeGetDocList(
     "FM_Request_Master",
     {
       fields: ["*"],
+      filters: [["owner", "=", userEmailId]],
       orderBy: {
         field: "modified",
         order: "desc",
@@ -212,13 +231,11 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
     }
   );
 
-  // Set table data when the fetched data changes
   useEffect(() => {
     if (FM_Request_Master) {
       setTableData(FM_Request_Master);
     }
   }, [FM_Request_Master]);
-  // Fetch specific data only if doctypeNames and documentName are defined
   const { data: specificData, isLoading: isLoadingSpecific } =
     useFrappeGetDocList(doctypeNames || "", {
       fields: ["*"],
@@ -230,7 +247,6 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
       limit: 1,
     });
 
-  // Update drawer data when specific data changes
   useEffect(() => {
     if (specificData) {
       setDrawerData(specificData);
@@ -257,21 +273,20 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
       employee.name.toLowerCase().includes(filter.toLowerCase()) ||
       employee.employee_name.toLowerCase().includes(filter.toLowerCase())
   );
-  // get child docytypes from group ride
+
   const { data: FM_Group_Vehicle_Request }: any = useFrappeGetDoc(
     doctypeNames,
     documentName
   );
-  // Initialize state for group ride data
+
   const [groupRideData, setGroupRideData] = useState(FM_Group_Vehicle_Request);
 
-  // Update groupRideData state when FM_Group_Vehicle_Request data changes
   useEffect(() => {
     if (FM_Group_Vehicle_Request) {
       setGroupRideData(FM_Group_Vehicle_Request);
     }
   }, [FM_Group_Vehicle_Request]);
-  // Handle drawer toggle
+
   const toggleDrawer = (open: boolean) => {
     setIsOpen(open);
   };
@@ -285,6 +300,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
     setTerms(false);
     setOpenModal(false);
     setRideTime(null);
+    setRideMoreDates([]);
   };
   const handleTermsChange = () => {
     setOpenModal(true);
@@ -332,7 +348,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
   };
   const handleFromTimeChange = (time) => {
     if (dayjs(time).isValid()) {
-      const formattedTime = dayjs(time).format("HH:mm:ss");
+      const formattedTime = dayjs(time).format("HH:mm");
       setRideTime(formattedTime);
     } else {
       toast.error("Invalid time selected");
@@ -341,7 +357,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
   };
   const handleToTimeChange = (time) => {
     if (dayjs(time).isValid()) {
-      const formattedTime = dayjs(time).format("HH:mm:ss");
+      const formattedTime = dayjs(time).format("HH:mm");
       setToTime(formattedTime);
     } else {
       toast.error("Invalid time selected");
@@ -354,7 +370,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
       const formattedDate = dayjs(date).format("DD-MM-YYYY");
       setRideDate(formattedDate); // Set the valid date
     } else {
-      setRideDate(null); // Clear the date if invalid
+      setRideDate(null);
     }
   };
   const handleEditClick = (index, breakPoint) => {
@@ -369,45 +385,42 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
     });
   };
 
-  const handleSaveClick = async () => {
-    // console.log("EditedData:", editedBreakPoint);
-
+  const handleSaveClickGroupRide = async (index) => {
+    const updatedPassengerDetails = groupRideData.passenger_details.map(
+      (passenger, i) =>
+        i === index ? { ...passenger, ...editedPassenger } : passenger
+    );
     try {
-      await handleGroupRideData(editedBreakPoint);
+      await handleGroupRideDataPassenger(updatedPassengerDetails[index]);
       toast.success("Document updated successfully");
+
+      setGroupRideData((prev) => ({
+        ...prev,
+        passenger_details: updatedPassengerDetails,
+      }));
     } catch (error) {
-      console.error("Error updating document:", error);
       toast.error("Failed to update document");
     }
 
-    setEditIndex(null);
-  };
-  const handleSaveClickGroupRide = async () => {
-    // console.log("EditedData:", editedPassenger);
-
-    try {
-      await handleGroupRideDataPassenger(editedPassenger);
-      toast.success("Document updated successfully");
-    } catch (error) {
-      console.error("Error updating document:", error);
-      toast.error("Failed to update document");
-    }
-
+    // Reset the edit index
     setEditIndex(null);
   };
 
+  // Function to handle input changes
   const handleInputChange = (e, field) => {
-    setEditedBreakPoint({
-      ...editedBreakPoint,
+    setEditedBreakPoint((prev) => ({
+      ...prev,
       [field]: e.target.value,
-    });
+    }));
   };
+
   const handleInputChangeGroupRide = (e, field) => {
-    setEditedPassenger({
-      ...editedPassenger,
+    setEditedPassenger((prev) => ({
+      ...prev,
       [field]: e.target.value,
-    });
+    }));
   };
+
   const Changeride = (event) => {
     setRideType(event.target.value);
   };
@@ -418,6 +431,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
 
   const handleCloseDrawer = () => {
     toggleDrawer(false);
+    // setRideMoreDates([]);
   };
   const handleTravelMoreChange = () => {
     setTravelMore((prevState) => !prevState);
@@ -457,9 +471,35 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
       toast.warning("Invalid date selected");
     }
   };
-  const handleGroupRideData = async () => {
-    // Check if editedBreakPoint has data and name is available
-    if (!editedBreakPoint || !editedBreakPoint.name) {
+
+  const handleSaveClick = async (index) => {
+    try {
+      // Update the row data
+      const updatedBreakPoints = groupRideData.break_points.map(
+        (breakPoint, i) => (i === index ? { ...editedBreakPoint } : breakPoint)
+      );
+
+      // Perform the update operation
+      await handleGroupRideData(updatedBreakPoints[index]);
+
+      // Update the state with the new break points
+      setGroupRideData((prev) => ({
+        ...prev,
+        break_points: updatedBreakPoints,
+      }));
+
+      toast.success("Document updated successfully");
+    } catch (error) {
+      console.error("Error updating document:", error);
+      toast.error("Failed to update document");
+    }
+
+    setEditIndex(null);
+  };
+
+  const handleGroupRideData = async (breakPoint) => {
+    // Check if breakPoint has data and name is available
+    if (!breakPoint || !breakPoint.name) {
       console.error("Error: No edited data available or missing 'name' field");
       return;
     }
@@ -468,22 +508,19 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
       parent: documentName,
       parentfield: "break_points",
       parenttype: "FM_Goods_Vehicle_Request",
-      ...editedBreakPoint, // Spread the properties from the editedBreakPoint state
+      ...breakPoint, // Spread the properties from the editedBreakPoint state
     };
 
     try {
-      // Update the document based on the name in editedBreakPoint
-      await updateDoc(
-        "FM_Goods_Breakpoints",
-        editedBreakPoint.name,
-        childDocument
-      );
+      // Update the document based on the name in breakPoint
+      await updateDoc("FM_Goods_Breakpoints", breakPoint.name, childDocument);
       toast.success("Document updated successfully");
     } catch (error) {
       console.error("Error updating document:", error);
       toast.error("Failed to update document");
     }
   };
+
   const handleGroupRideDataPassenger = async () => {
     // Check if editedPassenger has data and name is available
     if (!editedPassenger || !editedPassenger.name) {
@@ -530,6 +567,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
       setRideType(drawerDetails.type || "");
       setRideTypegoods(drawerDetails.type || "");
       setFromLocation(drawerData[0]?.from_location || "");
+
       setToLocation(drawerData[0]?.to_location || "");
       setEquipment(drawerData[0]?.equipment || "");
       setFromTime(drawerData[0]?.from_time || "");
@@ -541,14 +579,13 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
       const requestDateTime = drawerData[0]?.request_date_time || null;
       if (requestDateTime) {
         const [datePart, timePart] = requestDateTime.split(" ");
-        setRideDate(datePart || null); // Set the date part
-        setRideTime(timePart || null); // Set the time part
+        setRideDate(datePart || null);
+        setRideTime(timePart || null);
       } else {
-        setRideDate(null); // Clear if no date available
-        setRideTime(null); // Clear if no time available
+        setRideDate(null);
+        setRideTime(null);
       }
       setTravelMore(drawerData[0]?.mod || "");
-      // setRideMoreDates(drawerData[0]?.mod_dates || []);
       setPurpose(drawerData[0]?.purpose);
       setInitialValues({
         type: rideType,
@@ -600,9 +637,10 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
   }
 
   // Assuming initialValues is also of type StateValues
-  const handleUpdate = async (status: string) => {
-    // Current values from the state
-    const currentValues: StateValues = {
+  const handleUpdate = async () => {
+    let doctypename = doctypeNames;
+    let id = documentName;
+    const currentValues = {
       type: rideType,
       project_name: selectedProject,
       from_location: fromLocation,
@@ -622,22 +660,28 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
       description: description,
     };
 
-    // Get changed fields
-    const updateData = getChangedFields(currentValues, initialValues);
+    const updateData = currentValues;
 
-    // Add the status field to the update data
-    updateData.status = status;
-
-    // Check if there are any changes to update
-    if (Object.keys(updateData).length === 1 && updateData.status === status) {
+    if (Object.keys(updateData).length === 1) {
       toast.info("No changes detected.");
       return false;
     }
 
     try {
-      await updateDoc(doctypeNames, documentName, updateData);
+      await updateDoc(doctypename, id, updateData);
       toast.success("Updated successfully");
-      // Optionally close the drawer or handle post-update logic
+      setTableData((prevAllData) => {
+        return prevAllData.map((item) => {
+          if (item.doctypename === doctypename && item.name === id) {
+            return { ...item, ...updateData };
+          }
+          return item;
+        });
+      });
+      setView(true);
+      setEdit(false);
+      // setRideMoreDates([]);
+      // handleCancel();
       return true;
     } catch (error) {
       toast.error("Failed to update data.");
@@ -645,6 +689,45 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
     }
   };
 
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+  const handleCloseDia = () => {
+    setOpen(false);
+  };
+  const handleDelete = async () => {
+    let doctypename = doctypeNames;
+    let id = documentName;
+
+    let updateData = {
+      status: "Cancelled",
+    };
+    try {
+      await updateDoc(doctypename, id, updateData);
+      toast.success("Deleted Successfully");
+
+      setTableData((prevAllData) => {
+        return prevAllData.map((item) => {
+          if (item.doctypename === doctypename && item.name === id) {
+            return { ...item, ...updateData };
+          }
+          return item;
+        });
+      });
+      handleCloseDrawer();
+      setOpen(false);
+    } catch (error) {
+      toast.error(`Error Approved doc: ${error.message}`);
+      setOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    const filterInput = document.querySelector(".form-control");
+    if (filterInput) {
+      filterInput.placeholder = "Request Type";
+    }
+  }, []);
   // Columns definition for the table
   const columns = [
     {
@@ -676,7 +759,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
     },
     {
       key: "creation",
-      label: "Request Date",
+      label: "Created On",
       _style: {
         width: "15%",
         fontSize: "14px",
@@ -756,9 +839,88 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
       </Box>
     );
   }
+  //   Stepper
 
+  const handleRowClick = (item: any) => {
+    setSelectedItem(item);
+  };
+
+  const steps = ["Pending", "Project Lead", "Fleet Manager"];
+
+  const statusToStepIndex = {
+    Pending: 0,
+    Cancelled: 0,
+    "Project Lead Approved": 1,
+    "Project Lead Rejected": 1,
+    Approved: 2,
+    Rejected: 2,
+  };
+
+  const activeStep =
+    statusToStepIndex[selectedItem?.status] !== undefined
+      ? statusToStepIndex[selectedItem?.status]
+      : null;
+
+  const isRejected =
+    selectedItem?.status === "Project Lead Rejected" ||
+    selectedItem?.status === "Rejected";
+
+  const isApproved =
+    selectedItem?.status === "Project Lead Approved" ||
+    selectedItem?.status === "Department Lead Approved" ||
+    selectedItem?.status === "Approved";
+
+  const isCancelled = selectedItem?.status === "Cancelled";
+  const sortedItems =
+    tableData?.sort((a, b) => {
+      if (a.creation > b.creation) return -1;
+      if (a.creation < b.creation) return 1;
+      return 0;
+    }) || [];
+
+  const stepperStyles = {
+    "& .MuiStepIcon-root": {
+      color: "inherit", // Default icon color
+    },
+    "& .MuiStepIcon-root.Mui-active": {
+      backgroundColor: "#4D8C52",
+      borderRadius: "50%",
+      color: "#4D8C52",
+      border: "2px solid #4D8C52",
+    },
+    "& .MuiStepIcon-root.Mui-completed": {
+      backgroundColor: "#4D8C52",
+      borderRadius: "50%",
+      color: "#FFF",
+      border: "2px solid #4D8C52",
+    },
+    "& .MuiStepConnector-root": {
+      borderColor: "#4D8C52", // Line color
+    },
+    "& .MuiStepConnector-line": {
+      borderColor: "#4D8C52", // Line color
+    },
+  };
   return (
     <>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          color: "#FFF",
+          backgroundColor: "#4D8C52",
+          padding: "10px",
+          borderRadius: "5px",
+          fontSize: "18px",
+          fontWeight: 600,
+          marginBottom: "10px",
+        }}
+      >
+        Track Request
+      </Box>
+
+      {/* {JSON.stringify(selectedItem)} */}
       <div
         style={{
           backgroundColor: darkMode ? "#222222" : "#fff",
@@ -766,14 +928,74 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
           padding: "15px",
         }}
       >
-        {/* {JSON.stringify(drawerDetails)} */}
+        {tableData?.length > 0 && (
+          <Box sx={{ width: "100%", padding: "30px" }}>
+            <Stepper
+              sx={stepperStyles}
+              activeStep={activeStep}
+              alternativeLabel
+            >
+              {steps.map((label, index) => (
+                <Step
+                  key={label}
+                  className={`
+                    step-transition
+                    ${index === activeStep ? "active-step" : "inactive-step"}
+                  `}
+                >
+                  <StepLabel>
+                    <Box
+                      sx={{
+                        width: "120px",
+                        margin: "0 auto",
+                        padding: "5px",
+                        borderRadius: "50px",
+                        fontWeight: 600,
+                        color:
+                          (isRejected && activeStep === index) ||
+                          (isApproved && activeStep === index) ||
+                          (isCancelled && activeStep === index)
+                            ? "#FFF"
+                            : "inherit",
+                        background:
+                          isRejected && activeStep === index
+                            ? "#B3261E"
+                            : isApproved && activeStep === index
+                            ? "#4D8C52"
+                            : isCancelled && activeStep === index
+                            ? "#9E9E9E"
+                            : "inherit",
+                      }}
+                    >
+                      {isRejected && activeStep === index ? (
+                        <>
+                          <VscError size={20} /> Rejected
+                        </>
+                      ) : isApproved && activeStep === index ? (
+                        <>
+                          <MdOutlineDoneOutline size={20} /> Approved
+                        </>
+                      ) : isCancelled && activeStep === index ? (
+                        <>
+                          <VscError size={20} /> Cancelled
+                        </>
+                      ) : (
+                        label
+                      )}
+                    </Box>
+                  </StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+          </Box>
+        )}
         <CSmartTable
           cleaner
           clickableRows
           columns={columns}
           columnFilter
           columnSorter
-          items={tableData}
+          items={sortedItems}
           itemsPerPageSelect
           itemsPerPage={10}
           pagination
@@ -781,19 +1003,59 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
           tableProps={{
             className: "add-this-class red-border",
             responsive: true,
-            striped: true,
+
             hover: true,
           }}
+          onRowClick={(item) => handleRowClick(item)}
           tableBodyProps={{
             className: "align-middle tableData",
           }}
           scopedColumns={{
-            S_no: (_item: any, index: number) => {
-              return <td>{index + 1}</td>;
-            },
-            project_name: (item: any) => {
-              return <td>{item?.project_name || "-"}</td>;
-            },
+            S_no: (item, index) => (
+              <td
+                style={{
+                  backgroundColor: selectedItem === item ? "#080a0c13" : "",
+                }}
+              >
+                {index + 1}
+              </td>
+            ),
+            project_name: (item: any) => (
+              <td
+                style={{
+                  backgroundColor: selectedItem === item ? "#080a0c13" : "",
+                }}
+              >
+                {item?.project_name || "-"}
+              </td>
+            ),
+            name: (item: any) => (
+              <td
+                style={{
+                  backgroundColor: selectedItem === item ? "#080a0c13" : "",
+                }}
+              >
+                {item?.name || "-"}
+              </td>
+            ),
+            type: (item: any) => (
+              <td
+                style={{
+                  backgroundColor: selectedItem === item ? "#080a0c13" : "",
+                }}
+              >
+                {item?.type || "-"}
+              </td>
+            ),
+            status: (item: any) => (
+              <td
+                style={{
+                  backgroundColor: selectedItem === item ? "#080a0c13" : "",
+                }}
+              >
+                {item?.status || "-"}
+              </td>
+            ),
             creation: (item: any) => {
               const date = new Date(item.creation);
               const formattedDate = `${date
@@ -802,11 +1064,24 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                 .padStart(2, "0")}-${(date.getMonth() + 1)
                 .toString()
                 .padStart(2, "0")}-${date.getFullYear()}`;
-              return <td>{formattedDate}</td>;
+              return (
+                <td
+                  style={{
+                    backgroundColor: selectedItem === item ? "#080a0c13" : "",
+                  }}
+                >
+                  {formattedDate}
+                </td>
+              );
             },
             action: (item: any) => {
               return (
-                <td className="ActionData">
+                <td
+                  style={{
+                    backgroundColor: selectedItem === item ? "#080a0c13" : "",
+                  }}
+                  className="ActionData"
+                >
                   <div className="viewicon">
                     <MdOutlineVisibility
                       size={20}
@@ -815,17 +1090,9 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                         setView(true);
                         setEdit(false);
                         setDrawerDetails(item);
+                        setBtnShow(true);
                       }}
                     />
-                  </div>
-                  <div className="editicon">
-                    {item.status.includes("Pending") ||
-                    (item?.reports_to === "" &&
-                      item?.status === "Project Lead Approved") ? (
-                      <MdDeleteForever size={20} />
-                    ) : (
-                      <MdDeleteForever size={20} className="deleteIcon" />
-                    )}
                   </div>
                 </td>
               );
@@ -856,18 +1123,15 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
         onClose={handleCloseDrawer}
       >
         {/* {JSON.stringify(drawerData)} */}
+        {/* View Section */}
         {view && (
           <>
             <Box sx={{ padding: "20px" }}>
               <Box>
                 <div className="m-4">
                   <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <Box
-                      flexGrow={1}
-                      className="drawerTitle"
-                      sx={{ color: darkMode ? "#d1d1d1" : "#5b5b5b" }}
-                    >
-                      Request Type: {drawerDetails.type}
+                    <Box flexGrow={1} className="drawerTitle">
+                      Request Type - {drawerDetails.type}
                     </Box>
                     <Button
                       className="closeX"
@@ -877,48 +1141,40 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                       X
                     </Button>
                   </Box>
-                  <Grid container spacing={2} sx={{ marginTop: 2 }}>
+                  <br />
+                  <br />
+                  <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
-                      <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                        Request Date:
-                      </Typography>
-                      <Typography variant="body1">
+                      <Typography variant="body1">Request Date</Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 600 }}>
                         {drawerData[0]?.request_date_time
                           ? drawerData[0]?.request_date_time.split(" ")[0] // Extracts the date part
-                          : "N/A"}{" "}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                        Request Time:
-                      </Typography>
-                      <Typography variant="body1">
-                        {drawerData[0]?.request_date_time
-                          ? drawerData[0]?.request_date_time.split(" ")[1] // Extracts the time part
                           : "N/A"}{" "}
                       </Typography>
                     </Grid>
                     {doctypeNames !== "FM_Equipment_Vehicle_Request" && (
                       <>
                         <Grid item xs={12} sm={6}>
-                          <Typography
-                            variant="body1"
-                            sx={{ fontWeight: "bold" }}
-                          >
-                            From Location:
+                          <Typography variant="body1">Request Time</Typography>
+                          <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                            {drawerData[0]?.request_date_time
+                              ? drawerData[0]?.request_date_time.split(" ")[1] // Extracts the time part
+                              : "N/A"}{" "}
                           </Typography>
-                          <Typography variant="body1">
+                        </Grid>
+                      </>
+                    )}
+                    {doctypeNames !== "FM_Equipment_Vehicle_Request" && (
+                      <>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="body1">From Location</Typography>
+                          <Typography variant="body1" sx={{ fontWeight: 600 }}>
                             {drawerData[0]?.from_location || "N/A"}
                           </Typography>
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                          <Typography
-                            variant="body1"
-                            sx={{ fontWeight: "bold" }}
-                          >
-                            To Location:
-                          </Typography>
-                          <Typography variant="body1">
+                          <Typography variant="body1">To Location</Typography>
+                          <Typography variant="body1" sx={{ fontWeight: 600 }}>
                             {drawerData[0]?.to_location || "N/A"}
                           </Typography>
                         </Grid>
@@ -927,59 +1183,153 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                     {doctypeNames === "FM_Equipment_Vehicle_Request" && (
                       <>
                         <Grid item xs={12} sm={6}>
-                          <Typography
-                            variant="body1"
-                            sx={{ fontWeight: "bold" }}
-                          >
-                            From Time:
-                          </Typography>
-                          <Typography variant="body1">
+                          <Typography variant="body1">From Time</Typography>
+                          <Typography variant="body1" sx={{ fontWeight: 600 }}>
                             {drawerData[0]?.from_time || "N/A"}
                           </Typography>
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                          <Typography
-                            variant="body1"
-                            sx={{ fontWeight: "bold" }}
-                          >
-                            To Time:
-                          </Typography>
-                          <Typography variant="body1">
+                          <Typography variant="body1">To Time</Typography>
+                          <Typography variant="body1" sx={{ fontWeight: 600 }}>
                             {drawerData[0]?.to_time || "N/A"}
                           </Typography>
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                          <Typography
-                            variant="body1"
-                            sx={{ fontWeight: "bold" }}
-                          >
-                            Equipment Type:
-                          </Typography>
                           <Typography variant="body1">
+                            Equipment Type
+                          </Typography>
+                          <Typography variant="body1" sx={{ fontWeight: 600 }}>
                             {drawerData[0]?.equipment_type || "N/A"}
                           </Typography>
                         </Grid>
                       </>
                     )}
-
-                    <Grid item xs={12}>
-                      <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                        Project Name:
-                      </Typography>
-                      <Typography variant="body1">
+                    <Grid item xs={6}>
+                      <Typography variant="body1">Project Name</Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 600 }}>
                         {drawerDetails.project_name}
                       </Typography>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                        Purpose:
+                    </Grid>{" "}
+                    <Grid item xs={6}>
+                      <Typography variant="body1">Ride Type </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                        {drawerDetails.type}
                       </Typography>
-                      <Typography variant="body1">
+                    </Grid>
+                    {doctypeNames === "FM_Group_Vehicle_Request" && (
+                      <>
+                        <Grid item xs={6}>
+                          <Typography variant="body1">
+                            Passenger Count
+                          </Typography>
+                          <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                            {drawerData[0]?.passenger_count}
+                          </Typography>
+                        </Grid>
+                      </>
+                    )}
+                    <Grid item xs={12}>
+                      <Typography variant="body1">Purpose</Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 600 }}>
                         {drawerData[0]?.purpose}
                       </Typography>
                     </Grid>
+                    {doctypeNames === "FM_Goods_Vehicle_Request" && (
+                      <>
+                        <Grid item xs={12}>
+                          <Typography variant="body1">Description </Typography>
+                          <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                            {drawerData[0]?.description || "N/A"}
+                          </Typography>
+                        </Grid>
+                      </>
+                    )}
+                    {drawerData[0]?.mod === 1 && (
+                      <>
+                        <Grid item xs={12}>
+                          <Typography variant="body1">
+                            Travel More Than One Day Dates
+                          </Typography>
+                          <Typography
+                            variant="body1"
+                            sx={{
+                              color: "blue",
+                              fontStyle: "italic",
+                              fontWeight: 600,
+                            }}
+                          >
+                            {drawerData[0]?.mod_dates.split(",").join(" | ")}
+                          </Typography>
+                        </Grid>
+                      </>
+                    )}
+                    {/* Good*/}
+                    {doctypeNames === "FM_Goods_Vehicle_Request" && (
+                      <>
+                        {groupRideData?.break_points &&
+                          groupRideData.break_points.length > 0 &&
+                          // Sort the break_points array alphabetically by address
+                          groupRideData.break_points
+                            .sort((a, b) => a.address.localeCompare(b.address))
+                            .map((breakPoint, index) => (
+                              <Box
+                                sx={{
+                                  padding: "5px 20px",
+                                }}
+                                key={index}
+                              >
+                                {/* Section Heading */}
+                                <Typography
+                                  variant="h6"
+                                  sx={{
+                                    marginBottom: "10px",
 
-                    {/* Rest of your code */}
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  Breakpoints : {index + 1}
+                                </Typography>
+
+                                {/* Section Content */}
+                                <Grid container spacing={3}>
+                                  <Grid item xs={12} sm={6}>
+                                    <Typography variant="body1">
+                                      Address
+                                    </Typography>
+                                    <Typography variant="body1">
+                                      {breakPoint.address || "N/A"}
+                                    </Typography>
+                                  </Grid>
+                                  <Grid item xs={12} sm={6}>
+                                    <Typography variant="body1">
+                                      Description
+                                    </Typography>
+                                    <Typography variant="body1">
+                                      {breakPoint.description || "N/A"}
+                                    </Typography>
+                                  </Grid>
+                                  <Grid item xs={12} sm={6}>
+                                    <Typography variant="body1">
+                                      Purpose
+                                    </Typography>
+                                    <Typography variant="body1">
+                                      {breakPoint.purpose || "N/A"}
+                                    </Typography>
+                                  </Grid>
+                                  <Grid item xs={12} sm={6}>
+                                    <Typography variant="body1">
+                                      Type
+                                    </Typography>
+                                    <Typography variant="body1">
+                                      {breakPoint.type || "N/A"}
+                                    </Typography>
+                                  </Grid>
+                                </Grid>
+                              </Box>
+                            ))}
+                      </>
+                    )}
+                    {/* Group Ride*/}
                     {doctypeNames === "FM_Group_Vehicle_Request" &&
                       groupRideData && (
                         <Box sx={{ padding: "30px" }}>
@@ -995,24 +1345,24 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                                     sx={{ mb: 2 }}
                                   >
                                     <Grid item xs={12} sm={6}>
+                                      <Typography variant="body1">
+                                        Passenger Employee ID
+                                      </Typography>
                                       <Typography
                                         variant="body1"
-                                        sx={{ fontWeight: "bold" }}
+                                        sx={{ fontWeight: 600 }}
                                       >
-                                        Passenger Employee ID:
-                                      </Typography>
-                                      <Typography variant="body1">
                                         {passenger.employee_id}
                                       </Typography>
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
+                                      <Typography variant="body1">
+                                        Passenger Employee Name
+                                      </Typography>
                                       <Typography
                                         variant="body1"
-                                        sx={{ fontWeight: "bold" }}
+                                        sx={{ fontWeight: 600 }}
                                       >
-                                        Passenger Employee Name:
-                                      </Typography>
-                                      <Typography variant="body1">
                                         {passenger.employee_name}
                                       </Typography>
                                     </Grid>
@@ -1022,124 +1372,8 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                           </Grid>
                         </Box>
                       )}
-                    {/* Rest of your code */}
-
-                    {drawerData[0]?.mod === 1 && (
-                      <>
-                        <Grid item xs={12}>
-                          <Typography
-                            variant="body1"
-                            sx={{ fontWeight: "bold" }}
-                          >
-                            Travel More Than One Day Dates:
-                          </Typography>
-                          <Typography
-                            variant="body1"
-                            sx={{ color: "blue", fontStyle: "italic" }}
-                          >
-                            {drawerData[0]?.mod_dates.split(",").join(" | ")}
-                          </Typography>
-                        </Grid>
-                      </>
-                    )}
-
-                    {doctypeNames === "FM_Goods_Vehicle_Request" && (
-                      <>
-                        <Grid item xs={12}>
-                          <Typography
-                            variant="body1"
-                            sx={{ fontWeight: "bold" }}
-                          >
-                            Description:
-                          </Typography>
-                          <Typography variant="body1">
-                            {drawerData[0]?.description || "N/A"}
-                          </Typography>
-                        </Grid>
-                        {groupRideData?.break_points &&
-                          groupRideData.break_points.length > 0 &&
-                          groupRideData.break_points.map(
-                            (breakPoint, index) => (
-                              <Box sx={{ padding: "34px" }}>
-                                <Grid container spacing={10} key={index}>
-                                  <Grid item xs={12} sm={6}>
-                                    <Typography
-                                      variant="body1"
-                                      sx={{ fontWeight: "bold" }}
-                                    >
-                                      Address:
-                                    </Typography>
-                                    <Typography variant="body1">
-                                      {breakPoint.address || "N/A"}
-                                    </Typography>
-                                  </Grid>
-                                  <Grid item xs={12} sm={6}>
-                                    <Typography
-                                      variant="body1"
-                                      sx={{ fontWeight: "bold" }}
-                                    >
-                                      Description:
-                                    </Typography>
-                                    <Typography variant="body1">
-                                      {breakPoint.description || "N/A"}
-                                    </Typography>
-                                  </Grid>
-                                  <Grid item xs={12} sm={6}>
-                                    <Typography
-                                      variant="body1"
-                                      sx={{ fontWeight: "bold" }}
-                                    >
-                                      Purpose:
-                                    </Typography>
-                                    <Typography variant="body1">
-                                      {breakPoint.purpose || "N/A"}
-                                    </Typography>
-                                  </Grid>
-                                  <Grid item xs={12} sm={6}>
-                                    <Typography
-                                      variant="body1"
-                                      sx={{ fontWeight: "bold" }}
-                                    >
-                                      Type:
-                                    </Typography>
-                                    <Typography variant="body1">
-                                      {breakPoint.type || "N/A"}
-                                    </Typography>
-                                  </Grid>
-                                </Grid>
-                              </Box>
-                            )
-                          )}
-                      </>
-                    )}
                   </Grid>
 
-                  {drawerDetails.status === "Pending" && (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        marginTop: "20px",
-                      }}
-                    >
-                      <Button
-                        className="cancelBtn"
-                        onClick={() => {
-                          setEdit(true);
-                          setView(false);
-                        }}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        className="deleteBtn"
-                        onClick={() => handleUpdate("Delete")}
-                        disabled={loading}
-                      >
-                        {loading ? "Deleting..." : "Delete"}
-                      </Button>
-                    </Box>
-                  )}
                   {error && (
                     <Box sx={{ marginTop: "20px", textAlign: "center" }}>
                       <Typography color="error">
@@ -1152,12 +1386,14 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
             </Box>
           </>
         )}
+
+        {/* Edit section */}
         {edit && (
           <>
             <br />
             <br />
             <Box
-              className="slideFromRight"
+              // className="slideFromRight"
               display="flex"
               flexDirection="column"
               alignItems="center"
@@ -1165,7 +1401,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <ThemeProvider theme={ThemeColor}>
                   <Box
-                    className="slideFromRight"
+                    // className="slideFromRight"
                     width={{ xs: "100%", sm: "100%", md: "90%" }}
                     marginBottom="16px"
                     sx={{ display: "flex", justifyContent: "center" }}
@@ -1207,7 +1443,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                   {doctypeNames === "FM_Passenger_Vehicle_Request" && (
                     <>
                       <Box
-                        className="slideFromRight delay-1"
+                        // className="slideFromRight delay-1"
                         width={{ xs: "100%", sm: "100%", md: "90%" }}
                         marginBottom="16px"
                         sx={{ display: "flex", justifyContent: "center" }}
@@ -1252,46 +1488,9 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                       </Box>
                     </>
                   )}
-                  {doctypeNames === "FM_Goods_Vehicle_Request" && (
-                    <>
-                      <Box
-                        className="slideFromRight delay-1"
-                        width={{ xs: "100%", sm: "100%", md: "90%" }}
-                        marginBottom="16px"
-                        sx={{ display: "flex", justifyContent: "center" }}
-                      >
-                        <FormControl
-                          variant="outlined"
-                          sx={{ width: { xs: "100%", sm: "100%", md: "90%" } }}
-                        >
-                          <InputLabel>
-                            Select Ride Type {""}
-                            <Typography className="CodeStar" variant="Code">
-                              *
-                            </Typography>
-                          </InputLabel>
-                          <Select
-                            value={rideTypegoods}
-                            onChange={changeRideGoods}
-                            label={<> Select Ride Type {""}</>}
-                            MenuProps={{
-                              PaperProps: {
-                                sx: {
-                                  textAlign: "left",
-                                },
-                              },
-                            }}
-                          >
-                            <MenuItem value="Pickup">Pickup</MenuItem>
-                            <MenuItem value="Drop">Drop</MenuItem>
-                          </Select>
-                        </FormControl>
-                      </Box>
-                    </>
-                  )}
 
                   <Box
-                    className="slideFromRight delay-2"
+                    // className="slideFromRight delay-2"
                     width={{ xs: "100%", sm: "100%", md: "90%" }}
                     textAlign={"center"}
                     marginBottom="16px"
@@ -1330,10 +1529,161 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                       )}
                     />
                   </Box>
+
+                  <Box
+                    // className="slideFromRight delay-3"
+                    width={{ xs: "100%", sm: "100%", md: "90%" }}
+                    marginBottom="16px"
+                    textAlign="center"
+                  >
+                    <DatePicker
+                      label={
+                        <Typography>
+                          Date <code className="CodeStar">*</code>
+                        </Typography>
+                      }
+                      value={rideDate ? dayjs(rideDate, "DD-MM-YYYY") : null}
+                      minDate={today}
+                      sx={{
+                        width: {
+                          xs: "100%",
+                          sm: "100%",
+                          md: "90%",
+                        },
+                      }}
+                      format="DD-MM-YYYY"
+                      onChange={handleFromDateChange}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          variant="outlined"
+                          placeholder="Select Date"
+                          error={!rideDate} // Shows error if rideDate is not set
+                          helperText={!rideDate && "This field is required"} // Error message
+                        />
+                      )}
+                    />
+                  </Box>
+
+                  <Box
+                    // className="slideFromRight delay-3"
+                    sx={{
+                      width: {
+                        xs: "90%",
+                        sm: "90%",
+                        md: "90%",
+                      },
+                    }}
+                    marginBottom="16px"
+                  >
+                    <FormGroup
+                      row
+                      sx={{ display: "flex", justifyContent: "left" }}
+                    >
+                      <FormControlLabel
+                        sx={{ marginLeft: { sm: "25px" } }}
+                        // d={!rideType || !selectedProject || !rideDate}
+                        control={
+                          <Checkbox
+                            checked={travelMore}
+                            onChange={handleTravelMoreChange}
+                          />
+                        }
+                        label="Travel more than one day "
+                      />
+                    </FormGroup>
+                    <Box
+                      sx={{
+                        textAlign: "center",
+                        display: "flex",
+                        flexWrap: "wrap",
+                        justifyContent: "center",
+                        alignItems: "center", // Align label and chips vertically
+                      }}
+                    >
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          marginRight: "8px",
+                        }}
+                      >
+                        Old Date :
+                      </Typography>
+                      {drawerData[0]?.mod_dates
+                        ? drawerData[0].mod_dates
+                            .split(",")
+                            .map((date, index) => (
+                              <Chip
+                                key={index}
+                                label={date.trim()} // Trim spaces around each date
+                                sx={{
+                                  margin: "2px",
+                                  padding: "5px",
+                                }}
+                              />
+                            ))
+                        : ""}
+                    </Box>
+                    <Typography
+                      sx={{
+                        textAlign: "center",
+                        color: "#959595",
+                      }}
+                    >
+                      If you want new date means select date
+                    </Typography>
+                  </Box>
+
+                  {/* {travelMore === true && ( */}
+                  <>
+                    <Box
+                      width={{ xs: "100%", sm: "100%", md: "90%" }}
+                      marginBottom="16px"
+                      textAlign={"center"}
+                    >
+                      <DatePicker
+                        label={
+                          <Typography>
+                            Select Date <code className="CodeStar">*</code>
+                          </Typography>
+                        }
+                        value={null}
+                        // mod_dates
+                        minDate={dayjs(rideDate, "DD-MM-YYYY")}
+                        sx={{
+                          width: {
+                            xs: "100%",
+                            sm: "100%",
+                            md: "90%",
+                          },
+                        }}
+                        format="DD-MM-YYYY"
+                        onChange={handleMoreDateChange}
+                        renderInput={(params) => (
+                          <TextField {...params} variant="outlined" />
+                        )}
+                      />
+
+                      <Box mt={2}>
+                        {rideMoreDates?.map((date, index) => (
+                          <Chip
+                            key={index}
+                            label={date}
+                            onDelete={() => handleRemoveDate(date)}
+                            sx={{
+                              margin: "2px",
+                              padding: "5px",
+                            }}
+                          />
+                        ))}
+                      </Box>
+                    </Box>
+                  </>
+                  {/* )} */}
                   {doctypeNames !== "FM_Equipment_Vehicle_Request" && (
                     <>
                       <Box
-                        className="slideFromRight delay-2"
+                        // className="slideFromRight delay-2"
                         width={{ xs: "100%", sm: "100%", md: "90%" }}
                         textAlign={"center"}
                         marginBottom="16px"
@@ -1377,118 +1727,46 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                     </>
                   )}
 
-                  <Box
-                    className="slideFromRight delay-3"
-                    width={{ xs: "100%", sm: "100%", md: "90%" }}
-                    marginBottom="16px"
-                    textAlign="center"
-                  >
-                    <DatePicker
-                      label={
-                        <Typography>
-                          Date <code className="CodeStar">*</code>
-                        </Typography>
-                      }
-                      // value={rideDate ? dayjs(rideDate, "DD-MM-YYYY") : null}
-                      minDate={today}
-                      sx={{
-                        width: {
-                          xs: "100%",
-                          sm: "100%",
-                          md: "90%",
-                        },
-                      }}
-                      format="DD-MM-YYYY"
-                      onChange={handleFromDateChange}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          variant="outlined"
-                          placeholder="Select Date"
-                          error={!rideDate} // Shows error if rideDate is not set
-                          helperText={!rideDate && "This field is required"} // Error message
-                        />
-                      )}
-                    />
-                  </Box>
-
-                  <Box
-                    className="slideFromRight delay-3"
-                    sx={{
-                      width: {
-                        xs: "90%",
-                        sm: "90%",
-                        md: "90%",
-                      },
-                    }}
-                    marginBottom="16px"
-                  >
-                    <FormGroup
-                      row
-                      sx={{ display: "flex", justifyContent: "left" }}
-                    >
-                      <FormControlLabel
-                        sx={{ marginLeft: { sm: "25px" } }}
-                        // d={!rideType || !selectedProject || !rideDate}
-                        control={
-                          <Checkbox
-                            checked={travelMore}
-                            onChange={handleTravelMoreChange}
-                          />
-                        }
-                        label="Travel more than one day"
-                      />
-                    </FormGroup>
-                  </Box>
-
-                  {travelMore === true && (
+                  {doctypeNames === "FM_Goods_Vehicle_Request" && (
                     <>
                       <Box
+                        // className="slideFromRight delay-1"
                         width={{ xs: "100%", sm: "100%", md: "90%" }}
                         marginBottom="16px"
-                        textAlign={"center"}
+                        sx={{ display: "flex", justifyContent: "center" }}
                       >
-                        <DatePicker
-                          label={
-                            <Typography>
-                              Select Date <code className="CodeStar">*</code>
+                        <FormControl
+                          variant="outlined"
+                          sx={{ width: { xs: "100%", sm: "100%", md: "90%" } }}
+                        >
+                          <InputLabel>
+                            Select Ride Type {""}
+                            <Typography className="CodeStar" variant="Code">
+                              *
                             </Typography>
-                          }
-                          value={null}
-                          minDate={dayjs(rideDate, "DD-MM-YYYY")}
-                          sx={{
-                            width: {
-                              xs: "100%",
-                              sm: "100%",
-                              md: "90%",
-                            },
-                          }}
-                          format="DD-MM-YYYY"
-                          onChange={handleMoreDateChange}
-                          renderInput={(params) => (
-                            <TextField {...params} variant="outlined" />
-                          )}
-                        />
-
-                        <Box mt={2} className="slideFromRight">
-                          {rideMoreDates?.map((date, index) => (
-                            <Chip
-                              key={index}
-                              label={date}
-                              onDelete={() => handleRemoveDate(date)}
-                              sx={{
-                                margin: "2px",
-                                padding: "5px",
-                              }}
-                            />
-                          ))}
-                        </Box>
+                          </InputLabel>
+                          <Select
+                            value={rideTypegoods}
+                            onChange={changeRideGoods}
+                            label={<> Select Ride Type {""}</>}
+                            MenuProps={{
+                              PaperProps: {
+                                sx: {
+                                  textAlign: "left",
+                                },
+                              },
+                            }}
+                          >
+                            <MenuItem value="Pickup">Pickup</MenuItem>
+                            <MenuItem value="Drop">Drop</MenuItem>
+                          </Select>
+                        </FormControl>
                       </Box>
                     </>
                   )}
 
                   <Box
-                    className="slideFromRight delay-4"
+                    // className="slideFromRight delay-4"
                     width={{ xs: "100%", sm: "100%", md: "90%" }}
                     marginBottom="16px"
                     textAlign={"center"}
@@ -1509,8 +1787,8 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                           md: "90%",
                         },
                       }}
-                      // value={rideTime ? dayjs(rideTime, "HH:mm:ss") : null}
-                      format="HH:mm:ss"
+                      value={rideTime ? dayjs(rideTime, "HH:mm") : null}
+                      format="HH:mm"
                       ampm={false}
                       onChange={handleFromTimeChange}
                       renderInput={(params) => (
@@ -1525,7 +1803,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                   </Box>
 
                   <Box
-                    className="slideFromRight delay-5"
+                    // className="slideFromRight delay-5"
                     width={{ xs: "100%", sm: "100%", md: "90%" }}
                     marginBottom="16px"
                     textAlign={"center"}
@@ -1571,7 +1849,6 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                             <TableRow>
                               <TableCell>Passenger ID</TableCell>
                               <TableCell>Passenger Name</TableCell>
-                              <TableCell>Document Name</TableCell>
                               <TableCell align="right">Actions</TableCell>
                             </TableRow>
                           </TableHead>
@@ -1579,12 +1856,13 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                             {groupRideData.passenger_details.map(
                               (passenger, index) => (
                                 <TableRow key={index}>
-                                  <TableCell>
+                                  <TableCell sx={{ width: "40%" }}>
                                     {editIndex === index ? (
                                       <Autocomplete
                                         options={filteredEmployees}
                                         getOptionLabel={(option) =>
-                                          option.name || "N/A"
+                                          `${option.name} - ${option.employee_name}` ||
+                                          "N/A"
                                         }
                                         value={
                                           filteredEmployees.find(
@@ -1617,52 +1895,16 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                                     )}
                                   </TableCell>
                                   <TableCell>
-                                    {editIndex === index ? (
-                                      <Autocomplete
-                                        options={filteredEmployees}
-                                        getOptionLabel={(option) =>
-                                          option.employee_name || "N/A"
-                                        }
-                                        value={
-                                          filteredEmployees.find(
-                                            (emp) =>
-                                              emp.employee_name ===
-                                              editedPassenger.employee_name
-                                          ) || null
-                                        }
-                                        onInputChange={(event, newInputValue) =>
-                                          setFilter(newInputValue)
-                                        }
-                                        onChange={(event, newValue) =>
-                                          handleInputChangeGroupRide(
-                                            {
-                                              target: {
-                                                value:
-                                                  newValue?.employee_name || "",
-                                              },
-                                            },
-                                            "employee_name"
-                                          )
-                                        }
-                                        renderInput={(params) => (
-                                          <TextField
-                                            {...params}
-                                            label="Employee Name"
-                                          />
-                                        )}
-                                      />
-                                    ) : (
-                                      passenger.employee_name || "N/A"
-                                    )}
+                                    {passenger.employee_name || "N/A"}
                                   </TableCell>
-                                  <TableCell>
-                                    {passenger.name || "N/A"}
-                                  </TableCell>
+
                                   <TableCell align="right">
                                     {editIndex === index ? (
                                       <Button
                                         variant="contained"
-                                        onClick={handleSaveClickGroupRide}
+                                        onClick={() =>
+                                          handleSaveClickGroupRide(index)
+                                        }
                                       >
                                         Save
                                       </Button>
@@ -1691,7 +1933,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                   {doctypeNames === "FM_Goods_Vehicle_Request" && (
                     <>
                       <Box
-                        className="slideFromRight delay-4"
+                        // className="slideFromRight delay-4"
                         width={{ xs: "100%", sm: "100%", md: "90%" }}
                         textAlign={"center"}
                         sx={{
@@ -1720,7 +1962,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                           }}
                         />
                       </Box>
-                      <Box
+                      {/* <Box
                         sx={{
                           display: "flex",
                           justifyContent: "flex-end",
@@ -1735,29 +1977,24 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                         >
                           <MdAddCircle size={40} />
                         </IconButton>
-                      </Box>
+                      </Box> */}
                       {groupRideData?.break_points &&
                         groupRideData.break_points.length > 0 && (
                           <TableContainer
                             sx={{
-                              width: "100%",
-                              maxWidth: 600,
+                              width: "90%",
                               marginTop: "16px",
                               borderRadius: "2px",
                               overflowX: "auto",
                             }}
                           >
-                            <Table
-                              sx={{ minWidth: 650 }}
-                              aria-label="breakpoints table"
-                            >
+                            <Table aria-label="breakpoints table">
                               <TableHead>
                                 <TableRow>
                                   <TableCell>Address</TableCell>
                                   <TableCell>Description</TableCell>
                                   <TableCell>Purpose</TableCell>
                                   <TableCell>Type</TableCell>
-                                  <TableCell>Name</TableCell>
                                   <TableCell>Actions</TableCell>
                                 </TableRow>
                               </TableHead>
@@ -1768,7 +2005,9 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                                       <TableCell>
                                         {editIndex === index ? (
                                           <TextField
-                                            value={editedBreakPoint.address}
+                                            value={
+                                              editedBreakPoint.address || ""
+                                            }
                                             onChange={(e) =>
                                               handleInputChange(e, "address")
                                             }
@@ -1780,7 +2019,9 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                                       <TableCell>
                                         {editIndex === index ? (
                                           <TextField
-                                            value={editedBreakPoint.description}
+                                            value={
+                                              editedBreakPoint.description || ""
+                                            }
                                             onChange={(e) =>
                                               handleInputChange(
                                                 e,
@@ -1795,7 +2036,9 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                                       <TableCell>
                                         {editIndex === index ? (
                                           <TextField
-                                            value={editedBreakPoint.purpose}
+                                            value={
+                                              editedBreakPoint.purpose || ""
+                                            }
                                             onChange={(e) =>
                                               handleInputChange(e, "purpose")
                                             }
@@ -1807,7 +2050,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                                       <TableCell>
                                         {editIndex === index ? (
                                           <Select
-                                            value={editedBreakPoint.type}
+                                            value={editedBreakPoint.type || ""}
                                             onChange={(e) =>
                                               handleInputChange(e, "type")
                                             }
@@ -1827,27 +2070,24 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                                           breakPoint.type || "N/A"
                                         )}
                                       </TableCell>
-                                      <TableCell>
-                                        {/* Name Field - Read Only */}
-                                        {breakPoint.name || "N/A"}
-                                      </TableCell>
                                       <TableCell align="right">
                                         {editIndex === index ? (
                                           <Button
-                                            variant="contained"
-                                            onClick={handleSaveClick}
+                                            className="saveBtn"
+                                            onClick={() =>
+                                              handleSaveClick(index)
+                                            }
                                           >
                                             Save
                                           </Button>
                                         ) : (
-                                          <Button
-                                            variant="outlined"
+                                          <FaRegEdit
+                                            size={20}
+                                            style={{ cursor: "pointer" }}
                                             onClick={() =>
                                               handleEditClick(index, breakPoint)
                                             }
-                                          >
-                                            Edit
-                                          </Button>
+                                          />
                                         )}
                                       </TableCell>
                                     </TableRow>
@@ -1889,7 +2129,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                               {/* {JSON.stringify(sections)} */}
                               {sections.map((section, index) => (
                                 <Box
-                                  className="slideFromRight"
+                                  // className="slideFromRight"
                                   key={index}
                                   sx={{ marginBottom: "16px" }}
                                 >
@@ -2048,7 +2288,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                   {doctypeNames === "FM_Equipment_Vehicle_Request" && (
                     <>
                       <Box
-                        className="slideFromRight delay-2"
+                        // className="slideFromRight delay-2"
                         width={{ xs: "100%", sm: "100%", md: "90%" }}
                         marginBottom="16px"
                         textAlign={"center"}
@@ -2069,8 +2309,8 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                               md: "90%",
                             },
                           }}
-                          value={fromTime ? dayjs(fromTime, "HH:mm:ss") : null}
-                          format="HH:mm:ss"
+                          value={fromTime ? dayjs(fromTime, "HH:mm") : null}
+                          format="HH:mm"
                           ampm={false}
                           onChange={handleFromTimeChange}
                           renderInput={(params) => (
@@ -2085,7 +2325,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                       </Box>
 
                       <Box
-                        className="slideFromRight delay-3"
+                        // className="slideFromRight delay-3"
                         width={{ xs: "100%", sm: "100%", md: "90%" }}
                         marginBottom="16px"
                         textAlign={"center"}
@@ -2106,8 +2346,8 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                               md: "90%",
                             },
                           }}
-                          value={toTime ? dayjs(toTime, "HH:mm:ss") : null}
-                          format="HH:mm:ss"
+                          value={toTime ? dayjs(toTime, "HH:mm") : null}
+                          format="HH:mm"
                           ampm={false}
                           onChange={handleToTimeChange}
                           renderInput={(params) => (
@@ -2122,7 +2362,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                       </Box>
 
                       <Box
-                        className="slideFromRight delay-4"
+                        // className="slideFromRight delay-4"
                         width={{ xs: "100%", sm: "100%", md: "90%" }}
                         textAlign={"center"}
                         marginBottom="16px"
@@ -2178,8 +2418,11 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                 <Button
                   className="cancelBtn"
                   onClick={() => {
-                    handleCancel();
-                    handleCloseDrawer();
+                    // handleCancel();
+                    setView(true);
+                    setEdit(false);
+                    // handleCloseDrawer();
+                    setBtnShow(true);
                   }}
                 >
                   Cancel
@@ -2198,7 +2441,58 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
             </Box>
           </>
         )}
+
+        {btnShow && (
+          <>
+            {drawerDetails.status === "Pending" && (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <Button
+                  className="cancelBtn"
+                  onClick={() => {
+                    setEdit(true);
+                    setView(false);
+                    setBtnShow(false);
+                  }}
+                >
+                  Edit
+                </Button>
+                <Button
+                  className="deleteBtn"
+                  onClick={handleClickOpen}
+                  disabled={loading}
+                >
+                  {loading ? "Deleting..." : "Delete"}
+                </Button>
+              </Box>
+            )}
+          </>
+        )}
       </Drawer>
+      <Dialog
+        open={open}
+        keepMounted
+        onClose={handleClose}
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-description">
+            Are you sure want to delete ?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button className="cancelBtn" onClick={handleCloseDia}>
+            No
+          </Button>
+          <Button className="saveBtn" onClick={() => handleDelete()} autoFocus>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

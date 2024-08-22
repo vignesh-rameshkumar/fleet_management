@@ -17,7 +17,11 @@ import {
   Select,
 } from "@mui/material";
 import { MdOutlineVisibility, MdDeleteForever } from "react-icons/md";
-import { useFrappeGetDocList, useFrappeUpdateDoc } from "frappe-react-sdk";
+import {
+  useFrappeGetDocList,
+  useFrappeUpdateDoc,
+  useFrappeGetDoc,
+} from "frappe-react-sdk";
 import Autocomplete from "@mui/material/Autocomplete";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
@@ -283,6 +287,21 @@ const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({
     }
   };
 
+  // child doc Passenger Members
+  const id = drawerDetails?.name;
+  const doc = drawerDetails?.doctypename;
+  const { data: FM_Group_Vehicle_Request }: any = useFrappeGetDoc(doc, id);
+
+  const [groupRideData, setGroupRideData] = useState(FM_Group_Vehicle_Request);
+
+  useEffect(() => {
+    if (FM_Group_Vehicle_Request) {
+      setGroupRideData(FM_Group_Vehicle_Request);
+    }
+  }, [FM_Group_Vehicle_Request]);
+
+  // console.log("groupRideData", groupRideData);
+  //
   return (
     <>
       <Box
@@ -340,7 +359,7 @@ const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({
             status: (item: any) => {
               return (
                 <td>
-                  <div
+                  {/* <div
                     style={{
                       backgroundColor:
                         item.status === "Project Lead Approved"
@@ -352,11 +371,11 @@ const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({
                       borderRadius: "20px",
                       margin: "0 auto",
                     }}
-                  >
-                    {item?.status === "Project Lead Approved"
-                      ? "Approved"
-                      : item?.status}
-                  </div>
+                  > */}
+                  {item?.status === "Project Lead Approved"
+                    ? "Approved"
+                    : item?.status}
+                  {/* </div> */}
                 </td>
               );
             },
@@ -525,19 +544,31 @@ const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({
                         {new Date(drawerDetails.creation).toLocaleTimeString()}
                       </Typography>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={6}>
                       <Typography
                         variant="body1"
                         sx={{
                           fontWeight: 600,
                         }}
                       >
-                        Category
+                        Ride Type
                       </Typography>
                       <Typography variant="body1">
                         {drawerDetails.type}
                       </Typography>
                     </Grid>
+                    {doctypeName === "FM_Group_Vehicle_Request" && (
+                      <>
+                        <Grid item xs={6}>
+                          <Typography variant="body1">
+                            Passenger Count
+                          </Typography>
+                          <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                            {drawerData[0]?.passenger_count}
+                          </Typography>
+                        </Grid>
+                      </>
+                    )}
 
                     {doctypeName === "FM_Equipment_Vehicle_Request" && (
                       <>
@@ -645,6 +676,109 @@ const RequestApprovalDL: React.FC<RequestApprovalDLProps> = ({
                   )}
                 </div>
               </Box>
+              {/* Group Ride */}
+              {doctypeName === "FM_Group_Vehicle_Request" && groupRideData && (
+                <Box sx={{ padding: "30px" }}>
+                  <Grid container spacing={2}>
+                    {groupRideData.passenger_details &&
+                      groupRideData.passenger_details.length > 0 &&
+                      groupRideData.passenger_details.map(
+                        (passenger, index) => (
+                          <Grid
+                            container
+                            spacing={8}
+                            key={index}
+                            sx={{ mb: 2 }}
+                          >
+                            <Grid item xs={12} sm={6}>
+                              <Typography variant="body1">
+                                Passenger Employee ID
+                              </Typography>
+                              <Typography
+                                variant="body1"
+                                sx={{ fontWeight: 600 }}
+                              >
+                                {passenger.employee_id}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <Typography variant="body1">
+                                Passenger Employee Name
+                              </Typography>
+                              <Typography
+                                variant="body1"
+                                sx={{ fontWeight: 600 }}
+                              >
+                                {passenger.employee_name}
+                              </Typography>
+                            </Grid>
+                          </Grid>
+                        )
+                      )}
+                  </Grid>
+                </Box>
+              )}
+
+              {/* Good*/}
+              {doctypeName === "FM_Goods_Vehicle_Request" && (
+                <>
+                  {groupRideData?.break_points &&
+                    groupRideData.break_points.length > 0 &&
+                    // Sort the break_points array alphabetically by address
+                    groupRideData.break_points
+                      .sort((a, b) => a.address.localeCompare(b.address))
+                      .map((breakPoint, index) => (
+                        <Box
+                          sx={{
+                            padding: "5px 20px",
+                          }}
+                          key={index}
+                        >
+                          {/* Section Heading */}
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              marginBottom: "10px",
+
+                              fontWeight: 600,
+                            }}
+                          >
+                            Breakpoints : {index + 1}
+                          </Typography>
+
+                          {/* Section Content */}
+                          <Grid container spacing={3}>
+                            <Grid item xs={12} sm={6}>
+                              <Typography variant="body1">Address</Typography>
+                              <Typography variant="body1">
+                                {breakPoint.address || "N/A"}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <Typography variant="body1">
+                                Description
+                              </Typography>
+                              <Typography variant="body1">
+                                {breakPoint.description || "N/A"}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <Typography variant="body1">Purpose</Typography>
+                              <Typography variant="body1">
+                                {breakPoint.purpose || "N/A"}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <Typography variant="body1">Type</Typography>
+                              <Typography variant="body1">
+                                {breakPoint.type || "N/A"}
+                              </Typography>
+                            </Grid>
+                          </Grid>
+                        </Box>
+                      ))}
+                </>
+              )}
             </Box>
           </>
         )}

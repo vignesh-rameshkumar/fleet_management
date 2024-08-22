@@ -184,8 +184,15 @@ const Equipment: React.FC<EquipmentProps> = ({
 
   const handleToTimeChange = (time) => {
     if (dayjs(time).isValid()) {
-      const formattedTime = dayjs(time).format("HH:mm:ss");
-      setToTime(formattedTime);
+      const formattedTime = dayjs(time).format("HH:mm");
+
+      // Check if the selected ToTime is greater than FromTime
+      if (dayjs(formattedTime, "HH:mm").isAfter(dayjs(fromTime, "HH:mm"))) {
+        setToTime(formattedTime);
+      } else {
+        toast.error("To Time must be greater than From Time");
+        setToTime(null);
+      }
     } else {
       toast.error("Invalid time selected");
       setToTime(null);
@@ -400,7 +407,7 @@ const Equipment: React.FC<EquipmentProps> = ({
                     <DatePicker
                       label={
                         <Typography>
-                          From <code className="CodeStar">*</code>
+                          Select Date<code className="CodeStar">*</code>
                         </Typography>
                       }
                       value={rideDate ? dayjs(rideDate, "DD-MM-YYYY") : null}
@@ -523,7 +530,7 @@ const Equipment: React.FC<EquipmentProps> = ({
                           md: "90%",
                         },
                       }}
-                      value={fromTime ? dayjs(fromTime, "HH:mm:ss") : null}
+                      value={fromTime ? dayjs(fromTime, "HH:mm") : null}
                       format="HH:mm"
                       ampm={false}
                       disabled={
@@ -565,9 +572,10 @@ const Equipment: React.FC<EquipmentProps> = ({
                           md: "90%",
                         },
                       }}
-                      value={toTime ? dayjs(toTime, "HH:mm:ss") : null}
+                      value={toTime ? dayjs(toTime, "HH:mm") : null}
                       format="HH:mm"
                       ampm={false}
+                      minTime={fromTime ? dayjs(fromTime, "HH:mm") : null} // Use minTime for minimum time
                       onChange={handleToTimeChange}
                       disabled={
                         !selectedProject ||

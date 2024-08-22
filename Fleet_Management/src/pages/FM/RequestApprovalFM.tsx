@@ -20,7 +20,11 @@ import {
   Select,
 } from "@mui/material";
 import { MdOutlineVisibility, MdDeleteForever } from "react-icons/md";
-import { useFrappeGetDocList, useFrappeUpdateDoc } from "frappe-react-sdk";
+import {
+  useFrappeGetDocList,
+  useFrappeUpdateDoc,
+  useFrappeGetDoc,
+} from "frappe-react-sdk";
 import Autocomplete from "@mui/material/Autocomplete";
 import dayjs from "dayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -63,6 +67,7 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
   const [externalVehicleNo, setExternalVehicleNo] = useState("");
   const [externalDriverNo, setExternalDriverNo] = useState("");
   const [externalVehicleOTP, setExternalVehicleOTP] = useState("");
+  // const [groupRideData, setGroupRideData] = useState(FM_Group_Vehicle_Request);
 
   const today = dayjs();
 
@@ -534,6 +539,21 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
     }
   };
 
+  // child doc Passenger Members
+  const id = drawerDetails?.name;
+  const doc = drawerDetails?.doctypename;
+  const { data: FM_Group_Vehicle_Request }: any = useFrappeGetDoc(doc, id);
+
+  const [groupRideData, setGroupRideData] = useState(FM_Group_Vehicle_Request);
+
+  useEffect(() => {
+    if (FM_Group_Vehicle_Request) {
+      setGroupRideData(FM_Group_Vehicle_Request);
+    }
+  }, [FM_Group_Vehicle_Request]);
+
+  console.log("groupRideData", groupRideData);
+
   return (
     <>
       <Box
@@ -559,7 +579,7 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
           padding: "15px",
         }}
       >
-        {JSON.stringify(drawerData)}
+        {/* {JSON.stringify(drawerDetails)} */}
         <CSmartTable
           cleaner
           clickableRows
@@ -684,71 +704,61 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
                   </Box>
                   <Grid container spacing={2} sx={{ marginTop: 2 }}>
                     <Grid item xs={6}>
+                      <Typography variant="body1">Employee Name</Typography>
                       <Typography
                         variant="body1"
                         sx={{
                           fontWeight: 600,
                         }}
                       >
-                        Employee Name
-                      </Typography>
-                      <Typography variant="body1">
                         {drawerDetails.employee_name}
                       </Typography>
                     </Grid>
                     <Grid item xs={6}>
+                      <Typography variant="body1">Project Name</Typography>
                       <Typography
                         variant="body1"
                         sx={{
                           fontWeight: 600,
                         }}
                       >
-                        Project Name
-                      </Typography>
-                      <Typography variant="body1">
                         {drawerDetails.project_name}
                       </Typography>
                     </Grid>
                     {doctypeName !== "FM_Equipment_Vehicle_Request" && (
                       <>
                         <Grid item xs={12} sm={6}>
+                          <Typography variant="body1">From Location</Typography>
                           <Typography
                             variant="body1"
                             sx={{
                               fontWeight: 600,
                             }}
                           >
-                            From Location
-                          </Typography>
-                          <Typography variant="body1">
                             {drawerData[0]?.from_location || "N/A"}
                           </Typography>
                         </Grid>
                         <Grid item xs={12} sm={6}>
+                          <Typography variant="body1">To Location</Typography>
                           <Typography
                             variant="body1"
                             sx={{
                               fontWeight: 600,
                             }}
                           >
-                            To Location
-                          </Typography>
-                          <Typography variant="body1">
                             {drawerData[0]?.to_location || "N/A"}
                           </Typography>
                         </Grid>
                       </>
                     )}
                     <Grid item xs={12} sm={6}>
+                      <Typography variant="body1">Request Date</Typography>
                       <Typography
                         variant="body1"
                         sx={{
                           fontWeight: 600,
                         }}
                       >
-                        Request Date
-                      </Typography>
-                      <Typography variant="body1">
                         {`${new Date(drawerDetails.creation)
                           .getDate()
                           .toString()
@@ -762,90 +772,93 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
                       </Typography>
                     </Grid>
                     <Grid item xs={12} sm={6}>
+                      <Typography variant="body1">Request Time</Typography>
                       <Typography
                         variant="body1"
                         sx={{
                           fontWeight: 600,
                         }}
                       >
-                        Request Time
-                      </Typography>
-                      <Typography variant="body1">
                         {new Date(drawerDetails.creation).toLocaleTimeString()}
                       </Typography>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={6}>
+                      <Typography variant="body1">Ride Type</Typography>
                       <Typography
                         variant="body1"
                         sx={{
                           fontWeight: 600,
                         }}
                       >
-                        Category
-                      </Typography>
-                      <Typography variant="body1">
                         {drawerDetails.type}
                       </Typography>
                     </Grid>
 
-                    {doctypeName === "FM_Equipment_Vehicle_Request" && (
+                    {doctypeName === "FM_Group_Vehicle_Request" && (
                       <>
-                        <Grid item xs={12} sm={6}>
-                          <Typography
-                            variant="body1"
-                            sx={{
-                              fontWeight: 600,
-                            }}
-                          >
-                            From Time
-                          </Typography>
+                        <Grid item xs={6}>
                           <Typography variant="body1">
-                            {drawerData[0]?.from_time || "N/A"}
+                            Passenger Count
                           </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Typography
-                            variant="body1"
-                            sx={{
-                              fontWeight: 600,
-                            }}
-                          >
-                            To Time
-                          </Typography>
-                          <Typography variant="body1">
-                            {drawerData[0]?.to_time || "N/A"}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Typography
-                            variant="body1"
-                            sx={{
-                              fontWeight: 600,
-                            }}
-                          >
-                            Equipment Type:
-                          </Typography>
-                          <Typography variant="body1">
-                            {drawerData[0]?.equipment_type || "N/A"}
+                          <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                            {drawerData[0]?.passenger_count}
                           </Typography>
                         </Grid>
                       </>
                     )}
 
-                    {drawerData[0]?.mod === 1 && (
+                    {doctypeName === "FM_Equipment_Vehicle_Request" && (
                       <>
-                        <Grid item xs={12}>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="body1">From Time</Typography>
                           <Typography
                             variant="body1"
                             sx={{
                               fontWeight: 600,
                             }}
                           >
-                            Travel More Than One Day Dates:
+                            {drawerData[0]?.from_time || "N/A"}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="body1">To Time</Typography>
+                          <Typography
+                            variant="body1"
+                            sx={{
+                              fontWeight: 600,
+                            }}
+                          >
+                            {drawerData[0]?.to_time || "N/A"}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="body1">
+                            Equipment Type:
                           </Typography>
                           <Typography
                             variant="body1"
-                            sx={{ color: "blue", fontStyle: "italic" }}
+                            sx={{
+                              fontWeight: 600,
+                            }}
+                          >
+                            {drawerData[0]?.equipment_type || "N/A"}
+                          </Typography>
+                        </Grid>
+                      </>
+                    )}
+                    {drawerData[0]?.mod === 1 && (
+                      <>
+                        <Grid item xs={12}>
+                          <Typography variant="body1">
+                            Travel More Than One Day Dates
+                          </Typography>
+                          <Typography
+                            variant="body1"
+                            sx={{
+                              color: "blue",
+                              fontStyle: "italic",
+                              fontWeight: 600,
+                            }}
                           >
                             {drawerData[0]?.mod_dates.split(",").join(" | ")}
                           </Typography>
@@ -853,451 +866,566 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
                       </>
                     )}
                     <Grid item xs={12}>
+                      <Typography variant="body1">Purpose</Typography>
                       <Typography
                         variant="body1"
                         sx={{
                           fontWeight: 600,
                         }}
                       >
-                        Purpose
-                      </Typography>
-                      <Typography variant="body1">
                         {drawerData[0]?.purpose}
                       </Typography>
                     </Grid>
                     {doctypeName === "FM_Goods_Vehicle_Request" && (
                       <>
                         <Grid item xs={12}>
+                          <Typography variant="body1">Description:</Typography>
                           <Typography
                             variant="body1"
                             sx={{
                               fontWeight: 600,
                             }}
                           >
-                            Description:
-                          </Typography>
-                          <Typography variant="body1">
                             {drawerData[0]?.description || "N/A"}
                           </Typography>
                         </Grid>
                       </>
                     )}
                   </Grid>
-                  {drawerDetails.status === "Pending" && (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        marginTop: "20px",
-                      }}
-                    ></Box>
-                  )}
-                  <br />
 
-                  {/* Option  */}
-
-                  <Box>
-                    <ThemeProvider theme={ThemeColor}>
-                      <Box>Select an Option</Box>
-                      <Box>
-                        {" "}
-                        <RadioGroup
-                          row
-                          value={selectedOption}
-                          onChange={handleOptionChange}
-                        >
-                          <FormControlLabel
-                            sx={{ marginRight: { sm: "120px" } }}
-                            value={"Internal"}
-                            control={<Radio />}
-                            label="Internal"
-                            onClick={handleInternalChange}
-                          />
-                          <FormControlLabel
-                            value={"External"}
-                            control={<Radio />}
-                            label="External"
-                            onClick={handleexternalChange}
-                          />
-                        </RadioGroup>
+                  {/* Group Ride */}
+                  {doctypeName === "FM_Group_Vehicle_Request" &&
+                    groupRideData && (
+                      <Box sx={{ padding: "30px" }}>
+                        <Grid container spacing={2}>
+                          {groupRideData.passenger_details &&
+                            groupRideData.passenger_details.length > 0 &&
+                            groupRideData.passenger_details.map(
+                              (passenger, index) => (
+                                <Grid
+                                  container
+                                  spacing={8}
+                                  key={index}
+                                  sx={{ mb: 2 }}
+                                >
+                                  <Grid item xs={12} sm={6}>
+                                    <Typography variant="body1">
+                                      Passenger Employee ID
+                                    </Typography>
+                                    <Typography
+                                      variant="body1"
+                                      sx={{ fontWeight: 600 }}
+                                    >
+                                      {passenger.employee_id}
+                                    </Typography>
+                                  </Grid>
+                                  <Grid item xs={12} sm={6}>
+                                    <Typography variant="body1">
+                                      Passenger Employee Name
+                                    </Typography>
+                                    <Typography
+                                      variant="body1"
+                                      sx={{ fontWeight: 600 }}
+                                    >
+                                      {passenger.employee_name}
+                                    </Typography>
+                                  </Grid>
+                                </Grid>
+                              )
+                            )}
+                        </Grid>
                       </Box>
-                      {internal && (
-                        <>
-                          <Box
-                            sx={{
-                              border: "1px solid #d1d1d1",
-                              width: "90%",
-                              margin: "0 auto",
-                              padding: "10px 30px",
-                              borderRadius: "5px",
-                            }}
-                          >
+                    )}
+
+                  {/* Good*/}
+                  {doctypeName === "FM_Goods_Vehicle_Request" && (
+                    <>
+                      {groupRideData?.break_points &&
+                        groupRideData.break_points.length > 0 &&
+                        // Sort the break_points array alphabetically by address
+                        groupRideData.break_points
+                          .sort((a, b) => a.address.localeCompare(b.address))
+                          .map((breakPoint, index) => (
                             <Box
                               sx={{
-                                display: "flex",
-                                justifyContent: "space-between",
+                                padding: "5px 20px",
                               }}
+                              key={index}
                             >
-                              <Box sx={{ color: "#383838", fontSize: "14px" }}>
-                                <span>
-                                  If the date and time are acceptable, approve
-                                  it ,If changes are needed, use the edit option
-                                </span>
-                              </Box>
-                              <Box>
-                                <Button
-                                  className="saveBtn"
-                                  onClick={handleUpdateChange}
-                                >
-                                  Edit
-                                </Button>
-                              </Box>
+                              {/* Section Heading */}
+                              <Typography
+                                variant="h6"
+                                sx={{
+                                  marginBottom: "10px",
+
+                                  fontWeight: 600,
+                                }}
+                              >
+                                Breakpoints : {index + 1}
+                              </Typography>
+
+                              {/* Section Content */}
+                              <Grid container spacing={3}>
+                                <Grid item xs={12} sm={6}>
+                                  <Typography variant="body1">
+                                    Address
+                                  </Typography>
+                                  <Typography variant="body1">
+                                    {breakPoint.address || "N/A"}
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                  <Typography variant="body1">
+                                    Description
+                                  </Typography>
+                                  <Typography variant="body1">
+                                    {breakPoint.description || "N/A"}
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                  <Typography variant="body1">
+                                    Purpose
+                                  </Typography>
+                                  <Typography variant="body1">
+                                    {breakPoint.purpose || "N/A"}
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                  <Typography variant="body1">Type</Typography>
+                                  <Typography variant="body1">
+                                    {breakPoint.type || "N/A"}
+                                  </Typography>
+                                </Grid>
+                              </Grid>
                             </Box>
-                            <Box
-                              sx={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                              }}
+                          ))}
+                    </>
+                  )}
+
+                  <br />
+                  {/* Option  */}
+                  {drawerDetails?.status === "Project Lead Approved" && (
+                    <>
+                      <Box>
+                        <ThemeProvider theme={ThemeColor}>
+                          <Box>Select an Option</Box>
+                          <Box>
+                            {" "}
+                            <RadioGroup
+                              row
+                              value={selectedOption}
+                              onChange={handleOptionChange}
                             >
-                              <Box marginBottom="16px">
-                                <Typography variant="body1">
-                                  Start Date
-                                </Typography>
-                                <Typography
-                                  variant="body1"
+                              <FormControlLabel
+                                sx={{ marginRight: { sm: "120px" } }}
+                                value={"Internal"}
+                                control={<Radio />}
+                                label="Internal"
+                                onClick={handleInternalChange}
+                              />
+                              <FormControlLabel
+                                value={"External"}
+                                control={<Radio />}
+                                label="External"
+                                onClick={handleexternalChange}
+                              />
+                            </RadioGroup>
+                          </Box>
+                          {internal && (
+                            <>
+                              <Box
+                                sx={{
+                                  border: "1px solid #d1d1d1",
+                                  width: "90%",
+                                  margin: "0 auto",
+                                  padding: "10px 30px",
+                                  borderRadius: "5px",
+                                }}
+                              >
+                                <Box
                                   sx={{
-                                    fontWeight: 600,
+                                    display: "flex",
+                                    justifyContent: "space-between",
                                   }}
-                                >
-                                  {`${new Date(drawerDetails.creation)
-                                    .getDate()
-                                    .toString()
-                                    .padStart(2, "0")}-${(
-                                    new Date(
-                                      drawerDetails.creation
-                                    ).getMonth() + 1
-                                  )
-                                    .toString()
-                                    .padStart(2, "0")}-${new Date(
-                                    drawerDetails.creation
-                                  ).getFullYear()}`}
-                                </Typography>
-                              </Box>
-                              <Box marginBottom="16px">
-                                <Typography variant="body1">
-                                  End Time
-                                </Typography>
-                                <Typography
-                                  variant="body1"
-                                  sx={{
-                                    fontWeight: 600,
-                                  }}
-                                >
-                                  {new Date(
-                                    drawerDetails.creation
-                                  ).toLocaleTimeString()}
-                                </Typography>
-                              </Box>
-                            </Box>
-                            {editShow && (
-                              <>
-                                <LocalizationProvider
-                                  dateAdapter={AdapterDayjs}
                                 >
                                   <Box
-                                    sx={{
-                                      display: "flex",
-                                      justifyContent: "space-between",
-                                    }}
+                                    sx={{ color: "#383838", fontSize: "14px" }}
                                   >
-                                    {" "}
-                                    <Box
-                                      width={{
-                                        xs: "100%",
-                                        sm: "100%",
-                                        md: "90%",
-                                      }}
-                                      marginBottom="16px"
-                                      textAlign={"center"}
-                                    >
-                                      <DatePicker
-                                        label={
-                                          <Typography>
-                                            Select Start Date{" "}
-                                            <code className="CodeStar">*</code>
-                                          </Typography>
-                                        }
-                                        value={
-                                          approvalDate
-                                            ? dayjs(approvalDate, "DD-MM-YYYY")
-                                            : null
-                                        }
-                                        minDate={today}
-                                        sx={{
-                                          width: {
-                                            xs: "100%",
-                                            sm: "100%",
-                                            md: "90%",
-                                          },
-                                        }}
-                                        format="DD-MM-YYYY"
-                                        onChange={handleFromDateChange}
-                                        renderInput={(params) => (
-                                          <TextField
-                                            {...params}
-                                            variant="outlined"
-                                            placeholder=" Select Start Date"
-                                            error={false}
-                                          />
-                                        )}
-                                      />
-                                    </Box>
-                                    <Box
-                                      width={{
-                                        xs: "100%",
-                                        sm: "100%",
-                                        md: "90%",
-                                      }}
-                                      marginBottom="16px"
-                                      textAlign={"center"}
-                                    >
-                                      <TimePicker
-                                        label={
-                                          <>
-                                            Select Start Time{" "}
-                                            <Typography
-                                              variant="code"
-                                              className="CodeStar"
-                                            >
-                                              *
-                                            </Typography>
-                                          </>
-                                        }
-                                        sx={{
-                                          width: {
-                                            xs: "100%",
-                                            sm: "100%",
-                                            md: "90%",
-                                          },
-                                        }}
-                                        value={
-                                          approvalTime
-                                            ? dayjs(approvalTime, "HH:mm")
-                                            : null
-                                        }
-                                        format="HH:mm"
-                                        ampm={false}
-                                        onChange={handleFromTimeChange}
-                                        renderInput={(params) => (
-                                          <TextField
-                                            {...params}
-                                            placeholder=" Select Start Time"
-                                            error={false}
-                                          />
-                                        )}
-                                        adapter={AdapterDayjs}
-                                      />
-                                    </Box>
+                                    <span>
+                                      If the date and time are acceptable,
+                                      approve it ,If changes are needed, use the
+                                      edit option
+                                    </span>
                                   </Box>
-                                </LocalizationProvider>
-                              </>
-                            )}
-                          </Box>
-                          <br />
-                          <Box
-                            className={"Box"}
-                            sx={{
-                              gap: "10px",
-                              margin: "0 auto",
-                              width: {
-                                xs: "90%",
-                                sm: "90%",
-                                md: "90%",
-                              },
-                            }}
-                          >
-                            <Box
-                              width={{ xs: "100%", sm: "100%", md: "90%" }}
-                              marginBottom="16px"
-                            >
-                              <FormControl
-                                variant="outlined"
-                                sx={{
-                                  width: { xs: "100%", sm: "100%", md: "90%" },
-                                }}
-                              >
-                                <InputLabel>
-                                  Vehicle Assign{""}
-                                  <Typography
-                                    className="CodeStar"
-                                    variant="Code"
-                                  >
-                                    *
-                                  </Typography>
-                                </InputLabel>
-                                <Select
-                                  value={selectedVehicle}
-                                  onChange={handleVehicle}
-                                  label={
-                                    <>
-                                      Select Vehicle{""}
-                                      <Typography
-                                        className="CodeStar"
-                                        variant="Code"
-                                      >
-                                        *
-                                      </Typography>
-                                    </>
-                                  }
-                                >
-                                  {vehicleName?.map((x) => (
-                                    <MenuItem key={x?.name} value={x.name}>
-                                      {x.name}
-                                    </MenuItem>
-                                  ))}
-                                </Select>
-                              </FormControl>
-                            </Box>
-                            <Box
-                              width={{ xs: "100%", sm: "100%", md: "90%" }}
-                              marginBottom="16px"
-                            >
-                              <FormControl
-                                variant="outlined"
-                                sx={{
-                                  width: { xs: "100%", sm: "100%", md: "90%" },
-                                }}
-                              >
-                                <InputLabel>
-                                  Driver Assign {""}
-                                  <Typography
-                                    className="CodeStar"
-                                    variant="Code"
-                                  >
-                                    *
-                                  </Typography>
-                                </InputLabel>
-                                <Select
-                                  value={selectedDriver}
-                                  onChange={handleDriver}
-                                  label={
-                                    <>
-                                      Select Driver{""}
-                                      <Typography
-                                        className="CodeStar"
-                                        variant="Code"
-                                      >
-                                        *
-                                      </Typography>
-                                    </>
-                                  }
-                                >
-                                  {driverName?.map((x) => (
-                                    <MenuItem
-                                      key={x?.name}
-                                      value={x.employee_name}
+                                  <Box>
+                                    <Button
+                                      className="saveBtn"
+                                      onClick={handleUpdateChange}
                                     >
-                                      {x.employee_name}
-                                    </MenuItem>
-                                  ))}
-                                </Select>
-                              </FormControl>
-                            </Box>
-                          </Box>
-                        </>
-                      )}
-                      {external && (
-                        <>
-                          <Box
-                            sx={{
-                              border: "1px solid #d1d1d1",
-                              width: "90%",
-                              margin: "0 auto",
-                              padding: "10px 30px",
-                              borderRadius: "5px",
-                            }}
-                          >
-                            <Box sx={{ display: "flex" }}>
-                              <Box>
-                                <TextField
-                                  label={
-                                    <Typography>
-                                      Vehicle Number{" "}
-                                      <code className="CodeStar"> *</code>
-                                    </Typography>
-                                  }
-                                  variant="outlined"
-                                  value={externalVehicleNo}
+                                      Edit
+                                    </Button>
+                                  </Box>
+                                </Box>
+                                <Box
                                   sx={{
-                                    width: {
-                                      xs: "100%",
-                                      sm: "100%",
-                                      md: "90%",
-                                    },
+                                    display: "flex",
+                                    justifyContent: "space-between",
                                   }}
-                                  onChange={(e) => {
-                                    handleVehicleValidation(e);
-                                  }}
-                                />
-                              </Box>
-                              <Box>
-                                <TextField
-                                  label={
-                                    <Typography>
-                                      Driver Phone Number{" "}
-                                      <code className="CodeStar"> *</code>
+                                >
+                                  <Box marginBottom="16px">
+                                    <Typography variant="body1">
+                                      Start Date
                                     </Typography>
-                                  }
-                                  variant="outlined"
-                                  value={externalDriverNo}
-                                  sx={{
-                                    width: {
-                                      xs: "100%",
-                                      sm: "100%",
-                                      md: "90%",
-                                    },
-                                  }}
-                                  onChange={(e) => {
-                                    handlePhoneNoValidation(e);
-                                  }}
-                                />
+                                    <Typography
+                                      variant="body1"
+                                      sx={{
+                                        fontWeight: 600,
+                                      }}
+                                    >
+                                      {`${new Date(drawerDetails.creation)
+                                        .getDate()
+                                        .toString()
+                                        .padStart(2, "0")}-${(
+                                        new Date(
+                                          drawerDetails.creation
+                                        ).getMonth() + 1
+                                      )
+                                        .toString()
+                                        .padStart(2, "0")}-${new Date(
+                                        drawerDetails.creation
+                                      ).getFullYear()}`}
+                                    </Typography>
+                                  </Box>
+                                  <Box marginBottom="16px">
+                                    <Typography variant="body1">
+                                      End Time
+                                    </Typography>
+                                    <Typography
+                                      variant="body1"
+                                      sx={{
+                                        fontWeight: 600,
+                                      }}
+                                    >
+                                      {new Date(
+                                        drawerDetails.creation
+                                      ).toLocaleTimeString()}
+                                    </Typography>
+                                  </Box>
+                                </Box>
+                                {editShow && (
+                                  <>
+                                    <LocalizationProvider
+                                      dateAdapter={AdapterDayjs}
+                                    >
+                                      <Box
+                                        sx={{
+                                          display: "flex",
+                                          justifyContent: "space-between",
+                                        }}
+                                      >
+                                        {" "}
+                                        <Box
+                                          width={{
+                                            xs: "100%",
+                                            sm: "100%",
+                                            md: "90%",
+                                          }}
+                                          marginBottom="16px"
+                                          textAlign={"center"}
+                                        >
+                                          <DatePicker
+                                            label={
+                                              <Typography>
+                                                Select Start Date{" "}
+                                                <code className="CodeStar">
+                                                  *
+                                                </code>
+                                              </Typography>
+                                            }
+                                            value={
+                                              approvalDate
+                                                ? dayjs(
+                                                    approvalDate,
+                                                    "DD-MM-YYYY"
+                                                  )
+                                                : null
+                                            }
+                                            minDate={today}
+                                            sx={{
+                                              width: {
+                                                xs: "100%",
+                                                sm: "100%",
+                                                md: "90%",
+                                              },
+                                            }}
+                                            format="DD-MM-YYYY"
+                                            onChange={handleFromDateChange}
+                                            renderInput={(params) => (
+                                              <TextField
+                                                {...params}
+                                                variant="outlined"
+                                                placeholder=" Select Start Date"
+                                                error={false}
+                                              />
+                                            )}
+                                          />
+                                        </Box>
+                                        <Box
+                                          width={{
+                                            xs: "100%",
+                                            sm: "100%",
+                                            md: "90%",
+                                          }}
+                                          marginBottom="16px"
+                                          textAlign={"center"}
+                                        >
+                                          <TimePicker
+                                            label={
+                                              <>
+                                                Select Start Time{" "}
+                                                <Typography
+                                                  variant="code"
+                                                  className="CodeStar"
+                                                >
+                                                  *
+                                                </Typography>
+                                              </>
+                                            }
+                                            sx={{
+                                              width: {
+                                                xs: "100%",
+                                                sm: "100%",
+                                                md: "90%",
+                                              },
+                                            }}
+                                            value={
+                                              approvalTime
+                                                ? dayjs(approvalTime, "HH:mm")
+                                                : null
+                                            }
+                                            format="HH:mm"
+                                            ampm={false}
+                                            onChange={handleFromTimeChange}
+                                            renderInput={(params) => (
+                                              <TextField
+                                                {...params}
+                                                placeholder=" Select Start Time"
+                                                error={false}
+                                              />
+                                            )}
+                                            adapter={AdapterDayjs}
+                                          />
+                                        </Box>
+                                      </Box>
+                                    </LocalizationProvider>
+                                  </>
+                                )}
                               </Box>
-                            </Box>
-                            <Box
-                              sx={{
-                                width: {
-                                  xs: "100%",
-                                  sm: "100%",
-                                  md: "47%",
-                                },
-                                marginTop: "16px",
-                              }}
-                            >
-                              <TextField
-                                label={
-                                  <Typography>
-                                    OTP <code className="CodeStar"> *</code>
-                                  </Typography>
-                                }
-                                variant="outlined"
-                                value={externalVehicleOTP}
+                              <br />
+                              <Box
+                                className={"Box"}
                                 sx={{
+                                  gap: "10px",
+                                  margin: "0 auto",
                                   width: {
-                                    xs: "100%",
-                                    sm: "100%",
+                                    xs: "90%",
+                                    sm: "90%",
                                     md: "90%",
                                   },
                                 }}
-                                onChange={(e) => {
-                                  setExternalVehicleOTP(e.target.value);
+                              >
+                                <Box
+                                  width={{ xs: "100%", sm: "100%", md: "90%" }}
+                                  marginBottom="16px"
+                                >
+                                  <FormControl
+                                    variant="outlined"
+                                    sx={{
+                                      width: {
+                                        xs: "100%",
+                                        sm: "100%",
+                                        md: "90%",
+                                      },
+                                    }}
+                                  >
+                                    <InputLabel>
+                                      Vehicle Assign{""}
+                                      <Typography
+                                        className="CodeStar"
+                                        variant="Code"
+                                      >
+                                        *
+                                      </Typography>
+                                    </InputLabel>
+                                    <Select
+                                      value={selectedVehicle}
+                                      onChange={handleVehicle}
+                                      label={
+                                        <>
+                                          Select Vehicle{""}
+                                          <Typography
+                                            className="CodeStar"
+                                            variant="Code"
+                                          >
+                                            *
+                                          </Typography>
+                                        </>
+                                      }
+                                    >
+                                      {vehicleName?.map((x) => (
+                                        <MenuItem key={x?.name} value={x.name}>
+                                          {x.name}
+                                        </MenuItem>
+                                      ))}
+                                    </Select>
+                                  </FormControl>
+                                </Box>
+                                <Box
+                                  width={{ xs: "100%", sm: "100%", md: "90%" }}
+                                  marginBottom="16px"
+                                >
+                                  <FormControl
+                                    variant="outlined"
+                                    sx={{
+                                      width: {
+                                        xs: "100%",
+                                        sm: "100%",
+                                        md: "90%",
+                                      },
+                                    }}
+                                  >
+                                    <InputLabel>
+                                      Driver Assign {""}
+                                      <Typography
+                                        className="CodeStar"
+                                        variant="Code"
+                                      >
+                                        *
+                                      </Typography>
+                                    </InputLabel>
+                                    <Select
+                                      value={selectedDriver}
+                                      onChange={handleDriver}
+                                      label={
+                                        <>
+                                          Select Driver{""}
+                                          <Typography
+                                            className="CodeStar"
+                                            variant="Code"
+                                          >
+                                            *
+                                          </Typography>
+                                        </>
+                                      }
+                                    >
+                                      {driverName?.map((x) => (
+                                        <MenuItem
+                                          key={x?.name}
+                                          value={x.employee_name}
+                                        >
+                                          {x.employee_name}
+                                        </MenuItem>
+                                      ))}
+                                    </Select>
+                                  </FormControl>
+                                </Box>
+                              </Box>
+                            </>
+                          )}
+                          {external && (
+                            <>
+                              <Box
+                                sx={{
+                                  border: "1px solid #d1d1d1",
+                                  width: "90%",
+                                  margin: "0 auto",
+                                  padding: "10px 30px",
+                                  borderRadius: "5px",
                                 }}
-                              />
-                            </Box>
-                          </Box>
-                        </>
-                      )}
-                    </ThemeProvider>
-                  </Box>
+                              >
+                                <Box sx={{ display: "flex" }}>
+                                  <Box>
+                                    <TextField
+                                      label={
+                                        <Typography>
+                                          Vehicle Number{" "}
+                                          <code className="CodeStar"> *</code>
+                                        </Typography>
+                                      }
+                                      variant="outlined"
+                                      value={externalVehicleNo}
+                                      sx={{
+                                        width: {
+                                          xs: "100%",
+                                          sm: "100%",
+                                          md: "90%",
+                                        },
+                                      }}
+                                      onChange={(e) => {
+                                        handleVehicleValidation(e);
+                                      }}
+                                    />
+                                  </Box>
+                                  <Box>
+                                    <TextField
+                                      label={
+                                        <Typography>
+                                          Driver Phone Number{" "}
+                                          <code className="CodeStar"> *</code>
+                                        </Typography>
+                                      }
+                                      variant="outlined"
+                                      value={externalDriverNo}
+                                      sx={{
+                                        width: {
+                                          xs: "100%",
+                                          sm: "100%",
+                                          md: "90%",
+                                        },
+                                      }}
+                                      onChange={(e) => {
+                                        handlePhoneNoValidation(e);
+                                      }}
+                                    />
+                                  </Box>
+                                </Box>
+                                <Box
+                                  sx={{
+                                    width: {
+                                      xs: "100%",
+                                      sm: "100%",
+                                      md: "47%",
+                                    },
+                                    marginTop: "16px",
+                                  }}
+                                >
+                                  <TextField
+                                    label={
+                                      <Typography>
+                                        OTP <code className="CodeStar"> *</code>
+                                      </Typography>
+                                    }
+                                    variant="outlined"
+                                    value={externalVehicleOTP}
+                                    sx={{
+                                      width: {
+                                        xs: "100%",
+                                        sm: "100%",
+                                        md: "90%",
+                                      },
+                                    }}
+                                    onChange={(e) => {
+                                      setExternalVehicleOTP(e.target.value);
+                                    }}
+                                  />
+                                </Box>
+                              </Box>
+                            </>
+                          )}
+                        </ThemeProvider>
+                      </Box>
+                    </>
+                  )}
                 </div>
               </Box>
             </Box>

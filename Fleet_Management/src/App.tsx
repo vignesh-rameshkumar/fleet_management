@@ -153,6 +153,17 @@ const App: React.FC = () => {
                     }
                   />
                   <Route
+                    path="/Fleet_Management/quickaccess"
+                    element={
+                      <QuickAccess
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
+                  />
+                  <Route
                     path="/Fleet_Management/trackrequest"
                     element={
                       <TrackRequest

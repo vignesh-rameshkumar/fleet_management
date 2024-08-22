@@ -167,7 +167,7 @@ const SideBar: React.FC<SideBarProps> = ({
     {
       name: "Book Ride",
       icon: <IoCarSportOutline />,
-      path: "/Fleet_Management",
+      path: "/Fleet_Management/quickaccess",
       submenu: [
         {
           path: "/Fleet_Management",
@@ -193,7 +193,7 @@ const SideBar: React.FC<SideBarProps> = ({
     },
 
     {
-      path: "/Fleet_Management",
+      path: "/Fleet_Management/quickaccess",
       name: "Travel Route",
       icon: <MdOutlineRoute />,
       onClick: () => toggleDrawer(true, "TravelRoute"),
@@ -225,7 +225,7 @@ const SideBar: React.FC<SideBarProps> = ({
     {
       name: "Book Ride",
       icon: <IoCarSportOutline />,
-      path: "/Fleet_Management",
+      path: "/Fleet_Management/quickaccess",
       submenu: [
         {
           path: "/Fleet_Management",
@@ -251,7 +251,7 @@ const SideBar: React.FC<SideBarProps> = ({
     },
 
     {
-      path: "/Fleet_Management",
+      path: "/Fleet_Management/quickaccess",
       name: "Travel Route",
       icon: <MdOutlineRoute />,
       onClick: () => toggleDrawer(true, "TravelRoute"),
@@ -288,7 +288,7 @@ const SideBar: React.FC<SideBarProps> = ({
     {
       name: "Book Ride",
       icon: <IoCarSportOutline />,
-      path: "/Fleet_Management",
+      path: "/Fleet_Management/quickaccess",
       submenu: [
         {
           path: "/Fleet_Management",
@@ -314,7 +314,7 @@ const SideBar: React.FC<SideBarProps> = ({
     },
 
     {
-      path: "/Fleet_Management",
+      path: "/Fleet_Management/quickaccess",
       name: "Travel Route",
       icon: <MdOutlineRoute />,
       onClick: () => toggleDrawer(true, "TravelRoute"),
@@ -356,7 +356,7 @@ const SideBar: React.FC<SideBarProps> = ({
     {
       name: "Book Ride",
       icon: <IoCarSportOutline />,
-      path: "/Fleet_Management",
+      path: "/Fleet_Management/quickaccess",
       submenu: [
         {
           path: "/Fleet_Management",
@@ -381,7 +381,7 @@ const SideBar: React.FC<SideBarProps> = ({
       ],
     },
     {
-      path: "/Fleet_Management",
+      path: "/Fleet_Management/quickaccess",
       name: "Travel Route",
       icon: <MdOutlineRoute />,
       onClick: () => toggleDrawer(true, "TravelRoute"),
