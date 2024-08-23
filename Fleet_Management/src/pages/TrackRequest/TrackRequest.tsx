@@ -734,7 +734,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
       key: "S_no",
       label: "S.No",
       _style: {
-        width: "7%",
+        width: "5%",
         fontSize: "14px",
         textAlign: "center",
         color: darkMode ? "#FFF" : "#222222",
@@ -748,7 +748,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
       key: "name",
       label: "Request ID",
       _style: {
-        width: "18%",
+        width: "15%",
         fontSize: "14px",
         textAlign: "center",
         color: darkMode ? "#FFF" : "#222222",
@@ -774,7 +774,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
       key: "project_name",
       label: "Project Name",
       _style: {
-        width: "20%",
+        width: "15%",
         fontSize: "14px",
         textAlign: "center",
         color: darkMode ? "#FFF" : "#222222",
@@ -800,7 +800,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
       key: "status",
       label: "Status",
       _style: {
-        width: "15%",
+        width: "20%",
         fontSize: "14px",
         textAlign: "center",
         color: darkMode ? "#FFF" : "#222222",
@@ -813,7 +813,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
       key: "action",
       label: "Action",
       _style: {
-        width: "18%",
+        width: "10%",
         fontSize: "14px",
         textAlign: "center",
         color: darkMode ? "#FFF" : "#222222",
@@ -1053,7 +1053,31 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                   backgroundColor: selectedItem === item ? "#080a0c13" : "",
                 }}
               >
-                {item?.status || "-"}
+                <div
+                  style={{
+                    backgroundColor:
+                      item.status === "Approved"
+                        ? "#a5d0a9"
+                        : item.status === "Cancelled"
+                        ? "#9E9E9E"
+                        : "",
+                    color:
+                      item.status === "Approved"
+                        ? "#000"
+                        : item.status === "Cancelled"
+                        ? "#fff"
+                        : "",
+                    padding: "6px 6px",
+                    width:
+                      item.status === "Approved" || item.status === "Cancelled"
+                        ? "100px"
+                        : "",
+                    borderRadius: "20px",
+                    margin: "0 auto",
+                  }}
+                >
+                  {item?.status || "-"}
+                </div>
               </td>
             ),
             creation: (item: any) => {
@@ -1373,7 +1397,27 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                         </Box>
                       )}
                   </Grid>
-
+                  {drawerDetails?.status === "Rejected" ||
+                  drawerDetails?.status === "Project Lead Rejected" ? (
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      alignItems="left"
+                    >
+                      <Box
+                        width={{ xs: "100%", sm: "100%", md: "90%" }}
+                        marginBottom="16px"
+                        textAlign={"left"}
+                      >
+                        <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                          Reject Reason
+                        </Typography>
+                        <Typography variant="body1" sx={{ color: "red" }}>
+                          {drawerDetails?.reason}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  ) : null}
                   {error && (
                     <Box sx={{ marginTop: "20px", textAlign: "center" }}>
                       <Typography color="error">

@@ -67,7 +67,9 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
   const [externalVehicleNo, setExternalVehicleNo] = useState("");
   const [externalDriverNo, setExternalDriverNo] = useState("");
   const [externalVehicleOTP, setExternalVehicleOTP] = useState("");
-  // const [groupRideData, setGroupRideData] = useState(FM_Group_Vehicle_Request);
+  const [reasonshow, setReasonshow] = useState(false);
+  const [rejectreason, setRejectReason] = useState("");
+  const [btnshow, setBtnshow] = useState(false);
 
   const today = dayjs();
 
@@ -333,6 +335,9 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
     setExternalVehicleNo("");
     setExternalDriverNo("");
     setExternalVehicleOTP("");
+    setReasonshow(false);
+    setBtnshow(true);
+    setRejectReason("");
   };
 
   // Vehicle API
@@ -552,7 +557,34 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
     }
   }, [FM_Group_Vehicle_Request]);
 
-  console.log("groupRideData", groupRideData);
+  // Reject Section
+  const handleReject = async () => {
+    let doctypename = drawerDetails.doctypename;
+    let id = drawerDetails.name;
+    let EmployeeName = drawerDetails.employee_name;
+
+    let updateData = {
+      status: "Rejected",
+      reason: rejectreason,
+    };
+    try {
+      await updateDoc(doctypename, id, updateData);
+      // Directly update the specific data arrays and concatenated data
+      setTableData((prevAllData) => {
+        return prevAllData.map((item) => {
+          if (item.doctypename === doctypename && item.name === id) {
+            return { ...item, ...updateData };
+          }
+          return item;
+        });
+      });
+      toast.error(`${id} - ${EmployeeName}  - Rejected `);
+      handleCloseDrawer();
+      setRejectReason("");
+    } catch (error) {
+      toast.error(`Error Approved doc: ${error.message}`);
+    }
+  };
 
   return (
     <>
@@ -1002,8 +1034,33 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
                     </>
                   )}
 
+                  {/* Reject Section */}
+                  {drawerDetails.status === "Rejected" ||
+                  drawerDetails.status === "Project Lead Rejected" ? (
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      alignItems="left"
+                    >
+                      <Box
+                        width={{ xs: "100%", sm: "100%", md: "90%" }}
+                        marginTop="16px"
+                        textAlign={"left"}
+                      >
+                        <Typography variant="body1">Reject Reason</Typography>
+                        <Typography
+                          variant="body1"
+                          sx={{ color: "red", fontWeight: 600 }}
+                        >
+                          {drawerDetails.reason}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  ) : null}
+
                   <br />
                   {/* Option  */}
+
                   {drawerDetails?.status === "Project Lead Approved" && (
                     <>
                       <Box>
@@ -1049,7 +1106,10 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
                                   }}
                                 >
                                   <Box
-                                    sx={{ color: "#383838", fontSize: "14px" }}
+                                    sx={{
+                                      color: "#383838",
+                                      fontSize: "14px",
+                                    }}
                                   >
                                     <span>
                                       If the date and time are acceptable,
@@ -1235,7 +1295,11 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
                                 }}
                               >
                                 <Box
-                                  width={{ xs: "100%", sm: "100%", md: "90%" }}
+                                  width={{
+                                    xs: "100%",
+                                    sm: "100%",
+                                    md: "90%",
+                                  }}
                                   marginBottom="16px"
                                 >
                                   <FormControl
@@ -1281,7 +1345,11 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
                                   </FormControl>
                                 </Box>
                                 <Box
-                                  width={{ xs: "100%", sm: "100%", md: "90%" }}
+                                  width={{
+                                    xs: "100%",
+                                    sm: "100%",
+                                    md: "90%",
+                                  }}
                                   marginBottom="16px"
                                 >
                                   <FormControl
@@ -1431,33 +1499,94 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
             </Box>
           </>
         )}
-
-        {drawerDetails?.status === "Project Lead Approved" && (
+        {reasonshow && (
           <Box display="flex" flexDirection="column" alignItems="center">
-            <Box sx={{ display: "flex" }}>
-              <Button className="deleteBtn">Reject</Button>
+            <Box
+              width={{ xs: "100%", sm: "100%", md: "80%" }}
+              marginBottom="16px"
+              textAlign={"center"}
+            >
+              <TextField
+                label="Reason for Denial"
+                value={rejectreason}
+                multiline
+                rows={2}
+                sx={{
+                  width: {
+                    xs: "100%",
+                    sm: "100%",
+                    md: "80%",
+                  },
+                }}
+                onChange={(e) => {
+                  setRejectReason(e.target.value);
+                }}
+              />
+            </Box>
+
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <Button
+                className="cancelBtn"
+                onClick={() => {
+                  setReasonshow(false);
+                  setRejectReason("");
+                  setBtnshow(true);
+                }}
+              >
+                Discard
+              </Button>
+
               <Button
                 className="saveBtn"
-                disabled={
-                  (selectedOption === "Internal" &&
-                    (!selectedVehicle ||
-                      !selectedDriver ||
-                      (editShow === true &&
-                        (!approvalDate || !approvalTime)))) ||
-                  (selectedOption === "External" &&
-                    (!externalVehicleOTP ||
-                      !externalDriverNo ||
-                      !externalVehicleNo))
-                }
-                onClick={handleapprove}
+                disabled={!rejectreason}
+                onClick={() => {
+                  handleReject();
+                  setReasonshow(false);
+                }}
               >
-                Approve
+                save
               </Button>
             </Box>
+            {/* )} */}
           </Box>
         )}
 
-        <br />
+        {btnshow && (
+          <>
+            {drawerDetails?.status === "Project Lead Approved" && (
+              <Box display="flex" flexDirection="column" alignItems="center">
+                <Box sx={{ display: "flex" }}>
+                  <Button
+                    className="deleteBtn"
+                    onClick={() => {
+                      setReasonshow(true);
+                      setBtnshow(false);
+                    }}
+                  >
+                    Reject
+                  </Button>
+                  <Button
+                    className="saveBtn"
+                    disabled={
+                      (selectedOption === "Internal" &&
+                        (!selectedVehicle ||
+                          !selectedDriver ||
+                          (editShow === true &&
+                            (!approvalDate || !approvalTime)))) ||
+                      (selectedOption === "External" &&
+                        (!externalVehicleOTP ||
+                          !externalDriverNo ||
+                          !externalVehicleNo))
+                    }
+                    onClick={handleapprove}
+                  >
+                    Approve
+                  </Button>
+                </Box>
+              </Box>
+            )}
+          </>
+        )}
       </Drawer>
     </>
   );

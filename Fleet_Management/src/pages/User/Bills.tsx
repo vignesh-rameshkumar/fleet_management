@@ -504,7 +504,7 @@ const Bills: React.FC<BillsProps> = ({
                         Coins Consumed
                       </Typography>
                       <Typography variant="body1">
-                        {drawerDetails.bill_amount}
+                        {drawerDetails?.bill_amount}
                       </Typography>
                     </Grid>
                     <Grid item xs={6}>
@@ -517,7 +517,7 @@ const Bills: React.FC<BillsProps> = ({
                         Ride Type
                       </Typography>
                       <Typography variant="body1">
-                        {drawerDetails.allotment}
+                        {drawerDetails?.type}
                       </Typography>
                     </Grid>
                     <Grid item xs={6}>
@@ -585,6 +585,28 @@ const Bills: React.FC<BillsProps> = ({
                       </>
                     )}
                   </Grid>
+                  <br />
+                  {drawerDetails?.status === "Rejected" ||
+                  drawerDetails?.status === "Project Lead Rejected" ? (
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      alignItems="left"
+                    >
+                      <Box
+                        width={{ xs: "100%", sm: "100%", md: "90%" }}
+                        marginBottom="16px"
+                        textAlign={"left"}
+                      >
+                        <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                          Reject Reason
+                        </Typography>
+                        <Typography variant="body1" sx={{ color: "red" }}>
+                          {drawerDetails?.reason}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  ) : null}
                   {drawerDetails.status === "Pending" && (
                     <Box
                       sx={{

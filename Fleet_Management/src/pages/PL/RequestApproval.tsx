@@ -31,7 +31,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { ThemeProvider, createTheme } from "@mui/material";
-import RequestApprovalDL from "../DL/RequestApprovalDL";
+// import RequestApprovalDL from "../DL/RequestApprovalDL";
 
 interface RequestApprovalProps {
   darkMode: boolean;
@@ -54,6 +54,9 @@ const RequestApproval: React.FC<RequestApprovalProps> = ({
   const [tableData, setTableData] = useState<any[]>([]);
   const [drawerData, setDrawerData] = useState<any[]>([]);
   const [view, setView] = useState<boolean>(false);
+  const [reasonshow, setReasonshow] = useState(false);
+  const [rejectreason, setRejectReason] = useState("");
+  const [btnshow, setBtnshow] = useState(false);
 
   const [selectedProject, setSelectedProject] = useState();
   const [rideDate, setRideDate] = useState<string | null>(null);
@@ -101,14 +104,11 @@ const RequestApproval: React.FC<RequestApprovalProps> = ({
     }
   );
 
-  // Set table data when the fetched data changes
   useEffect(() => {
     if (FM_Request_Master) {
       setTableData(FM_Request_Master);
     }
   }, [FM_Request_Master]);
-
-  // console.log("FM_Request_Master", FM_Request_Master);
 
   const doctypeName = drawerDetails.doctypename;
   const documentName = drawerDetails.request_id;
@@ -137,6 +137,9 @@ const RequestApproval: React.FC<RequestApprovalProps> = ({
 
   const handleCloseDrawer = () => {
     toggleDrawer(false);
+    setReasonshow(false);
+    setBtnshow(true);
+    setRejectReason("");
   };
 
   const columns = [
@@ -300,7 +303,36 @@ const RequestApproval: React.FC<RequestApprovalProps> = ({
     }
   }, [FM_Group_Vehicle_Request]);
 
-  console.log("groupRideData", groupRideData);
+  // Reject Section
+  const handleReject = async () => {
+    let doctypename = drawerDetails.doctypename;
+    let id = drawerDetails.name;
+    let EmployeeName = drawerDetails.employee_name;
+
+    let updateData = {
+      status: "Project Lead Rejected",
+      reason: rejectreason,
+    };
+    try {
+      await updateDoc(doctypename, id, updateData);
+
+      // Directly update the specific data arrays and concatenated data
+      setTableData((prevAllData) => {
+        return prevAllData.map((item) => {
+          if (item.doctypename === doctypename && item.name === id) {
+            return { ...item, ...updateData };
+          }
+          return item;
+        });
+      });
+
+      toast.error(`${id} ${EmployeeName}  - Rejected `);
+      handleCloseDrawer();
+      setRejectReason("");
+    } catch (error) {
+      toast.error(`Error Approved doc: ${error.message}`);
+    }
+  };
 
   return (
     <>
@@ -399,6 +431,7 @@ const RequestApproval: React.FC<RequestApprovalProps> = ({
                       onClick={() => {
                         toggleDrawer(true);
                         setView(true);
+                        setBtnshow(true);
                         setDrawerDetails(item);
                       }}
                     />
@@ -623,7 +656,7 @@ const RequestApproval: React.FC<RequestApprovalProps> = ({
                               fontWeight: 600,
                             }}
                           >
-                            Travel More Than One Day Dates
+                            Travel More Than One Day Dates:
                           </Typography>
                           <Typography
                             variant="body1"
@@ -665,6 +698,15 @@ const RequestApproval: React.FC<RequestApprovalProps> = ({
                       </>
                     )}
                   </Grid>
+                  {drawerDetails.status === "Pending" && (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        marginTop: "20px",
+                      }}
+                    ></Box>
+                  )}
                 </div>
               </Box>
               {/* Group Ride */}
@@ -773,17 +815,101 @@ const RequestApproval: React.FC<RequestApprovalProps> = ({
             </Box>
           </>
         )}
-        <br />
-        {drawerDetails.status === "Pending" && (
-          <Box display="flex" flexDirection="column" alignItems="center">
-            <Box sx={{ display: "flex" }}>
-              <Button className="deleteBtn">Reject</Button>
 
-              <Button className="saveBtn" onClick={handleapprove}>
-                Approve
-              </Button>
+        {/* Reject Section */}
+        {drawerDetails.status === "Project Lead Rejected" ? (
+          <Box display="flex" flexDirection="column" alignItems="center">
+            <Box
+              width={{ xs: "100%", sm: "100%", md: "90%" }}
+              marginBottom="16px"
+              textAlign={"left"}
+            >
+              <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                Reject Reason
+              </Typography>
+              <Typography variant="body1" sx={{ color: "red" }}>
+                {drawerDetails.reason}
+              </Typography>
             </Box>
           </Box>
+        ) : null}
+        {reasonshow && (
+          <Box display="flex" flexDirection="column" alignItems="center">
+            <Box
+              width={{ xs: "100%", sm: "100%", md: "90%" }}
+              marginBottom="16px"
+              textAlign={"center"}
+            >
+              <TextField
+                label="Reason for Denial"
+                value={rejectreason}
+                multiline
+                rows={3}
+                sx={{
+                  width: {
+                    xs: "100%",
+                    sm: "100%",
+                    md: "90%",
+                  },
+                }}
+                onChange={(e) => {
+                  setRejectReason(e.target.value);
+                }}
+              />
+            </Box>
+
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <Button
+                className="cancelBtn"
+                onClick={() => {
+                  setReasonshow(false);
+                  setRejectReason("");
+                  setBtnshow(true);
+                }}
+              >
+                Discard
+              </Button>
+
+              <Button
+                className="saveBtn"
+                disabled={!rejectreason}
+                onClick={() => {
+                  handleReject();
+
+                  setReasonshow(false);
+                }}
+              >
+                save
+              </Button>
+            </Box>
+            {/* )} */}
+          </Box>
+        )}
+
+        <br />
+
+        {btnshow && (
+          <>
+            {drawerDetails.status === "Pending" && (
+              <Box display="flex" flexDirection="column" alignItems="center">
+                <Box sx={{ display: "flex" }}>
+                  <Button
+                    className="deleteBtn"
+                    onClick={() => {
+                      setReasonshow(true);
+                      setBtnshow(false);
+                    }}
+                  >
+                    Reject
+                  </Button>
+
+                  <Button className="saveBtn" onClick={handleapprove}>
+                    Approve
+                  </Button>
+                </Box>
+              </Box>
+            )}
+          </>
         )}
 
         <br />
