@@ -16,7 +16,8 @@ import Preloader from "./component/Preloader.tsx";
 import QuickAccess from "./pages/QuickAccess/QuickAccess.tsx";
 // Pages
 import GroupRide from "./pages/BookRide/GroupRide.tsx";
-
+import Logs from "./pages/FM/Logs.tsx";
+import Reports from "./pages/FM/Reports.tsx";
 import RequestApproval from "./pages/PL/RequestApproval.tsx";
 import RequestApprovalDL from "./pages/DL/RequestApprovalDL.tsx";
 import NotFoundPage from "./component/NotFoundPage.tsx";
@@ -258,6 +259,28 @@ const App: React.FC = () => {
                     path="/Fleet_Management/managefleet/driver"
                     element={
                       <Driver
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/Fleet_Management/managefleet/logs"
+                    element={
+                      <Logs
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/Fleet_Management/managefleet/reports"
+                    element={
+                      <Reports
                         darkMode={darkMode}
                         userEmailId={userEmailId}
                         userName={userName}

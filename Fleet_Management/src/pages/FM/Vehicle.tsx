@@ -8,7 +8,6 @@ import {
   CircularProgress,
   Radio,
   RadioGroup,
-  Alert,
   FormControlLabel,
   TextField,
   InputAdornment,
@@ -63,8 +62,8 @@ const Vehicle: React.FC<VehicleProps> = ({
   const [view, setView] = useState<boolean>(false);
   const [vehicleDetails, setVehicleDetails] = useState(false);
   const [table, setTable] = useState(true);
-  const [ownership, setOwnership] = useState("Own");
-  const [vehicleAvailability, setVehicleAvailability] = useState("Online");
+  const [ownership, setOwnership] = useState("Own"); // Default to "Own"
+  const [vehicleAvailability, setVehicleAvailability] = useState("Online"); // Default to "Online"
 
   // Separate states for form fields
   const [vehicleYear, setVehicleYear] = useState(null);
@@ -101,7 +100,7 @@ const Vehicle: React.FC<VehicleProps> = ({
   const [vin, setVIN] = useState("");
   const [vinError, setVINError] = useState(false);
   const [vinHelperText, setVINHelperText] = useState("");
-  const [edit, setEdit] = useState(true);
+
   const [rcDate, setRCDate] = useState(null);
   const [rcExpiredDate, setRCExpiredDate] = useState(null);
   const [rcDateError, setRCDateError] = useState(false);
@@ -174,6 +173,7 @@ const Vehicle: React.FC<VehicleProps> = ({
 
   const [isInsuranceModalOpen, setIsInsuranceModalOpen] =
     useState<boolean>(false);
+
   // documnet icon download option code '
   const [open, setOpen] = useState(false);
 
@@ -234,7 +234,6 @@ const Vehicle: React.FC<VehicleProps> = ({
       setTableData(FM_Vehicle_Details);
     }
   }, [FM_Vehicle_Details]);
-  // const documentName = drawerDetails?.name;
   // console.log("FM_Vehicle_Details",FM_Vehicle_Details)
   // const doctypeName = drawerDetails.doctypename;
   // const documentName = drawerDetails.request_id;
@@ -850,21 +849,14 @@ const Vehicle: React.FC<VehicleProps> = ({
     error,
     reset,
   } = useFrappeCreateDoc();
-  const {
-    updateDoc,
-    loading: updatingLoading,
-    error: updatingError,
-  } = useFrappeUpdateDoc();
 
   // Reusable function for file upload
   const uploadFile = async (file, options) => {
-    if (file instanceof File || file instanceof Blob) {
+    if (file) {
       const response = await upload(file, options);
       return response.file_url;
-    } else {
-      console.error("Invalid file type:", file);
-      return null;
     }
+    return null;
   };
   const formatDate = (date) => {
     return new Date(date).toISOString().slice(0, 19).replace("T", " ");
@@ -960,88 +952,6 @@ const Vehicle: React.FC<VehicleProps> = ({
     }
   };
 
-  const handleUpdate = async (status) => {
-    try {
-      // File uploads if needed
-
-      const vehicleImageUrl = await uploadFile(vehicleImage, {
-        isPrivate: true,
-        doctype: "FM_Vehicle_Details",
-        fieldname: "vehicle_image",
-      });
-      const rcImageUrl = await uploadFile(rcDetails, {
-        isPrivate: true,
-        doctype: "FM_Vehicle_Details",
-        fieldname: "rc_copy",
-      });
-      const pollutionCertificateUrl = await uploadFile(pollutionCertificate, {
-        isPrivate: true,
-        doctype: "FM_Vehicle_Details",
-        fieldname: "pollution_certificate",
-      });
-      const insuranceCopyUrl = await uploadFile(insuranceFile, {
-        isPrivate: true,
-        doctype: "FM_Vehicle_Details",
-        fieldname: "insurance_copy",
-      });
-      const purchaseinvoice = await uploadFile(purchaseInvoice, {
-        isPrivate: true,
-        doctype: "FM_Vehicle_Details",
-        fieldname: "purchase_invoice",
-      });
-      const billsofsales = await uploadFile(billsOfSales, {
-        isPrivate: true,
-        doctype: "FM_Vehicle_Details",
-        filedname: "bills_of_sales",
-      });
-      // Base request body
-      const updateData = {
-        manufacturer_name: vehicleName,
-        model: vehicleModel,
-        model_year: vehicleYear,
-        vehicle_type: vehicleType,
-        fuel_type: fuelType,
-        identification_number: vin,
-        rc_date: formatDate(rcDate),
-        contractor_name: travelsContractorsName,
-        travels_name: travelsName,
-        plate_number: licensePlateNumber,
-        vehicle_image: vehicleImageUrl,
-        contact_number: contactNumber,
-        status: vehicleAvailability,
-        ownership: ownership,
-
-        rc_expiring_date: formatDate(rcExpiredDate),
-        rc_copy: rcImageUrl,
-        pollution_certificate: pollutionCertificateUrl,
-        next_service_date: formatDate(nextServiceDate),
-        road_tax: formatDate(roadTaxDate),
-        permit: formatDate(permitYearlyOnceDate),
-        policyholder_name: policyHolderName,
-        policy_no: policyNumber,
-        policy_type: policyType,
-        policyholder_address: policyHolderAddress,
-        insurance_company_address: insuranceCompanyAddress,
-        insurance_company_name: insuranceCompanyName,
-        policy_effective_start: formatDate(policyEffectiveDate),
-        policy_effective_end: formatDate(policyEffectiveEndDate),
-        idv: idv,
-        idv_amount: idvAmount,
-        deductibles: deductibles,
-        insurance_copy: insuranceCopyUrl,
-        purchase_invoice: purchaseinvoice,
-        bills_of_sales: billsofsales,
-      };
-
-      // Update the document
-      await updateDoc("FM_Vehicle_Details", drawerDetails.name, updateData);
-      toast.success("Updated successfully");
-    } catch (error) {
-      toast.error("Failed to update data.");
-      console.error("Error:", error);
-    }
-  };
-
   // Helper function to handle errors
   const handleRequestError = (error) => {
     if (error.response) {
@@ -1080,34 +990,36 @@ const Vehicle: React.FC<VehicleProps> = ({
   };
   useEffect(() => {
     if (drawerDetails) {
-      setTravelsContractorsName(drawerDetails.contractor_name || "");
-      setTravelsName(drawerDetails.travels_name || "");
-      setLicensePlateNumber(drawerDetails.plate_number || "");
-      setVehicleModel(drawerDetails.model || "");
-      setContactNumber(drawerDetails.contact_number || "");
-      setVehicleName(drawerDetails.manufacturer_name || "");
-      setVehicleType(drawerDetails.vehicle_type || "");
-      setFuelType(drawerDetails.fuel_type || "");
-      setVIN(drawerDetails.identification_number || "");
+      setTravelsContractorsName(drawerDetails?.contractor_name || "");
+      setTravelsName(drawerDetails?.travels_name);
+      setLicensePlateNumber(drawerDetails?.plate_number || "");
+      setVehicleModel(drawerDetails?.model || "");
+      setContactNumber(drawerDetails?.contact_number || "");
+      setVehicleName(drawerDetails?.manufacturer_name || "");
+      // setVehicleYear(drawerDetails?.model_year || "");
+      setVehicleType(drawerDetails?.vehicle_type || "");
+      setFuelType(drawerDetails?.fuel_type || "");
+      setVIN(drawerDetails?.identification_number || "");
+      // setRCDate(drawerDetails?.rc_date || null);
+      // setRCExpiredDate(drawerDetails?.rc_expired_date || null);
+      // setRcDetails(drawerDetails.rc_copy || null);
       setPollutionCertificate(drawerDetails.pollution_certificate || null);
+      // setNextServiceDate(drawerDetails.next_service_date || null);
+      // setRoadTaxDate(drawerDetails.road_tax || null);
+      // setPermitYearlyOnceDate(drawerDetails.permit || null);
       setPolicyHolderName(drawerDetails.policyholder_name || "");
       setPolicyNumber(drawerDetails.policy_no || "");
       setPolicyType(drawerDetails.policy_type || "");
       setPolicyHolderAddress(drawerDetails.policyholder_address || "");
       setInsuranceCompanyAddress(drawerDetails.insurance_company_address || "");
       setInsuranceCompanyName(drawerDetails.insurance_company_name || "");
+      // setPolicyEffectiveDate(drawerDetails.policy_effective_start || null);
+      // setPolicyEffectiveEndDate(drawerDetails.policy_effective_end || null);
       setIdv(drawerDetails.idv || " ");
       setIdvAmount(drawerDetails.idv_amount || " ");
       setDeductibles(drawerDetails.deductibles || " ");
-      setBillsOfSales(drawerDetails.bills_of_sales || null);
-      setInsuranceFile(drawerDetails.insurance_copy || null);
-      setPurchaseInvoice(drawerDetails.purchase_invoice || null);
-      setRcDetails(drawerDetails.rc_copy || null);
-      // setRCDate(drawerDetails.rc_date ? new Date(drawerDetails.rc_date) : null);
-      // setRCExpiredDate(drawerDetails.rc_expiring_date ? new Date(drawerDetails.rc_expiring_date) : null);
     }
   }, [drawerDetails]);
-
   return (
     <>
       <Box
@@ -1150,7 +1062,6 @@ const Vehicle: React.FC<VehicleProps> = ({
                 cursor: "pointer",
               }}
               onClick={() => {
-                handleCancel();
                 setVehicleDetails(true);
                 setTable(false);
               }}
@@ -1224,543 +1135,274 @@ const Vehicle: React.FC<VehicleProps> = ({
       )}
       {vehicleDetails && (
         <>
-          <div
-            style={{
-              backgroundColor: "#FFFF",
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              gap: "100px",
+              padding: "40px",
+              justifyContent: "flex-start",
+              flexWrap: "wrap",
             }}
           >
+            {/* Column 1: Type of Ownership */}
+            <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              <Typography>Type of Ownership:</Typography>
+              <RadioGroup
+                row
+                value={ownership}
+                onChange={handleOwnershipChange}
+              >
+                <FormControlLabel
+                  value="Own"
+                  control={
+                    <Radio
+                      sx={{
+                        color: "#454545",
+                        "&.Mui-checked": {
+                          color: "#66BB6A",
+                        },
+                      }}
+                    />
+                  }
+                  label="Own"
+                />
+                <FormControlLabel
+                  value="Contract"
+                  control={
+                    <Radio
+                      sx={{
+                        color: "#454545",
+                        "&.Mui-checked": {
+                          color: "#66BB6A",
+                        },
+                      }}
+                    />
+                  }
+                  label="Contract"
+                />
+              </RadioGroup>
+            </Box>
+
+            {/* Column 2: Vehicle Available */}
             <Box
               sx={{
                 display: "flex",
-                flexDirection: "row",
-                gap: "100px",
-                padding: "40px",
-                justifyContent: "flex-start",
-                flexWrap: "wrap",
-                backgroundColor: "white",
+                flexDirection: "column",
+                gap: "10px",
               }}
             >
-              {/* Column 1: Type of Ownership */}
-              <Box
-                sx={{ display: "flex", flexDirection: "column", gap: "10px" }}
+              <Typography>Vehicle Available:</Typography>
+              <RadioGroup
+                row
+                value={vehicleAvailability}
+                onChange={handleVehicleAvailabilityChange}
               >
-                <Typography>Type of Ownership:</Typography>
-                <RadioGroup
-                  row
-                  value={ownership}
-                  onChange={handleOwnershipChange}
-                >
-                  <FormControlLabel
-                    value="Own"
-                    control={
-                      <Radio
-                        sx={{
-                          color: "#454545",
-                          "&.Mui-checked": {
-                            color: "#66BB6A",
-                          },
-                        }}
-                      />
-                    }
-                    label="Own"
-                  />
-                  <FormControlLabel
-                    value="Contract"
-                    control={
-                      <Radio
-                        sx={{
-                          color: "#454545",
-                          "&.Mui-checked": {
-                            color: "#66BB6A",
-                          },
-                        }}
-                      />
-                    }
-                    label="Contract"
-                  />
-                </RadioGroup>
-              </Box>
-
-              {/* Column 2: Vehicle Available */}
+                <FormControlLabel
+                  value="Online"
+                  control={
+                    <Radio
+                      sx={{
+                        color: "#454545",
+                        "&.Mui-checked": {
+                          color: "#66BB6A",
+                        },
+                      }}
+                    />
+                  }
+                  label="Online"
+                />
+                <FormControlLabel
+                  value="Offline"
+                  control={
+                    <Radio
+                      sx={{
+                        color: "#454545",
+                        "&.Mui-checked": {
+                          color: "#66BB6A",
+                        },
+                      }}
+                    />
+                  }
+                  label="Offline"
+                />
+              </RadioGroup>
+            </Box>
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Typography
+              sx={{
+                backgroundColor: "#B3CCB3",
+                // padding: 1,
+                flexGrow: 1,
+                colour: "#454545",
+                borderRadius: 1,
+                margin: 2,
+              }}
+            >
+              <IconButton
+                onClick={() => {
+                  setVehicleDetails(false);
+                  setTable(true);
+                }}
+              >
+                <ArrowBackIcon />
+              </IconButton>
+              Add Own Vehicle Details:
+            </Typography>
+          </Box>
+          {/* Conditional Rendering based on Ownership Type */}
+          {ownership === "Own" && (
+            <>
               <Box
                 sx={{
-                  display: "flex",
-                  flexDirection: "column",
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "1fr",
+                    sm: "1fr 1fr",
+                    md: "1fr 1fr 1fr",
+                  },
                   gap: "10px",
+                  padding: "20px",
                 }}
               >
-                <Typography>Vehicle Available:</Typography>
-                <RadioGroup
-                  row
-                  value={vehicleAvailability}
-                  onChange={handleVehicleAvailabilityChange}
-                >
-                  <FormControlLabel
-                    value="Online"
-                    control={
-                      <Radio
-                        sx={{
-                          color: "#454545",
-                          "&.Mui-checked": {
-                            color: "#66BB6A",
-                          },
-                        }}
-                      />
-                    }
-                    label="Online"
-                  />
-                  <FormControlLabel
-                    value="Offline"
-                    control={
-                      <Radio
-                        sx={{
-                          color: "#454545",
-                          "&.Mui-checked": {
-                            color: "#66BB6A",
-                          },
-                        }}
-                      />
-                    }
-                    label="Offline"
-                  />
-                </RadioGroup>
-              </Box>
-            </Box>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Typography
-                sx={{
-                  backgroundColor: "#B3CCB3",
-                  // padding: 1,
-                  flexGrow: 1,
-                  colour: "#454545",
-                  borderRadius: 1,
-                  margin: 2,
-                }}
-              >
-                <IconButton
-                  onClick={() => {
-                    setVehicleDetails(false);
-                    setTable(true);
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
                   }}
+                  label={
+                    <span>
+                      Manufacturer Name <span style={{ color: "red" }}>*</span>
+                    </span>
+                  }
+                  value={vehicleName}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    setVehicleName(newValue);
+                    validateVehicleName(newValue);
+                  }}
+                  error={vehicleError}
+                  helperText={vehicleHelperText}
+                />
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                  label={
+                    <span>
+                      Vehicle Model <span style={{ color: "red" }}>*</span>
+                    </span>
+                  }
+                  value={vehicleModel}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    setVehicleModel(newValue);
+                    validateVehicleModel(newValue);
+                  }}
+                  error={vehicleModelError}
+                  helperText={vehicleModelHelperText}
+                />
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label="Vehicle Year"
+                    views={["year", "month"]}
+                    value={vehicleYear}
+                    onChange={(newValue) => setVehicleYear(newValue)}
+                    sx={{
+                      width: "90%",
+                      "& .MuiInputBase-root": {
+                        height: "auto",
+                      },
+                      "& .MuiInputLabel-root": {
+                        lineHeight: "40px",
+                      },
+                    }}
+                    maxDate={dayjs()}
+                    renderInput={(params) => <TextField {...params} />}
+                  />
+                </LocalizationProvider>
+                <Modal
+                  open={isVehicleModalOpen}
+                  onClose={closeVehicleImagePreview}
+                  aria-labelledby="modal-title"
+                  aria-describedby="modal-description"
                 >
-                  <ArrowBackIcon />
-                </IconButton>
-                Add Own Vehicle Details:
-              </Typography>
-            </Box>
-            {/* Conditional Rendering based on Ownership Type */}
-            {ownership === "Own" && (
-              <>
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "80%",
+                      bgcolor: "background.paper",
+                      boxShadow: 24,
+                      p: 4,
+                    }}
+                  >
+                    <IconButton
+                      aria-label="close"
+                      onClick={closeVehicleImagePreview}
+                      sx={{ position: "absolute", top: 8, right: 16 }}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                    <Typography id="modal-title" variant="h6" component="h2">
+                      Vehicle Image Preview
+                    </Typography>
+                    <img
+                      src={vehicleImagePreviewUrl || ""}
+                      alt="Vehicle Preview"
+                      style={{ width: "100%", marginTop: 16 }}
+                    />
+                  </Box>
+                </Modal>
+
                 <Box
                   sx={{
-                    display: "grid",
-                    gridTemplateColumns: {
-                      xs: "1fr",
-                      sm: "1fr 1fr",
-                      md: "1fr 1fr 1fr",
-                    },
-                    gap: "10px",
-                    padding: "20px",
-                    backgroundColor: "#fff",
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    margin: "10 auto",
                   }}
                 >
                   <TextField
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      height: "auto",
-                      textAlign: "left",
-                    }}
+                    sx={{ margin: "0 auto" }}
                     label={
-                      <span>
-                        Manufacturer Name{" "}
-                        <span style={{ color: "red" }}>*</span>
-                      </span>
-                    }
-                    value={vehicleName}
-                    onChange={(e) => {
-                      const newValue = e.target.value;
-                      setVehicleName(newValue);
-                      validateVehicleName(newValue);
-                    }}
-                    error={vehicleError}
-                    helperText={vehicleHelperText}
-                  />
-                  <TextField
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      height: "auto",
-                      textAlign: "left",
-                    }}
-                    label={
-                      <span>
-                        Vehicle Model <span style={{ color: "red" }}>*</span>
-                      </span>
-                    }
-                    value={vehicleModel}
-                    onChange={(e) => {
-                      const newValue = e.target.value;
-                      setVehicleModel(newValue);
-                      validateVehicleModel(newValue);
-                    }}
-                    error={vehicleModelError}
-                    helperText={vehicleModelHelperText}
-                  />
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                      label="Vehicle Year"
-                      views={["year", "month"]}
-                      value={vehicleYear}
-                      onChange={(newValue) => setVehicleYear(newValue)}
-                      sx={{
-                        width: "90%",
-                        "& .MuiInputBase-root": {
-                          height: "auto",
-                        },
-                        "& .MuiInputLabel-root": {
-                          lineHeight: "40px",
-                        },
-                      }}
-                      maxDate={dayjs()}
-                      renderInput={(params) => <TextField {...params} />}
-                    />
-                  </LocalizationProvider>
-                  <Modal
-                    open={isVehicleModalOpen}
-                    onClose={closeVehicleImagePreview}
-                    aria-labelledby="modal-title"
-                    aria-describedby="modal-description"
-                  >
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        width: "80%",
-                        bgcolor: "background.paper",
-                        boxShadow: 24,
-                        p: 4,
-                      }}
-                    >
-                      <IconButton
-                        aria-label="close"
-                        onClick={closeVehicleImagePreview}
-                        sx={{ position: "absolute", top: 8, right: 16 }}
-                      >
-                        <CloseIcon />
-                      </IconButton>
-                      <Typography id="modal-title" variant="h6" component="h2">
-                        Vehicle Image Preview
+                      <Typography>
+                        Vehicle Image{" "}
+                        <span>
+                          <span style={{ color: "red" }}>*</span>
+                        </span>
                       </Typography>
-                      <img
-                        src={vehicleImagePreviewUrl || ""}
-                        alt="Vehicle Preview"
-                        style={{ width: "100%", marginTop: 16 }}
-                      />
-                    </Box>
-                  </Modal>
-
-                  <Box
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      margin: "10 auto",
-                    }}
-                  >
-                    <TextField
-                      sx={{ margin: "0 auto" }}
-                      label={
-                        <Typography>
-                          Vehicle Image{" "}
-                          <span>
-                            <span style={{ color: "red" }}>*</span>
-                          </span>
-                        </Typography>
+                    }
+                    className={`inputsimage ${
+                      fileError ? "input-invalid" : ""
+                    }`}
+                    type="text"
+                    placeholder="Images"
+                    value={vehicleImage ? vehicleImage.name : ""}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const fileInput = document.getElementById(
+                        "fileInputVehicle"
+                      ) as HTMLInputElement;
+                      if (fileInput) {
+                        fileInput.click();
                       }
-                      className={`inputsimage ${
-                        fileError ? "input-invalid" : ""
-                      }`}
-                      type="text"
-                      placeholder="Images"
-                      value={vehicleImage ? vehicleImage.name : ""}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const fileInput = document.getElementById(
-                          "fileInputVehicle"
-                        ) as HTMLInputElement;
-                        if (fileInput) {
-                          fileInput.click();
-                        }
-                      }}
-                      sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            {!vehicleImage && (
-                              <>
-                                <UploadFileIcon
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    const fileInput = document.getElementById(
-                                      "fileInputVehicle"
-                                    ) as HTMLInputElement;
-                                    if (fileInput) {
-                                      fileInput.click();
-                                    }
-                                  }}
-                                  className="AttachReporticon"
-                                  style={{ cursor: "pointer" }}
-                                />
-                              </>
-                            )}
-                            {vehicleImage && (
-                              <>
-                                <VisibilityIcon
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    openVehicleImagePreview();
-                                  }}
-                                  className="PreviewIcon"
-                                  style={{
-                                    cursor: "pointer",
-                                    marginLeft: "8px",
-                                  }}
-                                />
-                              </>
-                            )}
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                    <input
-                      type="file"
-                      id="fileInputVehicle"
-                      name="vehicle_photo"
-                      accept="image/*"
-                      style={{ display: "none" }}
-                      onChange={handleVehicleFileChange}
-                    />
-                    {fileError && <span className="ErrorMsg">{fileError}</span>}
-                  </Box>
-                  <TextField
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      height: "auto",
-                      textAlign: "left",
                     }}
-                    label={
-                      <span>
-                        License Plate Number{" "}
-                        <span style={{ color: "red" }}>*</span>
-                      </span>
-                    }
-                    value={licensePlateNumber}
-                    onChange={(e) => {
-                      const newValue = e.target.value;
-                      setLicensePlateNumber(newValue);
-                      validateLicensePlateNumber(newValue);
-                    }}
-                    error={licensePlateError}
-                    helperText={licensePlateHelperText}
-                  />
-                  <TextField
-                    select
-                    label="Vehicle Type"
-                    value={vehicleType}
-                    onChange={(e) => setVehicleType(e.target.value)}
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      "& .MuiSelect-icon": {
-                        color: "#66BB6A",
-                      },
-                      "& .MuiInputLabel-root": {
-                        color: "#000",
-                      },
-                    }}
-                    SelectProps={{ native: true }}
-                    InputLabelProps={{ shrink: true }}
-                  >
-                    <option value="">Select Vehicle Type</option>
-                    <option value="Passenger">Passenger</option>
-                    <option value="Equipment">Equipment</option>
-                    <option value="Goods">Goods</option>
-                  </TextField>
-                  <TextField
-                    select
-                    label="Fuel Type"
-                    value={fuelType}
-                    onChange={(e) => setFuelType(e.target.value)}
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      "& .MuiSelect-icon": {
-                        color: "#66BB6A",
-                      },
-                      "& .MuiInputLabel-root": {
-                        color: "#000",
-                      },
-                    }}
-                    SelectProps={{ native: true }}
-                    InputLabelProps={{ shrink: true }}
-                  >
-                    <option value="">Select Fuel Type</option>
-                    <option value="Petrol">Petrol</option>
-
-                    <option value="Diesel">Diesel</option>
-                    <option value="Electric">Electric</option>
-                    <option value="Hybrid">Hybrid</option>
-                  </TextField>
-                  <TextField
-                    label="Vehicle Identification Number (VIN)"
-                    value={vin}
-                    onChange={(e) => {
-                      setVIN(e.target.value);
-                      validateVIN(e.target.value);
-                    }}
-                    error={vinError}
-                    helperText={vinHelperText}
-                    sx={{ width: { xs: "100%", sm: "100%", md: "90%" } }}
-                  />
-                  {/* RC Date Picker */}
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                      label="RC Date"
-                      value={rcDate}
-                      onChange={handleRCDateChange}
-                      sx={{
-                        width: "90%",
-                        "& .MuiInputBase-root": {
-                          height: "auto",
-                        },
-                        "& .MuiInputLabel-root": {
-                          lineHeight: "40px",
-                        },
-                      }}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          error={rcDateError}
-                          helperText={rcDateHelperText}
-                        />
-                      )}
-                      format="DD/MM/YYYY"
-                    />
-                    {rcDateError && (
-                      <span
-                        style={{
-                          color: "red",
-                          position: "absolute",
-                          top: "100%",
-                          left: 0,
-                        }}
-                      >
-                        {rcDateHelperText}
-                      </span>
-                    )}
-
-                    <DatePicker
-                      label="RC Expired Date"
-                      value={rcExpiredDate}
-                      onChange={handleRCExpiredDateChange}
-                      sx={{
-                        width: "90%",
-                        "& .MuiInputBase-root": {
-                          height: "auto",
-                        },
-                        "& .MuiInputLabel-root": {
-                          lineHeight: "40px",
-                        },
-                      }}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          error={rcExpiredDateError}
-                          helperText={rcExpiredDateHelperText}
-                        />
-                      )}
-                      format="DD/MM/YYYY"
-                    />
-                    {rcExpiredDateError && (
-                      <span
-                        style={{
-                          color: "red",
-                          position: "absolute",
-                          top: "100%",
-                          left: 0,
-                        }}
-                      >
-                        {rcExpiredDateHelperText}
-                      </span>
-                    )}
-                  </LocalizationProvider>
-                  <Modal
-                    open={rcDetailsModalOpen}
-                    onClose={closeRCImagePreview}
-                    aria-labelledby="modal-title"
-                    aria-describedby="modal-description"
-                  >
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        width: "80%",
-                        bgcolor: "background.paper",
-                        boxShadow: 24,
-                        p: 4,
-                      }}
-                    >
-                      <IconButton
-                        aria-label="close"
-                        onClick={closeRCImagePreview}
-                        sx={{ position: "absolute", top: 8, right: 16 }}
-                      >
-                        <CloseIcon />
-                      </IconButton>
-                      <Typography id="modal-title" variant="h6" component="h2">
-                        RC Image Preview
-                      </Typography>
-                      <img
-                        src={rcImagePreviewUrl || ""}
-                        alt="RC Preview"
-                        style={{ width: "100%", marginTop: 16 }}
-                      />
-                    </Box>
-                  </Modal>
-
-                  <Box
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      margin: "10 auto",
-                    }}
-                  >
-                    <TextField
-                      sx={{ margin: "0 auto" }}
-                      label={<Typography>RC Image</Typography>}
-                      className={`inputsimage ${
-                        fileErrorRc ? "input-invalid" : ""
-                      }`}
-                      type="text"
-                      placeholder="Images"
-                      value={rcDetails ? rcDetails.name : ""}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const fileInput = document.getElementById(
-                          "fileInputRC"
-                        ) as HTMLInputElement;
-                        if (fileInput) {
-                          fileInput.click();
-                        }
-                      }}
-                      sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            {!rcDetails && (
+                    sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          {!vehicleImage && (
+                            <>
                               <UploadFileIcon
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   const fileInput = document.getElementById(
-                                    "fileInputRC"
+                                    "fileInputVehicle"
                                   ) as HTMLInputElement;
                                   if (fileInput) {
                                     fileInput.click();
@@ -1769,12 +1411,14 @@ const Vehicle: React.FC<VehicleProps> = ({
                                 className="AttachReporticon"
                                 style={{ cursor: "pointer" }}
                               />
-                            )}
-                            {rcDetails && (
+                            </>
+                          )}
+                          {vehicleImage && (
+                            <>
                               <VisibilityIcon
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  openRCImagePreview();
+                                  openVehicleImagePreview();
                                 }}
                                 className="PreviewIcon"
                                 style={{
@@ -1782,1018 +1426,1220 @@ const Vehicle: React.FC<VehicleProps> = ({
                                   marginLeft: "8px",
                                 }}
                               />
-                            )}
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                    <input
-                      type="file"
-                      id="fileInputRC"
-                      name="rc_photo"
-                      accept="image/*"
-                      style={{ display: "none" }}
-                      onChange={handleVehicleFileChangeRC}
-                    />
-                    {fileErrorRc && (
-                      <span className="ErrorMsg">{fileErrorRc}</span>
-                    )}
-                  </Box>
-                  <Modal
-                    open={isPurchaseInvoiceModalOpen}
-                    onClose={closePurchaseInvoicePreview}
-                    aria-labelledby="modal-title"
-                    aria-describedby="modal-description"
-                  >
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        width: "80%",
-                        bgcolor: "background.paper",
-                        boxShadow: 24,
-                        p: 4,
-                      }}
-                    >
-                      <IconButton
-                        aria-label="close"
-                        onClick={closePurchaseInvoicePreview}
-                        sx={{ position: "absolute", top: 8, right: 16 }}
-                      >
-                        <CloseIcon />
-                      </IconButton>
-                      <Typography id="modal-title" variant="h6" component="h2">
-                        Purchase Invoice Preview
-                      </Typography>
-                      <img
-                        src={purchaseInvoicePreviewUrl || ""}
-                        alt="Purchase Invoice Preview"
-                        style={{ width: "100%", marginTop: 16 }}
-                      />
-                    </Box>
-                  </Modal>
-
-                  <Box
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      margin: "10 auto",
+                            </>
+                          )}
+                        </InputAdornment>
+                      ),
                     }}
-                  >
-                    <TextField
-                      sx={{ margin: "0 auto" }}
-                      label="Purchase Invoice"
-                      value={purchaseInvoice ? purchaseInvoice.name : ""}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const fileInput = document.getElementById(
-                          "fileInputInvoice"
-                        ) as HTMLInputElement;
-                        if (fileInput) {
-                          fileInput.click();
-                        }
-                      }}
-                      sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            {!purchaseInvoice && (
-                              <UploadFileIcon
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  const fileInput = document.getElementById(
-                                    "fileInputInvoice"
-                                  ) as HTMLInputElement;
-                                  if (fileInput) {
-                                    fileInput.click();
-                                  }
-                                }}
-                                style={{ cursor: "pointer" }}
-                              />
-                            )}
-                            {purchaseInvoice && (
-                              <VisibilityIcon
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  openPurchaseInvoicePreview();
-                                }}
-                                style={{ cursor: "pointer", marginLeft: "8px" }}
-                              />
-                            )}
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                    <input
-                      type="file"
-                      id="fileInputInvoice"
-                      name="purchase_invoice"
-                      accept="image/*"
-                      style={{ display: "none" }}
-                      onChange={handleFileChangeInvoice}
-                    />
-                    {fileErrorInvoice && (
-                      <span className="ErrorMsg">{fileErrorInvoice}</span>
-                    )}
-                  </Box>
-                  <Modal
-                    open={isPollutionCertificateModalOpen}
-                    onClose={closePollutionCertificatePreview}
-                    aria-labelledby="modal-title"
-                    aria-describedby="modal-description"
-                  >
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        width: "80%",
-                        bgcolor: "background.paper",
-                        boxShadow: 24,
-                        p: 4,
-                      }}
-                    >
-                      <IconButton
-                        aria-label="close"
-                        onClick={closePollutionCertificatePreview}
-                        sx={{ position: "absolute", top: 8, right: 16 }}
-                      >
-                        <CloseIcon />
-                      </IconButton>
-                      <Typography id="modal-title" variant="h6" component="h2">
-                        Pollution Certificate Preview
-                      </Typography>
-                      <img
-                        src={pollutionCertificatePreviewUrl || ""}
-                        alt="Pollution Certificate Preview"
-                        style={{ width: "100%", marginTop: 16 }}
-                      />
-                    </Box>
-                  </Modal>
-                  <Box
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      margin: "10 auto",
-                    }}
-                  >
-                    <TextField
-                      sx={{ margin: "0 auto" }}
-                      label="Pollution Certificate"
-                      value={
-                        pollutionCertificate ? pollutionCertificate.name : ""
-                      }
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const fileInput = document.getElementById(
-                          "fileInputPollutionCertificate"
-                        ) as HTMLInputElement;
-                        if (fileInput) {
-                          fileInput.click();
-                        }
-                      }}
-                      sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            {!pollutionCertificate && (
-                              <UploadFileIcon
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  const fileInput = document.getElementById(
-                                    "fileInputPollutionCertificate"
-                                  ) as HTMLInputElement;
-                                  if (fileInput) {
-                                    fileInput.click();
-                                  }
-                                }}
-                                style={{ cursor: "pointer" }}
-                              />
-                            )}
-                            {pollutionCertificate && (
-                              <VisibilityIcon
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  openPollutionCertificatePreview();
-                                }}
-                                style={{ cursor: "pointer", marginLeft: "8px" }}
-                              />
-                            )}
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                    <input
-                      type="file"
-                      id="fileInputPollutionCertificate"
-                      name="pollution_certificate"
-                      accept="image/*"
-                      style={{ display: "none" }}
-                      onChange={handleFileChangePollutionCertificate}
-                    />
-                  </Box>
-                  <Modal
-                    open={isBillsOfSalesModalOpen}
-                    onClose={closeBillsOfSalesPreview}
-                    aria-labelledby="modal-title"
-                    aria-describedby="modal-description"
-                  >
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        width: "80%",
-                        bgcolor: "background.paper",
-                        boxShadow: 24,
-                        p: 4,
-                      }}
-                    >
-                      <IconButton
-                        aria-label="close"
-                        onClick={closeBillsOfSalesPreview}
-                        sx={{ position: "absolute", top: 8, right: 16 }}
-                      >
-                        <CloseIcon />
-                      </IconButton>
-                      <Typography id="modal-title" variant="h6" component="h2">
-                        Bills of Sales Preview
-                      </Typography>
-                      <img
-                        src={billsOfSalesPreviewUrl || ""}
-                        alt="Bills of Sales Preview"
-                        style={{ width: "100%", marginTop: 16 }}
-                      />
-                    </Box>
-                  </Modal>
-
-                  <Box
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      margin: "10 auto",
-                    }}
-                  >
-                    <TextField
-                      sx={{ margin: "0 auto" }}
-                      label="Bills of Sales"
-                      value={billsOfSales ? billsOfSales.name : ""}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const fileInput = document.getElementById(
-                          "fileInputBillsOfSales"
-                        ) as HTMLInputElement;
-                        if (fileInput) {
-                          fileInput.click();
-                        }
-                      }}
-                      sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            {!billsOfSales && (
-                              <UploadFileIcon
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  const fileInput = document.getElementById(
-                                    "fileInputBillsOfSales"
-                                  ) as HTMLInputElement;
-                                  if (fileInput) {
-                                    fileInput.click();
-                                  }
-                                }}
-                                style={{ cursor: "pointer" }}
-                              />
-                            )}
-                            {billsOfSales && (
-                              <VisibilityIcon
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  openBillsOfSalesPreview();
-                                }}
-                                style={{ cursor: "pointer", marginLeft: "8px" }}
-                              />
-                            )}
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                    <input
-                      type="file"
-                      id="fileInputBillsOfSales"
-                      name="bills_of_sales"
-                      accept="image/*"
-                      style={{ display: "none" }}
-                      onChange={handleFileChangeBillsOfSales}
-                    />
-                  </Box>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                      label="Next Service Date"
-                      value={nextServiceDate}
-                      onChange={handleNextServiceDateChange}
-                      sx={{
-                        width: "90%",
-                        "& .MuiInputBase-root": {
-                          height: "auto",
-                        },
-                        "& .MuiInputLabel-root": {
-                          lineHeight: "40px",
-                        },
-                      }}
-                      renderInput={(params) => <TextField {...params} />}
-                      format="DD/MM/YYYY"
-                    />
-                    {/* Road Tax Date Picker */}
-                    <DatePicker
-                      label="Road Tax Date"
-                      value={roadTaxDate}
-                      onChange={handleRoadTaxDateChange}
-                      sx={{
-                        width: "90%",
-                        "& .MuiInputBase-root": {
-                          height: "auto",
-                        },
-                        "& .MuiInputLabel-root": {
-                          lineHeight: "40px",
-                        },
-                      }}
-                      renderInput={(params) => <TextField {...params} />}
-                      format="DD/MM/YYYY"
-                    />
-                    {/* Permit Yearly Once Date Picker */}
-                    <DatePicker
-                      label="Permit Yearly Once Date"
-                      value={permitYearlyOnceDate}
-                      onChange={handlePermitYearlyOnceDateChange}
-                      sx={{
-                        width: "90%",
-                        "& .MuiInputBase-root": {
-                          height: "auto",
-                        },
-                        "& .MuiInputLabel-root": {
-                          lineHeight: "40px",
-                        },
-                      }}
-                      renderInput={(params) => <TextField {...params} />}
-                      format="DD/MM/YYYY"
-                    />
-                  </LocalizationProvider>
+                  />
+                  <input
+                    type="file"
+                    id="fileInputVehicle"
+                    name="vehicle_photo"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={handleVehicleFileChange}
+                  />
+                  {fileError && <span className="ErrorMsg">{fileError}</span>}
                 </Box>
-                <Box>
-                  <Typography
-                    sx={{
-                      backgroundColor: "#B3CCB3",
-                      padding: 1,
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                  label={
+                    <span>
+                      License Plate Number{" "}
+                      <span style={{ color: "red" }}>*</span>
+                    </span>
+                  }
+                  value={licensePlateNumber}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    setLicensePlateNumber(newValue);
+                    validateLicensePlateNumber(newValue);
+                  }}
+                  error={licensePlateError}
+                  helperText={licensePlateHelperText}
+                />
+                <TextField
+                  select
+                  label="Vehicle Type"
+                  value={vehicleType}
+                  onChange={(e) => setVehicleType(e.target.value)}
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    "& .MuiSelect-icon": {
+                      color: "#66BB6A",
+                    },
+                    "& .MuiInputLabel-root": {
+                      color: "#000",
+                    },
+                  }}
+                  SelectProps={{ native: true }}
+                  InputLabelProps={{ shrink: true }}
+                >
+                  <option value="">Select Vehicle Type</option>
+                  <option value="Passenger">Passenger</option>
+                  <option value="Equipment">Equipment</option>
+                  <option value="Goods">Goods</option>
+                </TextField>
+                <TextField
+                  select
+                  label="Fuel Type"
+                  value={fuelType}
+                  onChange={(e) => setFuelType(e.target.value)}
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    "& .MuiSelect-icon": {
+                      color: "#66BB6A",
+                    },
+                    "& .MuiInputLabel-root": {
+                      color: "#000",
+                    },
+                  }}
+                  SelectProps={{ native: true }}
+                  InputLabelProps={{ shrink: true }}
+                >
+                  <option value="">Select Fuel Type</option>
+                  <option value="Petrol">Petrol</option>
 
-                      colour: "#454545",
-                      borderRadius: 1,
-                      margin: 2,
+                  <option value="Diesel">Diesel</option>
+                  <option value="Electric">Electric</option>
+                  <option value="Hybrid">Hybrid</option>
+                </TextField>
+                <TextField
+                  label="Vehicle Identification Number (VIN)"
+                  value={vin}
+                  onChange={(e) => {
+                    setVIN(e.target.value);
+                    validateVIN(e.target.value);
+                  }}
+                  error={vinError}
+                  helperText={vinHelperText}
+                  sx={{ width: { xs: "100%", sm: "100%", md: "90%" } }}
+                />
+                {/* RC Date Picker */}
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label="RC Date"
+                    value={rcDate}
+                    onChange={handleRCDateChange}
+                    sx={{
+                      width: "90%",
+                      "& .MuiInputBase-root": {
+                        height: "auto",
+                      },
+                      "& .MuiInputLabel-root": {
+                        lineHeight: "40px",
+                      },
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        error={rcDateError}
+                        helperText={rcDateHelperText}
+                      />
+                    )}
+                    format="DD/MM/YYYY"
+                  />
+                  {rcDateError && (
+                    <span
+                      style={{
+                        color: "red",
+                        position: "absolute",
+                        top: "100%",
+                        left: 0,
+                      }}
+                    >
+                      {rcDateHelperText}
+                    </span>
+                  )}
+
+                  <DatePicker
+                    label="RC Expired Date"
+                    value={rcExpiredDate}
+                    onChange={handleRCExpiredDateChange}
+                    sx={{
+                      width: "90%",
+                      "& .MuiInputBase-root": {
+                        height: "auto",
+                      },
+                      "& .MuiInputLabel-root": {
+                        lineHeight: "40px",
+                      },
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        error={rcExpiredDateError}
+                        helperText={rcExpiredDateHelperText}
+                      />
+                    )}
+                    format="DD/MM/YYYY"
+                  />
+                  {rcExpiredDateError && (
+                    <span
+                      style={{
+                        color: "red",
+                        position: "absolute",
+                        top: "100%",
+                        left: 0,
+                      }}
+                    >
+                      {rcExpiredDateHelperText}
+                    </span>
+                  )}
+                </LocalizationProvider>
+                <Modal
+                  open={rcDetailsModalOpen}
+                  onClose={closeRCImagePreview}
+                  aria-labelledby="modal-title"
+                  aria-describedby="modal-description"
+                >
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "80%",
+                      bgcolor: "background.paper",
+                      boxShadow: 24,
+                      p: 4,
                     }}
                   >
-                    Add Insurance Detils
-                  </Typography>
-                </Box>
+                    <IconButton
+                      aria-label="close"
+                      onClick={closeRCImagePreview}
+                      sx={{ position: "absolute", top: 8, right: 16 }}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                    <Typography id="modal-title" variant="h6" component="h2">
+                      RC Image Preview
+                    </Typography>
+                    <img
+                      src={rcImagePreviewUrl || ""}
+                      alt="RC Preview"
+                      style={{ width: "100%", marginTop: 16 }}
+                    />
+                  </Box>
+                </Modal>
+
                 <Box
                   sx={{
-                    display: "grid",
-                    gridTemplateColumns: {
-                      xs: "1fr",
-                      sm: "1fr 1fr",
-                      md: "1fr 1fr 1fr",
-                    },
-                    gap: "10px",
-                    padding: "20px",
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    margin: "10 auto",
                   }}
                 >
                   <TextField
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      height: "auto",
-                      textAlign: "left",
-                    }}
-                    label="Policy Holder Name"
-                    value={policyHolderName}
-                    onChange={handleChangePolicyHolderName}
-                    inputProps={{
-                      pattern: "[a-zA-Zs]*",
-                    }}
-                  />
-                  <TextField
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      height: "auto",
-                      textAlign: "left",
-                    }}
-                    label="Policy Number"
-                    value={policyNumber}
-                    onChange={handlePolicyNumberChange}
-                    error={!!policyNumberError}
-                    helperText={policyNumberError}
-                  />
-                  <TextField
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      height: "auto",
-                      textAlign: "left",
-                    }}
-                    label="Policy Type"
-                    value={policyType}
-                    onChange={handlePolicyTypeChange}
-                    error={!!policyTypeError}
-                    helperText={policyTypeError}
-                  />
-                  <TextField
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      height: "auto",
-                      textAlign: "left",
-                    }}
-                    label="Policy Holder Address"
-                    value={policyHolderAddress}
-                    onChange={handlePolicyHolderAddressChange}
-                    error={!!policyHolderAddressError}
-                    helperText={policyHolderAddressError}
-                    multiline
-                    rows={4}
-                  />
-                  <TextField
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      height: "auto",
-                      textAlign: "left",
-                    }}
-                    label="Insurance Company Address"
-                    value={insuranceCompanyAddress}
-                    onChange={handleInsuranceCompanyAddressChange}
-                    error={!!insuranceCompanyAddressError}
-                    helperText={insuranceCompanyAddressError}
-                    multiline
-                    rows={4}
-                  />
-                  <TextField
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      height: "auto",
-                      textAlign: "left",
-                    }}
-                    label="Insurance Company Name"
-                    value={insuranceCompanyName}
-                    onChange={handleInsuranceCompanyNameChange}
-                    error={!!insuranceCompanyNameError}
-                    helperText={insuranceCompanyNameError}
-                  />
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                      label="Policy Effective Date"
-                      value={policyEffectiveDate}
-                      onChange={handlePolicyEffectiveDateChange}
-                      sx={{
-                        width: "90%",
-                        "& .MuiInputBase-root": {
-                          height: "auto",
-                        },
-                        "& .MuiInputLabel-root": {
-                          lineHeight: "40px",
-                        },
-                      }}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          error={!!policyEffectiveDateError}
-                          helperText={policyEffectiveDateError}
-                        />
-                      )}
-                      format="DD/MM/YYYY"
-                    />
-                    <DatePicker
-                      label="Policy Effective End Date"
-                      value={policyEffectiveEndDate}
-                      onChange={handlePolicyEffectiveEndDateChange}
-                      sx={{
-                        width: "90%",
-                        "& .MuiInputBase-root": {
-                          height: "auto",
-                        },
-                        "& .MuiInputLabel-root": {
-                          lineHeight: "40px",
-                        },
-                      }}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          error={!!policyEffectiveEndDateError}
-                          helperText={policyEffectiveEndDateError}
-                        />
-                      )}
-                      format="DD/MM/YYYY"
-                    />
-                  </LocalizationProvider>
-                  <TextField
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      height: "auto",
-                      textAlign: "left",
-                    }}
-                    label="IDV"
-                    value={idv}
-                    onChange={handleIdvChange}
-                    error={!!idvError}
-                    helperText={idvError}
-                  />
-
-                  <TextField
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      height: "auto",
-                      textAlign: "left",
-                    }}
-                    label="IDV Amount"
-                    value={idvAmount}
-                    onChange={handleIdvAmountChange}
-                    error={!!idvAmountError}
-                    helperText={idvAmountError}
-                    type="number"
-                    inputProps={{ step: "0.01" }}
-                  />
-                  <TextField
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      height: "auto",
-                      textAlign: "left",
-                    }}
-                    label="Deductibles"
-                    value={deductibles}
-                    onChange={handleDeductiblesChange}
-                    error={!!deductiblesError}
-                    helperText={deductiblesError}
+                    sx={{ margin: "0 auto" }}
+                    label={<Typography>RC Image</Typography>}
+                    className={`inputsimage ${
+                      fileErrorRc ? "input-invalid" : ""
+                    }`}
                     type="text"
+                    placeholder="Images"
+                    value={rcDetails ? rcDetails.name : ""}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const fileInput = document.getElementById(
+                        "fileInputRC"
+                      ) as HTMLInputElement;
+                      if (fileInput) {
+                        fileInput.click();
+                      }
+                    }}
+                    sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          {!rcDetails && (
+                            <UploadFileIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const fileInput = document.getElementById(
+                                  "fileInputRC"
+                                ) as HTMLInputElement;
+                                if (fileInput) {
+                                  fileInput.click();
+                                }
+                              }}
+                              className="AttachReporticon"
+                              style={{ cursor: "pointer" }}
+                            />
+                          )}
+                          {rcDetails && (
+                            <VisibilityIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openRCImagePreview();
+                              }}
+                              className="PreviewIcon"
+                              style={{
+                                cursor: "pointer",
+                                marginLeft: "8px",
+                              }}
+                            />
+                          )}
+                        </InputAdornment>
+                      ),
+                    }}
                   />
-                  <Modal
-                    open={isInsuranceModalOpen}
-                    onClose={closeInsurancePreview}
-                    aria-labelledby="modal-title"
-                    aria-describedby="modal-description"
-                  >
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        width: "80%",
-                        bgcolor: "background.paper",
-                        boxShadow: 24,
-                        p: 4,
-                      }}
-                    >
-                      <IconButton
-                        aria-label="close"
-                        onClick={closeInsurancePreview}
-                        sx={{ position: "absolute", top: 8, right: 16 }}
-                      >
-                        <CloseIcon />
-                      </IconButton>
-                      <Typography id="modal-title" variant="h6" component="h2">
-                        Insurance Preview
-                      </Typography>
-                      <img
-                        src={insurancePreviewUrl || ""}
-                        alt="Insurance Preview"
-                        style={{ width: "100%", marginTop: 16 }}
-                      />
-                    </Box>
-                  </Modal>
-
-                  {/* Insurance File Upload Field */}
+                  <input
+                    type="file"
+                    id="fileInputRC"
+                    name="rc_photo"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={handleVehicleFileChangeRC}
+                  />
+                  {fileErrorRc && (
+                    <span className="ErrorMsg">{fileErrorRc}</span>
+                  )}
+                </Box>
+                <Modal
+                  open={isPurchaseInvoiceModalOpen}
+                  onClose={closePurchaseInvoicePreview}
+                  aria-labelledby="modal-title"
+                  aria-describedby="modal-description"
+                >
                   <Box
                     sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      margin: "10 auto",
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "80%",
+                      bgcolor: "background.paper",
+                      boxShadow: 24,
+                      p: 4,
                     }}
                   >
-                    <TextField
-                      sx={{ margin: "0 auto" }}
-                      label="Insurance"
-                      value={insuranceFile ? insuranceFile.name : ""}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const fileInput = document.getElementById(
-                          "fileInputInsurance"
-                        ) as HTMLInputElement;
-                        if (fileInput) {
-                          fileInput.click();
-                        }
-                      }}
-                      sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            {!insuranceFile && (
+                    <IconButton
+                      aria-label="close"
+                      onClick={closePurchaseInvoicePreview}
+                      sx={{ position: "absolute", top: 8, right: 16 }}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                    <Typography id="modal-title" variant="h6" component="h2">
+                      Purchase Invoice Preview
+                    </Typography>
+                    <img
+                      src={purchaseInvoicePreviewUrl || ""}
+                      alt="Purchase Invoice Preview"
+                      style={{ width: "100%", marginTop: 16 }}
+                    />
+                  </Box>
+                </Modal>
+
+                <Box
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    margin: "10 auto",
+                  }}
+                >
+                  <TextField
+                    sx={{ margin: "0 auto" }}
+                    label="Purchase Invoice"
+                    value={purchaseInvoice ? purchaseInvoice.name : ""}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const fileInput = document.getElementById(
+                        "fileInputInvoice"
+                      ) as HTMLInputElement;
+                      if (fileInput) {
+                        fileInput.click();
+                      }
+                    }}
+                    sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          {!purchaseInvoice && (
+                            <UploadFileIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const fileInput = document.getElementById(
+                                  "fileInputInvoice"
+                                ) as HTMLInputElement;
+                                if (fileInput) {
+                                  fileInput.click();
+                                }
+                              }}
+                              style={{ cursor: "pointer" }}
+                            />
+                          )}
+                          {purchaseInvoice && (
+                            <VisibilityIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openPurchaseInvoicePreview();
+                              }}
+                              style={{ cursor: "pointer", marginLeft: "8px" }}
+                            />
+                          )}
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <input
+                    type="file"
+                    id="fileInputInvoice"
+                    name="purchase_invoice"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={handleFileChangeInvoice}
+                  />
+                  {fileErrorInvoice && (
+                    <span className="ErrorMsg">{fileErrorInvoice}</span>
+                  )}
+                </Box>
+                <Modal
+                  open={isPollutionCertificateModalOpen}
+                  onClose={closePollutionCertificatePreview}
+                  aria-labelledby="modal-title"
+                  aria-describedby="modal-description"
+                >
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "80%",
+                      bgcolor: "background.paper",
+                      boxShadow: 24,
+                      p: 4,
+                    }}
+                  >
+                    <IconButton
+                      aria-label="close"
+                      onClick={closePollutionCertificatePreview}
+                      sx={{ position: "absolute", top: 8, right: 16 }}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                    <Typography id="modal-title" variant="h6" component="h2">
+                      Pollution Certificate Preview
+                    </Typography>
+                    <img
+                      src={pollutionCertificatePreviewUrl || ""}
+                      alt="Pollution Certificate Preview"
+                      style={{ width: "100%", marginTop: 16 }}
+                    />
+                  </Box>
+                </Modal>
+                <Box
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    margin: "10 auto",
+                  }}
+                >
+                  <TextField
+                    sx={{ margin: "0 auto" }}
+                    label="Pollution Certificate"
+                    value={
+                      pollutionCertificate ? pollutionCertificate.name : ""
+                    }
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const fileInput = document.getElementById(
+                        "fileInputPollutionCertificate"
+                      ) as HTMLInputElement;
+                      if (fileInput) {
+                        fileInput.click();
+                      }
+                    }}
+                    sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          {!pollutionCertificate && (
+                            <UploadFileIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const fileInput = document.getElementById(
+                                  "fileInputPollutionCertificate"
+                                ) as HTMLInputElement;
+                                if (fileInput) {
+                                  fileInput.click();
+                                }
+                              }}
+                              style={{ cursor: "pointer" }}
+                            />
+                          )}
+                          {pollutionCertificate && (
+                            <VisibilityIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openPollutionCertificatePreview();
+                              }}
+                              style={{ cursor: "pointer", marginLeft: "8px" }}
+                            />
+                          )}
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <input
+                    type="file"
+                    id="fileInputPollutionCertificate"
+                    name="pollution_certificate"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={handleFileChangePollutionCertificate}
+                  />
+                </Box>
+                <Modal
+                  open={isBillsOfSalesModalOpen}
+                  onClose={closeBillsOfSalesPreview}
+                  aria-labelledby="modal-title"
+                  aria-describedby="modal-description"
+                >
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "80%",
+                      bgcolor: "background.paper",
+                      boxShadow: 24,
+                      p: 4,
+                    }}
+                  >
+                    <IconButton
+                      aria-label="close"
+                      onClick={closeBillsOfSalesPreview}
+                      sx={{ position: "absolute", top: 8, right: 16 }}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                    <Typography id="modal-title" variant="h6" component="h2">
+                      Bills of Sales Preview
+                    </Typography>
+                    <img
+                      src={billsOfSalesPreviewUrl || ""}
+                      alt="Bills of Sales Preview"
+                      style={{ width: "100%", marginTop: 16 }}
+                    />
+                  </Box>
+                </Modal>
+
+                <Box
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    margin: "10 auto",
+                  }}
+                >
+                  <TextField
+                    sx={{ margin: "0 auto" }}
+                    label="Bills of Sales"
+                    value={billsOfSales ? billsOfSales.name : ""}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const fileInput = document.getElementById(
+                        "fileInputBillsOfSales"
+                      ) as HTMLInputElement;
+                      if (fileInput) {
+                        fileInput.click();
+                      }
+                    }}
+                    sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          {!billsOfSales && (
+                            <UploadFileIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const fileInput = document.getElementById(
+                                  "fileInputBillsOfSales"
+                                ) as HTMLInputElement;
+                                if (fileInput) {
+                                  fileInput.click();
+                                }
+                              }}
+                              style={{ cursor: "pointer" }}
+                            />
+                          )}
+                          {billsOfSales && (
+                            <VisibilityIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openBillsOfSalesPreview();
+                              }}
+                              style={{ cursor: "pointer", marginLeft: "8px" }}
+                            />
+                          )}
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <input
+                    type="file"
+                    id="fileInputBillsOfSales"
+                    name="bills_of_sales"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={handleFileChangeBillsOfSales}
+                  />
+                </Box>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label="Next Service Date"
+                    value={nextServiceDate}
+                    onChange={handleNextServiceDateChange}
+                    sx={{
+                      width: "90%",
+                      "& .MuiInputBase-root": {
+                        height: "auto",
+                      },
+                      "& .MuiInputLabel-root": {
+                        lineHeight: "40px",
+                      },
+                    }}
+                    renderInput={(params) => <TextField {...params} />}
+                    format="DD/MM/YYYY"
+                  />
+                  {/* Road Tax Date Picker */}
+                  <DatePicker
+                    label="Road Tax Date"
+                    value={roadTaxDate}
+                    onChange={handleRoadTaxDateChange}
+                    sx={{
+                      width: "90%",
+                      "& .MuiInputBase-root": {
+                        height: "auto",
+                      },
+                      "& .MuiInputLabel-root": {
+                        lineHeight: "40px",
+                      },
+                    }}
+                    renderInput={(params) => <TextField {...params} />}
+                    format="DD/MM/YYYY"
+                  />
+                  {/* Permit Yearly Once Date Picker */}
+                  <DatePicker
+                    label="Permit Yearly Once Date"
+                    value={permitYearlyOnceDate}
+                    onChange={handlePermitYearlyOnceDateChange}
+                    sx={{
+                      width: "90%",
+                      "& .MuiInputBase-root": {
+                        height: "auto",
+                      },
+                      "& .MuiInputLabel-root": {
+                        lineHeight: "40px",
+                      },
+                    }}
+                    renderInput={(params) => <TextField {...params} />}
+                    format="DD/MM/YYYY"
+                  />
+                </LocalizationProvider>
+              </Box>
+              <Box>
+                <Typography
+                  sx={{
+                    backgroundColor: "#B3CCB3",
+                    padding: 1,
+
+                    colour: "#454545",
+                    borderRadius: 1,
+                    margin: 2,
+                  }}
+                >
+                  Add Insurance Detils
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "1fr",
+                    sm: "1fr 1fr",
+                    md: "1fr 1fr 1fr",
+                  },
+                  gap: "10px",
+                  padding: "20px",
+                }}
+              >
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                  label="Policy Holder Name"
+                  value={policyHolderName}
+                  onChange={handleChangePolicyHolderName}
+                  inputProps={{
+                    pattern: "[a-zA-Zs]*",
+                  }}
+                />
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                  label="Policy Number"
+                  value={policyNumber}
+                  onChange={handlePolicyNumberChange}
+                  error={!!policyNumberError}
+                  helperText={policyNumberError}
+                />
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                  label="Policy Type"
+                  value={policyType}
+                  onChange={handlePolicyTypeChange}
+                  error={!!policyTypeError}
+                  helperText={policyTypeError}
+                />
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                  label="Policy Holder Address"
+                  value={policyHolderAddress}
+                  onChange={handlePolicyHolderAddressChange}
+                  error={!!policyHolderAddressError}
+                  helperText={policyHolderAddressError}
+                  multiline
+                  rows={4}
+                />
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                  label="Insurance Company Address"
+                  value={insuranceCompanyAddress}
+                  onChange={handleInsuranceCompanyAddressChange}
+                  error={!!insuranceCompanyAddressError}
+                  helperText={insuranceCompanyAddressError}
+                  multiline
+                  rows={4}
+                />
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                  label="Insurance Company Name"
+                  value={insuranceCompanyName}
+                  onChange={handleInsuranceCompanyNameChange}
+                  error={!!insuranceCompanyNameError}
+                  helperText={insuranceCompanyNameError}
+                />
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label="Policy Effective Date"
+                    value={policyEffectiveDate}
+                    onChange={handlePolicyEffectiveDateChange}
+                    sx={{
+                      width: "90%",
+                      "& .MuiInputBase-root": {
+                        height: "auto",
+                      },
+                      "& .MuiInputLabel-root": {
+                        lineHeight: "40px",
+                      },
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        error={!!policyEffectiveDateError}
+                        helperText={policyEffectiveDateError}
+                      />
+                    )}
+                    format="DD/MM/YYYY"
+                  />
+                  <DatePicker
+                    label="Policy Effective End Date"
+                    value={policyEffectiveEndDate}
+                    onChange={handlePolicyEffectiveEndDateChange}
+                    sx={{
+                      width: "90%",
+                      "& .MuiInputBase-root": {
+                        height: "auto",
+                      },
+                      "& .MuiInputLabel-root": {
+                        lineHeight: "40px",
+                      },
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        error={!!policyEffectiveEndDateError}
+                        helperText={policyEffectiveEndDateError}
+                      />
+                    )}
+                    format="DD/MM/YYYY"
+                  />
+                </LocalizationProvider>
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                  label="IDV"
+                  value={idv}
+                  onChange={handleIdvChange}
+                  error={!!idvError}
+                  helperText={idvError}
+                />
+
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                  label="IDV Amount"
+                  value={idvAmount}
+                  onChange={handleIdvAmountChange}
+                  error={!!idvAmountError}
+                  helperText={idvAmountError}
+                  type="number"
+                  inputProps={{ step: "0.01" }}
+                />
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                  label="Deductibles"
+                  value={deductibles}
+                  onChange={handleDeductiblesChange}
+                  error={!!deductiblesError}
+                  helperText={deductiblesError}
+                  type="text"
+                />
+                <Modal
+                  open={isInsuranceModalOpen}
+                  onClose={closeInsurancePreview}
+                  aria-labelledby="modal-title"
+                  aria-describedby="modal-description"
+                >
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "80%",
+                      bgcolor: "background.paper",
+                      boxShadow: 24,
+                      p: 4,
+                    }}
+                  >
+                    <IconButton
+                      aria-label="close"
+                      onClick={closeInsurancePreview}
+                      sx={{ position: "absolute", top: 8, right: 16 }}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                    <Typography id="modal-title" variant="h6" component="h2">
+                      Insurance Preview
+                    </Typography>
+                    <img
+                      src={insurancePreviewUrl || ""}
+                      alt="Insurance Preview"
+                      style={{ width: "100%", marginTop: 16 }}
+                    />
+                  </Box>
+                </Modal>
+
+                {/* Insurance File Upload Field */}
+                <Box
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    margin: "10 auto",
+                  }}
+                >
+                  <TextField
+                    sx={{ margin: "0 auto" }}
+                    label="Insurance"
+                    value={insuranceFile ? insuranceFile.name : ""}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const fileInput = document.getElementById(
+                        "fileInputInsurance"
+                      ) as HTMLInputElement;
+                      if (fileInput) {
+                        fileInput.click();
+                      }
+                    }}
+                    sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          {!insuranceFile && (
+                            <UploadFileIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const fileInput = document.getElementById(
+                                  "fileInputInsurance"
+                                ) as HTMLInputElement;
+                                if (fileInput) {
+                                  fileInput.click();
+                                }
+                              }}
+                              style={{ cursor: "pointer" }}
+                            />
+                          )}
+                          {insuranceFile && (
+                            <VisibilityIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openInsurancePreview();
+                              }}
+                              style={{ cursor: "pointer", marginLeft: "8px" }}
+                            />
+                          )}
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <input
+                    type="file"
+                    id="fileInputInsurance"
+                    name="insurance"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={handleFileChangeInsurance}
+                  />
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  padding: "20px",
+                }}
+              >
+                <Button
+                  className="saveBtn"
+                  disabled={
+                    !vehicleName ||
+                    !vehicleModel ||
+                    !licensePlateNumber ||
+                    vehicleModelError ||
+                    policyNumberError ||
+                    policyTypeError ||
+                    policyHolderAddressError ||
+                    idvError ||
+                    idvAmountError ||
+                    deductiblesError
+                  }
+                  onClick={CreateContractorRequest}
+                >
+                  {contractorLoading ? "Submitting..." : "Submit"}
+                </Button>
+              </Box>
+            </>
+          )}
+          {ownership === "Contract" && (
+            <>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "1fr",
+                    sm: "1fr 1fr",
+                    md: "1fr 1fr 1fr",
+                  },
+                  gap: "10px",
+                  padding: "20px",
+                }}
+              >
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                  label={
+                    <span>
+                      Manufacturer Name <span style={{ color: "red" }}>*</span>
+                    </span>
+                  }
+                  value={vehicleName}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    setVehicleName(newValue);
+                    validateVehicleName(newValue);
+                  }}
+                  error={vehicleError}
+                  helperText={vehicleHelperText}
+                />
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                  label={
+                    <span>
+                      Travels Name <span style={{ color: "red" }}>*</span>
+                    </span>
+                  }
+                  value={travelsName}
+                  onChange={(e) => validateTravelsName(e.target.value)}
+                  error={!!travelsNameError}
+                  helperText={travelsNameError}
+                  sx={{ width: "100%", marginBottom: 2 }}
+                />
+
+                {/* Travels Contract's Name Field */}
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                  label={
+                    <span>
+                      Travels Contract Name{" "}
+                      <span style={{ color: "red" }}>*</span>
+                    </span>
+                  }
+                  value={travelsContractorsName}
+                  onChange={(e) =>
+                    validateTravelsContractorsName(e.target.value)
+                  }
+                  error={!!travelsContractorsNameError}
+                  helperText={travelsContractorsNameError}
+                  sx={{ width: "100%" }}
+                />
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                  label={
+                    <span>
+                      License Plate Number{" "}
+                      <span style={{ color: "red" }}>*</span>
+                    </span>
+                  }
+                  value={licensePlateNumber}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    setLicensePlateNumber(newValue);
+                    validateLicensePlateNumber(newValue);
+                  }}
+                  error={licensePlateError}
+                  helperText={licensePlateHelperText}
+                />
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "100%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                  label={
+                    <span>
+                      Vehicle Model <span style={{ color: "red" }}>*</span>
+                    </span>
+                  }
+                  value={vehicleModel}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    setVehicleModel(newValue);
+                    validateVehicleModel(newValue);
+                  }}
+                  error={vehicleModelError}
+                  helperText={vehicleModelHelperText}
+                />
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                  label={
+                    <span>
+                      Contact Number <span style={{ color: "red" }}>*</span>
+                    </span>
+                  }
+                  value={contactNumber}
+                  onChange={(e) => validateContactNumber(e.target.value)}
+                  error={!!contactNumberError}
+                  helperText={contactNumberError}
+                  sx={{ width: "100%", marginBottom: 2 }}
+                  inputProps={{
+                    maxLength: 10, // Optionally, limit the input to 10 characters
+                  }}
+                />
+                <Modal
+                  open={isVehicleModalOpen}
+                  onClose={closeVehicleImagePreview}
+                  aria-labelledby="modal-title"
+                  aria-describedby="modal-description"
+                >
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "80%",
+                      bgcolor: "background.paper",
+                      boxShadow: 24,
+                      p: 4,
+                    }}
+                  >
+                    <IconButton
+                      aria-label="close"
+                      onClick={closeVehicleImagePreview}
+                      sx={{ position: "absolute", top: 8, right: 16 }}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                    <Typography id="modal-title" variant="h6" component="h2">
+                      Vehicle Image Preview
+                    </Typography>
+                    <img
+                      src={vehicleImagePreviewUrl || ""}
+                      alt="Vehicle Preview"
+                      style={{ width: "100%", marginTop: 16 }}
+                    />
+                  </Box>
+                </Modal>
+
+                <Box
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    margin: "10 auto",
+                  }}
+                >
+                  <TextField
+                    sx={{ margin: "0 auto" }}
+                    label={
+                      <Typography>
+                        Vehicle Image{" "}
+                        <span>
+                          <span style={{ color: "red" }}>*</span>
+                        </span>
+                      </Typography>
+                    }
+                    className={`inputsimage ${
+                      fileError ? "input-invalid" : ""
+                    }`}
+                    type="text"
+                    placeholder="Images"
+                    value={vehicleImage ? vehicleImage.name : ""}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const fileInput = document.getElementById(
+                        "fileInputVehicle"
+                      ) as HTMLInputElement;
+                      if (fileInput) {
+                        fileInput.click();
+                      }
+                    }}
+                    sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          {!vehicleImage && (
+                            <>
                               <UploadFileIcon
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   const fileInput = document.getElementById(
-                                    "fileInputInsurance"
+                                    "fileInputVehicle"
                                   ) as HTMLInputElement;
                                   if (fileInput) {
                                     fileInput.click();
                                   }
                                 }}
+                                className="AttachReporticon"
                                 style={{ cursor: "pointer" }}
                               />
-                            )}
-                            {insuranceFile && (
+                            </>
+                          )}
+                          {vehicleImage && (
+                            <>
                               <VisibilityIcon
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  openInsurancePreview();
+                                  openVehicleImagePreview();
                                 }}
-                                style={{ cursor: "pointer", marginLeft: "8px" }}
+                                className="PreviewIcon"
+                                style={{
+                                  cursor: "pointer",
+                                  marginLeft: "8px",
+                                }}
                               />
-                            )}
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                    <input
-                      type="file"
-                      id="fileInputInsurance"
-                      name="insurance"
-                      accept="image/*"
-                      style={{ display: "none" }}
-                      onChange={handleFileChangeInsurance}
-                    />
-                  </Box>
+                            </>
+                          )}
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <input
+                    type="file"
+                    id="fileInputVehicle"
+                    name="vehicle_photo"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={handleVehicleFileChange}
+                  />
+                  {fileError && <span className="ErrorMsg">{fileError}</span>}
                 </Box>
-                {edit && (
-                  <>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        padding: "20px",
-                      }}
-                    >
-                      <Button
-                        className="saveBtn"
-                        disabled={
-                          !vehicleName ||
-                          !vehicleModel ||
-                          !licensePlateNumber ||
-                          vehicleModelError ||
-                          policyNumberError ||
-                          policyTypeError ||
-                          policyHolderAddressError ||
-                          idvError ||
-                          idvAmountError ||
-                          deductiblesError
-                        }
-                        onClick={CreateContractorRequest}
-                      >
-                        {contractorLoading ? "Submitting..." : "Submit"}
-                      </Button>
-                    </Box>
-                  </>
-                )}
-                {!edit && (
-                  <>
-                    {updatingLoading ? ( // Show loading spinner while updating
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "center",
-                          padding: "20px",
-                        }}
-                      >
-                        <CircularProgress />
-                      </Box>
-                    ) : (
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "center",
-                          padding: "20px",
-                        }}
-                      >
-                        <Button
-                          className="saveBtn"
-                          onClick={handleUpdate}
-                          disabled={updatingLoading}
-                        >
-                          Update
-                        </Button>
-                      </Box>
-                    )}
-
-                    {updatingError && (
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "center",
-                          padding: "20px",
-                        }}
-                      >
-                        <Alert severity="error">
-                          {updatingError.message || "Failed to update data."}
-                        </Alert>
-                      </Box>
-                    )}
-                  </>
-                )}
-              </>
-            )}
-            {ownership === "Contract" && (
-              <>
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: {
-                      xs: "1fr",
-                      sm: "1fr 1fr",
-                      md: "1fr 1fr 1fr",
-                    },
-                    gap: "10px",
-                    padding: "20px",
-                  }}
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  padding: "20px",
+                }}
+              >
+                <Button
+                  className="saveBtn"
+                  disabled={
+                    !travelsContractorsName ||
+                    !travelsName ||
+                    !licensePlateNumber ||
+                    !vehicleModel ||
+                    !vehicleImage ||
+                    !contactNumber ||
+                    travelsNameError ||
+                    travelsContractorsNameError ||
+                    licensePlateError ||
+                    vehicleModelError ||
+                    contactNumberError ||
+                    contractorLoading ||
+                    !vehicleName ||
+                    vehicleError
+                  }
+                  onClick={CreateContractorRequest}
                 >
-                  <TextField
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      height: "auto",
-                      textAlign: "left",
-                    }}
-                    label={
-                      <span>
-                        Manufacturer Name{" "}
-                        <span style={{ color: "red" }}>*</span>
-                      </span>
-                    }
-                    value={vehicleName}
-                    onChange={(e) => {
-                      const newValue = e.target.value;
-                      setVehicleName(newValue);
-                      validateVehicleName(newValue);
-                    }}
-                    error={vehicleError}
-                    helperText={vehicleHelperText}
-                  />
-                  <TextField
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      height: "auto",
-                      textAlign: "left",
-                    }}
-                    label={
-                      <span>
-                        Travels Name <span style={{ color: "red" }}>*</span>
-                      </span>
-                    }
-                    value={travelsName}
-                    onChange={(e) => validateTravelsName(e.target.value)}
-                    error={!!travelsNameError}
-                    helperText={travelsNameError}
-                    sx={{ width: "100%", marginBottom: 2 }}
-                  />
-
-                  {/* Travels Contract's Name Field */}
-                  <TextField
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      height: "auto",
-                      textAlign: "left",
-                    }}
-                    label={
-                      <span>
-                        Travels Contract Name{" "}
-                        <span style={{ color: "red" }}>*</span>
-                      </span>
-                    }
-                    value={travelsContractorsName}
-                    onChange={(e) =>
-                      validateTravelsContractorsName(e.target.value)
-                    }
-                    error={!!travelsContractorsNameError}
-                    helperText={travelsContractorsNameError}
-                    sx={{ width: "100%" }}
-                  />
-                  <TextField
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      height: "auto",
-                      textAlign: "left",
-                    }}
-                    label={
-                      <span>
-                        License Plate Number{" "}
-                        <span style={{ color: "red" }}>*</span>
-                      </span>
-                    }
-                    value={licensePlateNumber}
-                    onChange={(e) => {
-                      const newValue = e.target.value;
-                      setLicensePlateNumber(newValue);
-                      validateLicensePlateNumber(newValue);
-                    }}
-                    error={licensePlateError}
-                    helperText={licensePlateHelperText}
-                  />
-                  <TextField
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "100%" },
-                      height: "auto",
-                      textAlign: "left",
-                    }}
-                    label={
-                      <span>
-                        Vehicle Model <span style={{ color: "red" }}>*</span>
-                      </span>
-                    }
-                    value={vehicleModel}
-                    onChange={(e) => {
-                      const newValue = e.target.value;
-                      setVehicleModel(newValue);
-                      validateVehicleModel(newValue);
-                    }}
-                    error={vehicleModelError}
-                    helperText={vehicleModelHelperText}
-                  />
-                  <TextField
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      height: "auto",
-                      textAlign: "left",
-                    }}
-                    label={
-                      <span>
-                        Contact Number <span style={{ color: "red" }}>*</span>
-                      </span>
-                    }
-                    value={contactNumber}
-                    onChange={(e) => validateContactNumber(e.target.value)}
-                    error={!!contactNumberError}
-                    helperText={contactNumberError}
-                    sx={{ width: "100%", marginBottom: 2 }}
-                    inputProps={{
-                      maxLength: 10, // Optionally, limit the input to 10 characters
-                    }}
-                  />
-                  <Modal
-                    open={isVehicleModalOpen}
-                    onClose={closeVehicleImagePreview}
-                    aria-labelledby="modal-title"
-                    aria-describedby="modal-description"
-                  >
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        width: "80%",
-                        bgcolor: "background.paper",
-                        boxShadow: 24,
-                        p: 4,
-                      }}
-                    >
-                      <IconButton
-                        aria-label="close"
-                        onClick={closeVehicleImagePreview}
-                        sx={{ position: "absolute", top: 8, right: 16 }}
-                      >
-                        <CloseIcon />
-                      </IconButton>
-                      <Typography id="modal-title" variant="h6" component="h2">
-                        Vehicle Image Preview
-                      </Typography>
-                      <img
-                        src={vehicleImagePreviewUrl || ""}
-                        alt="Vehicle Preview"
-                        style={{ width: "100%", marginTop: 16 }}
-                      />
-                    </Box>
-                  </Modal>
-
-                  <Box
-                    sx={{
-                      width: { xs: "100%", sm: "100%", md: "90%" },
-                      margin: "10 auto",
-                    }}
-                  >
-                    <TextField
-                      sx={{ margin: "0 auto" }}
-                      label={
-                        <Typography>
-                          Vehicle Image{" "}
-                          <span>
-                            <span style={{ color: "red" }}>*</span>
-                          </span>
-                        </Typography>
-                      }
-                      className={`inputsimage ${
-                        fileError ? "input-invalid" : ""
-                      }`}
-                      type="text"
-                      placeholder="Images"
-                      value={vehicleImage ? vehicleImage.name : ""}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const fileInput = document.getElementById(
-                          "fileInputVehicle"
-                        ) as HTMLInputElement;
-                        if (fileInput) {
-                          fileInput.click();
-                        }
-                      }}
-                      sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            {!vehicleImage && (
-                              <>
-                                <UploadFileIcon
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    const fileInput = document.getElementById(
-                                      "fileInputVehicle"
-                                    ) as HTMLInputElement;
-                                    if (fileInput) {
-                                      fileInput.click();
-                                    }
-                                  }}
-                                  className="AttachReporticon"
-                                  style={{ cursor: "pointer" }}
-                                />
-                              </>
-                            )}
-                            {vehicleImage && (
-                              <>
-                                <VisibilityIcon
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    openVehicleImagePreview();
-                                  }}
-                                  className="PreviewIcon"
-                                  style={{
-                                    cursor: "pointer",
-                                    marginLeft: "8px",
-                                  }}
-                                />
-                              </>
-                            )}
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                    <input
-                      type="file"
-                      id="fileInputVehicle"
-                      name="vehicle_photo"
-                      accept="image/*"
-                      style={{ display: "none" }}
-                      onChange={handleVehicleFileChange}
-                    />
-                    {fileError && <span className="ErrorMsg">{fileError}</span>}
-                  </Box>
-                </Box>
-                {edit && (
-                  <>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        padding: "20px",
-                      }}
-                    >
-                      <Button
-                        className="saveBtn"
-                        disabled={
-                          !travelsContractorsName ||
-                          !travelsName ||
-                          !licensePlateNumber ||
-                          !vehicleModel ||
-                          !vehicleImage ||
-                          !contactNumber ||
-                          travelsNameError ||
-                          travelsContractorsNameError ||
-                          licensePlateError ||
-                          vehicleModelError ||
-                          contactNumberError ||
-                          contractorLoading ||
-                          !vehicleName ||
-                          vehicleError
-                        }
-                        onClick={CreateContractorRequest}
-                      >
-                        {contractorLoading ? "Submitting..." : "Submit"}
-                      </Button>
-                    </Box>
-                  </>
-                )}
-              </>
-            )}
-          </div>
+                  {contractorLoading ? "Submitting..." : "Submit"}
+                </Button>
+              </Box>
+            </>
+          )}
         </>
       )}
 
@@ -3432,7 +3278,6 @@ const Vehicle: React.FC<VehicleProps> = ({
                 <Box>
                   <Typography
                     onClick={() => {
-                      setEdit(false);
                       setVehicleDetails(true);
                       setTable(false);
                       handleCloseDrawer();

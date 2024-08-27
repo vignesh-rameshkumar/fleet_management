@@ -39,7 +39,7 @@
   },
   {
    "fieldname": "fine_bill_copy",
-   "fieldtype": "Data",
+   "fieldtype": "Attach",
    "label": "Fine Bill Copy"
   },
   {
@@ -63,7 +63,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-30 14:45:51.440387",
+ "modified": "2024-08-27 15:31:53.146719",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Fine_Log",
