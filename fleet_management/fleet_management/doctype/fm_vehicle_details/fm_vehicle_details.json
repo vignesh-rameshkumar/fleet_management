@@ -25,6 +25,7 @@
   "rc_copy",
   "next_service_date",
   "purchase_invoice",
+  "bills_of_sales",
   "pollution_certificate",
   "road_tax",
   "permit",
@@ -44,6 +45,7 @@
   "insurance_company_address",
   "deductibles",
   "contract_details_tab",
+  "travels_name",
   "contractor_name",
   "contact_number"
  ],
@@ -138,7 +140,7 @@
   },
   {
    "fieldname": "purchase_invoice",
-   "fieldtype": "Data",
+   "fieldtype": "Attach",
    "label": "Purchase Invoice"
   },
   {
@@ -249,13 +251,23 @@
   },
   {
    "fieldname": "contact_number",
-   "fieldtype": "Phone",
+   "fieldtype": "Data",
    "label": "Contact Number"
+  },
+  {
+   "fieldname": "travels_name",
+   "fieldtype": "Data",
+   "label": "Travels Name"
+  },
+  {
+   "fieldname": "bills_of_sales",
+   "fieldtype": "Attach",
+   "label": "Bills Of Sales"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-30 12:18:17.463072",
+ "modified": "2024-08-22 10:44:26.560510",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Vehicle_Details",

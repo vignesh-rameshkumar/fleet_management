@@ -35,33 +35,32 @@
   },
   {
    "fieldname": "employee_id",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "Employee ID",
-   "options": "Employee",
    "unique": 1
   },
   {
    "fetch_from": "employee_id.employee_name",
    "fieldname": "employee_name",
-   "fieldtype": "Read Only",
+   "fieldtype": "Data",
    "label": "Employee Name"
   },
   {
    "fetch_from": "employee_id.date_of_birth",
    "fieldname": "dob",
-   "fieldtype": "Read Only",
+   "fieldtype": "Data",
    "label": "Date of Birth"
   },
   {
    "fetch_from": "employee_id.image",
    "fieldname": "driver_photo",
-   "fieldtype": "Read Only",
+   "fieldtype": "Attach",
    "label": "Driver Image"
   },
   {
    "fetch_from": "employee_id.cell_number",
    "fieldname": "mobile_number",
-   "fieldtype": "Phone",
+   "fieldtype": "Data",
    "label": "Mobile Number"
   },
   {
@@ -90,7 +89,7 @@
   },
   {
    "fieldname": "emergency_contact_number",
-   "fieldtype": "Phone",
+   "fieldtype": "Data",
    "label": "Emergency Contact Number"
   },
   {
@@ -123,7 +122,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-30 14:37:43.387967",
+ "modified": "2024-08-23 16:03:15.460744",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Driver_Details",
