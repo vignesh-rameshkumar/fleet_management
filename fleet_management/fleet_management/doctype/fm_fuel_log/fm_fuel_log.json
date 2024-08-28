@@ -8,7 +8,7 @@
  "engine": "InnoDB",
  "field_order": [
   "date",
-  "vehicle_no",
+  "vehicle_number",
   "current_odometer_reading",
   "bill_amount",
   "fuel_in_litres",
@@ -21,12 +21,6 @@
    "fieldname": "date",
    "fieldtype": "Data",
    "label": "Date"
-  },
-  {
-   "fieldname": "vehicle_no",
-   "fieldtype": "Link",
-   "label": "Vehicle No",
-   "options": "FM_Vehicle_Details"
   },
   {
    "fieldname": "current_odometer_reading",
@@ -57,11 +51,17 @@
    "fieldname": "bill_copy",
    "fieldtype": "Attach",
    "label": "Bill Copy"
+  },
+  {
+   "fieldname": "vehicle_number",
+   "fieldtype": "Link",
+   "label": "Vehicle No",
+   "options": "FM_Vehicle_Details"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-30 14:57:36.413053",
+ "modified": "2024-08-28 10:38:21.391248",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Fuel_Log",

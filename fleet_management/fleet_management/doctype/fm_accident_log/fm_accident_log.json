@@ -16,7 +16,7 @@
   "police_station_noname",
   "driver_employee_id",
   "driver_name",
-  "vehicle_no"
+  "vehicle_number"
  ],
  "fields": [
   {
@@ -52,7 +52,7 @@
   },
   {
    "fieldname": "fir_copy",
-   "fieldtype": "Data",
+   "fieldtype": "Attach",
    "label": "FIR Copy"
   },
   {
@@ -73,7 +73,7 @@
    "label": "Driver Name"
   },
   {
-   "fieldname": "vehicle_no",
+   "fieldname": "vehicle_number",
    "fieldtype": "Link",
    "label": "Vehicle No",
    "options": "FM_Vehicle_Details"
@@ -81,7 +81,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-30 15:25:15.625699",
+ "modified": "2024-08-28 11:32:10.519101",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Accident_Log",

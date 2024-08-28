@@ -31,8 +31,7 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Vehicle Number",
-   "options": "FM_Vehicle_Details",
-   "reqd": 1
+   "options": "FM_Vehicle_Details"
   },
   {
    "fieldname": "service_type",
@@ -82,7 +81,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-07 16:26:29.583280",
+ "modified": "2024-08-28 13:38:41.811078",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Maintenance_Log",

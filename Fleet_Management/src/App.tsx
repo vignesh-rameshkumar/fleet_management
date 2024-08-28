@@ -26,6 +26,9 @@ import Bills from "./pages/User/Bills.tsx";
 import RequestApprovalFM from "./pages/FM/RequestApprovalFM.tsx";
 import Vehicle from "./pages/FM/Vehicle.tsx";
 import Driver from "./pages/FM/Driver.tsx";
+import ExternalServices from "./pages/FM/ExternalServices.tsx";
+
+
 
 // import Calendar from "./component/Calendar.tsx";
 
@@ -287,7 +290,19 @@ const App: React.FC = () => {
                         employeeID={employeeID}
                       />
                     }
+                    />
+                    <Route
+                    path="/Fleet_Management/externalservice"
+                    element={
+                      <ExternalServices
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
                   />
+                  
                 </>
               )}
             </Routes>

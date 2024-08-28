@@ -2287,7 +2287,7 @@ const Vehicle: React.FC<VehicleProps> = ({
                         fileInput.click();
                       }
                     }}
-                    sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
+                    // sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end">
