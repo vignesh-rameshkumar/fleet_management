@@ -27,8 +27,7 @@ import RequestApprovalFM from "./pages/FM/RequestApprovalFM.tsx";
 import Vehicle from "./pages/FM/Vehicle.tsx";
 import Driver from "./pages/FM/Driver.tsx";
 import ExternalServices from "./pages/FM/ExternalServices.tsx";
-
-
+import Dashboard from "./pages/FM/Dashboard.tsx";
 
 // import Calendar from "./component/Calendar.tsx";
 
@@ -146,6 +145,17 @@ const App: React.FC = () => {
                 <>
                   <Route path="/Auth" element={<Auth />} />
                   <Route
+                    path="/"
+                    element={
+                      <QuickAccess
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
+                  />{" "}
+                  <Route
                     path="/Fleet_Management"
                     element={
                       <QuickAccess
@@ -237,6 +247,17 @@ const App: React.FC = () => {
                   />
                   {/* Fleet manager */}
                   <Route
+                    path="/Fleet_Management/dashboard"
+                    element={
+                      <Dashboard
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
+                  />
+                  <Route
                     path="/Fleet_Management/requestapprovalfm"
                     element={
                       <RequestApprovalFM
@@ -290,8 +311,8 @@ const App: React.FC = () => {
                         employeeID={employeeID}
                       />
                     }
-                    />
-                    <Route
+                  />
+                  <Route
                     path="/Fleet_Management/externalservice"
                     element={
                       <ExternalServices
@@ -302,7 +323,6 @@ const App: React.FC = () => {
                       />
                     }
                   />
-                  
                 </>
               )}
             </Routes>
