@@ -16,6 +16,7 @@ import {
   Select,
   Radio,
   RadioGroup,
+  CardContent,
 } from "@mui/material";
 
 import { MdOutlineVisibility, MdDeleteForever } from "react-icons/md";
@@ -34,7 +35,10 @@ import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { ThemeProvider, createTheme } from "@mui/material";
 import { HiPlusSm, HiMinusSm } from "react-icons/hi";
 import { red } from "@mui/material/colors";
-
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import HourglassEmptyOutlinedIcon from "@mui/icons-material/HourglassEmptyOutlined";
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 interface ReportsProps {
   darkMode: boolean;
   onCloseDrawer: () => void;
@@ -128,33 +132,69 @@ const Reports: React.FC<ReportsProps> = ({
       },
     },
   });
+  const theme = createTheme({
+    components: {
+      MuiRadio: {
+        styleOverrides: {
+          root: {
+            color: "#A5D0A9", // Light green color for unchecked state
+            "&.Mui-checked": {
+              color: "#4D8C52", // Darker green for checked state
+            },
+          },
+        },
+      },
+    },
+  });
   // State
-
-  const [edit, setEdit] = useState<boolean>(false);
-  const [rideDate, setRideDate] = useState<string | null>(null);
-  const [rideTime, setRideTime] = useState<string | null>(null);
-  const [doctypeNames, setDoctypeNames] = useState("");
-  const [editedPassenger, setEditedPassenger] = useState({});
-  // Fetching data
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [drawerDetails, setDrawerDetails] = useState<any>({});
+  const [table, setTable] = useState(true);
+  const [subHeadingLog, setSubHeadingLog] = useState(true);
+  const [subRadioReports, setSubRadioReports] = useState(true);
+  const [activeLog, setActiveLog] = useState("travelroute");
   const [tableData, setTableData] = useState<any[]>([]);
-  const [drawerData, setDrawerData] = useState<any[]>([]);
-  const [view, setView] = useState<boolean>(false);
-  const [approvalDate, setApprovalDate] = useState(null);
-  const [selectedVehicle, setSelectedVehicle] = useState();
-
-  const [approvalTime, setApprovalTime] = useState(null);
-  const [selectedOption, setSelectedOption] = useState();
-  const [internal, setInternal] = useState(false);
-  const [external, setExternal] = useState(false);
-  const [editShow, setEditShow] = useState(false);
-  const [requestShow, setRequestShow] = useState(false);
-  const [externalVehicleNo, setExternalVehicleNo] = useState("");
-  const [externalDriverNo, setExternalDriverNo] = useState("");
-  const [externalVehicleOTP, setExternalVehicleOTP] = useState("");
-
-  const columns = [
+  const [card, setCard] = useState(true);
+  const [radioOptions, setRadioOptions] = useState([
+    { value: "all", label: "All" },
+    { value: "thaiyur_to_research_park", label: "Thaiyur to Research Park" },
+    { value: "research_park_to_thaiyur", label: "Research Park to Thaiyur" },
+    { value: "ambattur_to_thaiyur", label: "Ambattur to Thaiyur" },
+  ]);
+  const [selectedRadio, setSelectedRadio] = useState("all");
+  const cardData = [
+    {
+      title: "All Requests",
+      // count: allRequests,
+      color: "#6D57FA",
+      icon: (
+        <DescriptionOutlinedIcon sx={{ color: "#6D57FA", fontSize: "30px" }} />
+      ),
+    },
+    {
+      title: "Approved Request",
+      // count: approvedRequests,
+      color: "#5C8A58",
+      icon: (
+        <CheckCircleOutlineIcon sx={{ color: "#5C8A58", fontSize: "30px" }} />
+      ),
+    },
+    {
+      title: "Rejected Request",
+      // count: rejectedRequests,
+      color: "#BA3B34",
+      icon: <CancelOutlinedIcon sx={{ color: "#BA3B34", fontSize: "30px" }} />,
+    },
+    {
+      title: "Pending Request",
+      // count: pendingRequests,
+      color: "#FFCC00",
+      icon: (
+        <HourglassEmptyOutlinedIcon
+          sx={{ color: "#FFCC00", fontSize: "30px" }}
+        />
+      ),
+    },
+  ];
+  const travelRouteColumns = [
     {
       key: "S_no",
       label: "S.No",
@@ -265,9 +305,355 @@ const Reports: React.FC<ReportsProps> = ({
       sorter: false,
     },
   ];
+  const passengerRouteColumns = [
+    {
+      key: "S_no",
+      label: "S.No",
+      _style: {
+        width: "7%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+        borderTopLeftRadius: "5px",
+      },
+      filter: false,
+      sorter: false,
+    },
 
-  const { updateDoc } = useFrappeUpdateDoc();
+    {
+      key: "request_date_time",
+      label: "Date",
+      _style: {
+        width: "10%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+      },
+      filter: true,
+      sorter: true,
+    },
+    {
+      key: "employee_name",
+      label: "Employee Name",
+      _style: {
+        width: "15%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+      },
+      filter: true,
+      sorter: true,
+    },
+    {
+      key: "from_location",
+      label: "From Location",
+      _style: {
+        width: "15%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+      },
+      filter: true,
+      sorter: true,
+    },
+    {
+      key: "to_location",
+      label: "To Location",
+      _style: {
+        width: "15%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+      },
+      filter: true,
+      sorter: true,
+    },
+    {
+      key: "ride_start_time",
+      label: "Ride Status",
+      _style: {
+        width: "15%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+      },
+      filter: true,
+      sorter: true,
+    },
+  ];
+  const goodsRouteColumns = [
+    {
+      key: "S_no",
+      label: "S.No",
+      _style: {
+        width: "7%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+        borderTopLeftRadius: "5px",
+      },
+      filter: false,
+      sorter: false,
+    },
 
+    {
+      key: "request_date_time",
+      label: "Request Date",
+      _style: {
+        width: "10%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+      },
+      filter: true,
+      sorter: true,
+    },
+    {
+      key: "employee_name",
+      label: "Employee Name",
+      _style: {
+        width: "15%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+      },
+      filter: true,
+      sorter: true,
+    },
+    {
+      key: "from_location",
+      label: "From Location",
+      _style: {
+        width: "15%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+      },
+      filter: true,
+      sorter: true,
+    },
+    {
+      key: "to_location",
+      label: "To Location",
+      _style: {
+        width: "15%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+      },
+      filter: true,
+      sorter: true,
+    },
+    {
+      key: "ride_start_time",
+      label: "status",
+      _style: {
+        width: "15%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+      },
+      filter: true,
+      sorter: true,
+    },
+  ];
+  const equipmentRouteColumns = [
+    {
+      key: "S_no",
+      label: "S.No",
+      _style: {
+        width: "7%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+        borderTopLeftRadius: "5px",
+      },
+      filter: false,
+      sorter: false,
+    },
+
+    {
+      key: "request_date_time",
+      label: "Date",
+      _style: {
+        width: "10%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+      },
+      filter: true,
+      sorter: true,
+    },
+    {
+      key: "employee_name",
+      label: "Employee Name",
+      _style: {
+        width: "15%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+      },
+      filter: true,
+      sorter: true,
+    },
+    {
+      key: "type",
+      label: "Request Type",
+      _style: {
+        width: "15%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+      },
+      filter: true,
+      sorter: true,
+    },
+    {
+      key: "employee_name",
+      label: "Employee Name",
+      _style: {
+        width: "15%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+      },
+      filter: true,
+      sorter: true,
+    },
+    {
+      key: "project_name",
+      label: "Project Name",
+      _style: {
+        width: "15%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+      },
+      filter: true,
+      sorter: true,
+    },
+
+    {
+      key: "status",
+      label: "Status",
+      _style: {
+        width: "15%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+      },
+      filter: true,
+      sorter: true,
+    },
+
+    {
+      key: "action",
+      label: "Action",
+      _style: {
+        width: "18%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+        borderTopRightRadius: "5px",
+      },
+      filter: false,
+      sorter: false,
+    },
+  ];
+  const [doctypeName, setDoctypeName] = useState("FM_Fine_Log");
+  const [columns, setColumns] = useState(travelRouteColumns);
+  //handle change
+  const handleRadioChange = (event) => {
+    setSelectedRadio(event.target.value);
+    // Add your logic here to filter the table data based on the selected radio option
+  };
+  const handleLogClick = (logType) => {
+    setActiveLog(logType);
+    if (logType === "travelroute") {
+      setDoctypeName("FM_Travel_Route_Report");
+      setColumns(travelRouteColumns);
+      setSelectedRadio("all");
+      setRadioOptions([
+        { value: "all", label: "All" },
+        {
+          value: "thaiyur_to_research_park",
+          label: "Thaiyur to Research Park",
+        },
+        {
+          value: "research_park_to_thaiyur",
+          label: "Research Park to Thaiyur",
+        },
+        { value: "ambattur_to_thaiyur", label: "Ambattur to Thaiyur" },
+      ]);
+    } else if (logType === "passenger") {
+      setDoctypeName("FM_Passenger_Vehicle_Request");
+      setColumns(passengerRouteColumns);
+      setSelectedRadio("all");
+      setRadioOptions([
+        { value: "all", label: "All" },
+        { value: "travel_within_office", label: "Travel within office" },
+        { value: "vendor", label: "Vendor" },
+        { value: "advisor", label: "Advisor" },
+        { value: "health_emergency", label: "Health Emergency" },
+        { value: "group_ride", label: "Group Ride" },
+        { value: "other", label: "Other" },
+      ]);
+    } else if (logType === "goods") {
+      setDoctypeName("FM_Goods_Vehicle_Request");
+      setSelectedRadio("all");
+      setColumns(goodsRouteColumns);
+      setRadioOptions([
+        { value: "all", label: "All" },
+        { value: "pick_up", label: "Pick Up" },
+        { value: "drop", label: "Drop" },
+      ]);
+    } else if (logType === "equipment") {
+      setDoctypeName("FM_Equipment_Vehicle_Request");
+      setColumns(equipmentRouteColumns);
+      setSelectedRadio("all");
+      setRadioOptions([
+        { value: "all", label: "All" },
+        { value: "crane", label: "Crane" },
+      ]);
+    }
+  };
+  //api and useEffect
+  const { data: ReportsData, isLoading: reportsDataLoading } =
+    useFrappeGetDocList(doctypeName, {
+      fields: ["*"],
+      orderBy: {
+        field: "modified",
+        order: "desc",
+      },
+      limit: 10000,
+    });
+
+  // Set table data when the fetched data changes
+  useEffect(() => {
+    if (ReportsData) {
+      setTableData(ReportsData);
+    }
+  }, [ReportsData, doctypeName]);
   return (
     <>
       <Box
@@ -286,6 +672,191 @@ const Reports: React.FC<ReportsProps> = ({
       >
         Report Details
       </Box>
+
+      {subHeadingLog && (
+        <>
+          <div>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-evenly",
+                gap: "5px",
+                margin: "10px",
+              }}
+            >
+              {["travelroute", "passenger", "goods", "equipment"].map(
+                (logType) => (
+                  <Typography
+                    key={logType}
+                    onClick={() => handleLogClick(logType)}
+                    sx={{
+                      backgroundColor:
+                        activeLog === logType ? "#E5F3E6" : "#f5f5f5",
+                      cursor: "pointer",
+                      padding: "10px",
+                      borderRadius: "4px 4px 0 0",
+                      width: "20vw",
+                      display: "flex",
+                      justifyContent: "center",
+                      fontSize: "16px",
+                      fontWeight: 600,
+                      color: activeLog === logType ? "#375d33" : "#A1A1A1",
+                      borderBottom:
+                        activeLog === logType
+                          ? "3px solid #487644"
+                          : "3px solid transparent",
+                    }}
+                  >
+                    {logType.charAt(0).toUpperCase() + logType.slice(1)}
+                  </Typography>
+                )
+              )}
+            </Box>
+          </div>
+        </>
+      )}
+
+      {subRadioReports && (
+        <>
+          <ThemeProvider theme={theme}>
+            <Box sx={{ margin: "20px" }}>
+              <RadioGroup
+                row
+                value={selectedRadio}
+                onChange={handleRadioChange}
+              >
+                {radioOptions.map((option) => (
+                  <FormControlLabel
+                    key={option.value}
+                    value={option.value}
+                    control={<Radio />}
+                    label={option.label}
+                  />
+                ))}
+              </RadioGroup>
+            </Box>
+          </ThemeProvider>
+        </>
+      )}
+
+      {card && (
+        <>
+          <Grid container spacing={2} sx={{ borderRadius: "10px" }}>
+            {cardData.map((data, index) => (
+              <Grid item xs={12} sm={6} md={3} key={index}>
+                <Box
+                  sx={{
+                    borderRadius: "10px",
+                    borderLeft: `6px solid ${data.color}`,
+                    backgroundColor: "#f9f9f9",
+                  }}
+                >
+                  <CardContent>
+                    <div style={{ color: "#5B5B5B", fontWeight: "500" }}>
+                      {data.title}
+                    </div>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        fontSize: "20px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {data.count} {data.icon}
+                    </Box>
+                  </CardContent>
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </>
+      )}
+      <br />
+
+      {table && (
+        <>
+          <div
+            style={{
+              backgroundColor: darkMode ? "#222222" : "#fff",
+              padding: "15px",
+            }}
+          >
+            {JSON.stringify(tableData)}
+            <CSmartTable
+              cleaner
+              clickableRows
+              columns={columns}
+              columnFilter
+              columnSorter
+              items={tableData}
+              itemsPerPageSelect
+              itemsPerPage={10}
+              pagination
+              tableFilter
+              tableProps={{
+                className: "add-this-class red-border",
+                responsive: true,
+                striped: true,
+                hover: true,
+              }}
+              onRowClick={(item) => handleRowClick(item)}
+              tableBodyProps={{
+                className: "align-middle tableData",
+              }}
+              scopedColumns={{
+                S_no: (_item, index) => <td>{index + 1}</td>,
+                incident_date: (item: any) => {
+                  const date = new Date(item.creation);
+                  const formattedDate = `${date
+                    .getDate()
+                    .toString()
+                    .padStart(2, "0")}-${(date.getMonth() + 1)
+                    .toString()
+                    .padStart(2, "0")}-${date.getFullYear()}`;
+                  return <td>{formattedDate}</td>;
+                },
+                creation: (item: any) => {
+                  const date = new Date(item.creation);
+                  const formattedDate = `${date
+                    .getDate()
+                    .toString()
+                    .padStart(2, "0")}-${(date.getMonth() + 1)
+                    .toString()
+                    .padStart(2, "0")}-${date.getFullYear()}`;
+                  return <td>{formattedDate}</td>;
+                },
+                // accident_date: (item: any) => {
+                //   const date = new Date(item.creation);
+                //   const formattedDate = `${date
+                //     .getDate()
+                //     .toString()
+                //     .padStart(2, "0")}-${(date.getMonth() + 1)
+                //     .toString()
+                //     .padStart(2, "0")}-${date.getFullYear()}`;
+                //   return <td>{formattedDate}</td>;
+                // },
+
+                // action: (item) => (
+                //   <td className="ActionData">
+                //     <div className="viewicon">
+                //       <MdOutlineVisibility
+                //         size={20}
+                //         onClick={() => {
+                //           toggleDrawer(true);
+                //           setView(true);
+                //           setDrawerDetails(item);
+                //         }}
+                //       />
+                //     </div>
+                //   </td>
+                // ),
+              }}
+            />
+          </div>
+        </>
+      )}
     </>
   );
 };

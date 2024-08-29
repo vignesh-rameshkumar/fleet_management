@@ -40,9 +40,8 @@ const ExternalServices: React.FC<ExternalServicesProps> = ({
     <Box
       sx={{
         backgroundColor: darkMode ? "#222222" : "#fff",
-        padding: "140px",
+        padding: "80px 10px",
         width: "100%",
-        height: "auto",
       }}
     >
       <Grid container spacing={2} justifyContent="center">
@@ -64,7 +63,9 @@ const ExternalServices: React.FC<ExternalServicesProps> = ({
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
-                  padding: "20px",
+
+                  padding: "10px",
+                  width: "100%",
                 }}
               >
                 <img
@@ -95,7 +96,8 @@ const ExternalServices: React.FC<ExternalServicesProps> = ({
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
-                  padding: "20px",
+                  padding: "10px",
+                  width: "100%",
                 }}
               >
                 <img
