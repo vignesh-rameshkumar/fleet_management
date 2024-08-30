@@ -837,7 +837,7 @@ const Reports: React.FC<ReportsProps> = ({
                     return <td>{formattedDate}</td>;
                   },
                   request_date_time: (item: any) => {
-                    const date = new Date(item.request_date_time);
+                    const date = new Date(item.creation);
                     const formattedDate = `${date
                       .getDate()
                       .toString()
