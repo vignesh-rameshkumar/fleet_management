@@ -539,23 +539,8 @@ const Reports: React.FC<ReportsProps> = ({
       filter: true,
       sorter: true,
     },
-
-    {
-      key: "action",
-      label: "Action",
-      _style: {
-        width: "18%",
-        fontSize: "14px",
-        textAlign: "center",
-        color: darkMode ? "#FFF" : "#222222",
-        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
-        borderTopRightRadius: "5px",
-      },
-      filter: false,
-      sorter: false,
-    },
   ];
-  const [doctypeName, setDoctypeName] = useState("FM_Fine_Log");
+  const [doctypeName, setDoctypeName] = useState("FM_Travel_Route_Request");
   const [columns, setColumns] = useState(travelRouteColumns);
   //handle change
   const handleRadioChange = (event) => {
@@ -682,9 +667,11 @@ const Reports: React.FC<ReportsProps> = ({
               <Box
                 sx={{
                   display: "flex",
-                  justifyContent: "space-evenly",
+                  flexDirection: { xs: "column", sm: "row" },
                   gap: "5px",
                   margin: "10px",
+                  justifyContent: "space-evenly",
+                  overflowX: "auto",
                 }}
               >
                 {["travelroute", "passenger", "goods", "equipment"].map(
@@ -696,12 +683,12 @@ const Reports: React.FC<ReportsProps> = ({
                         backgroundColor:
                           activeLog === logType ? "#E5F3E6" : "#f5f5f5",
                         cursor: "pointer",
-                        padding: "10px",
+                        padding: { xs: "8px", sm: "10px" },
                         borderRadius: "4px 4px 0 0",
-                        width: "20vw",
+                        width: { xs: "100%", sm: "20vw" },
                         display: "flex",
                         justifyContent: "center",
-                        fontSize: "16px",
+                        fontSize: { xs: "14px", sm: "16px" },
                         fontWeight: 600,
                         color: activeLog === logType ? "#375d33" : "#A1A1A1",
                         borderBottom:
@@ -749,10 +736,10 @@ const Reports: React.FC<ReportsProps> = ({
                 <Box
                   sx={{
                     borderRadius: "10px",
-                    borderLeft: `6px solid ${data.color}`,
+                    borderLeft: `4px solid ${data.color}`,
                     backgroundColor: "#f9f9f9",
-                    p: 2,
-                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                    p: 0,
+                    boxShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
                   }}
                 >
                   <CardContent>
@@ -770,7 +757,7 @@ const Reports: React.FC<ReportsProps> = ({
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
-                        fontSize: "20px",
+                        fontSize: "18px",
                         fontWeight: 600,
                       }}
                     >
