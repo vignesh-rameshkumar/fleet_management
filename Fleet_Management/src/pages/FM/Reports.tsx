@@ -153,6 +153,10 @@ const Reports: React.FC<ReportsProps> = ({
   const [activeLog, setActiveLog] = useState("travelroute");
   const [tableData, setTableData] = useState<any[]>([]);
   const [card, setCard] = useState(true);
+  const [approvedRequests, setApprovedRequests] = useState(0);
+  const [rejectedRequests, setRejectedRequests] = useState(0);
+  const [pendingRequests, setPendingRequests] = useState(0);
+  const [allRequests, setAllRequests] = useState(0);
   const [radioOptions, setRadioOptions] = useState([
     { value: "all", label: "All" },
     { value: "thaiyur_to_research_park", label: "Thaiyur to Research Park" },
@@ -163,7 +167,7 @@ const Reports: React.FC<ReportsProps> = ({
   const cardData = [
     {
       title: "All Requests",
-      // count: allRequests,
+      count: allRequests,
       color: "#6D57FA",
       icon: (
         <DescriptionOutlinedIcon sx={{ color: "#6D57FA", fontSize: "30px" }} />
@@ -171,7 +175,7 @@ const Reports: React.FC<ReportsProps> = ({
     },
     {
       title: "Approved Request",
-      // count: approvedRequests,
+      count: approvedRequests,
       color: "#5C8A58",
       icon: (
         <CheckCircleOutlineIcon sx={{ color: "#5C8A58", fontSize: "30px" }} />
@@ -179,13 +183,13 @@ const Reports: React.FC<ReportsProps> = ({
     },
     {
       title: "Rejected Request",
-      // count: rejectedRequests,
+      count: rejectedRequests,
       color: "#BA3B34",
       icon: <CancelOutlinedIcon sx={{ color: "#BA3B34", fontSize: "30px" }} />,
     },
     {
       title: "Pending Request",
-      // count: pendingRequests,
+      count: pendingRequests,
       color: "#FFCC00",
       icon: (
         <HourglassEmptyOutlinedIcon
@@ -224,32 +228,6 @@ const Reports: React.FC<ReportsProps> = ({
       sorter: true,
     },
     {
-      key: "name",
-      label: "Request ID",
-      _style: {
-        width: "15%",
-        fontSize: "14px",
-        textAlign: "center",
-        color: darkMode ? "#FFF" : "#222222",
-        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
-      },
-      filter: true,
-      sorter: true,
-    },
-    {
-      key: "type",
-      label: "Request Type",
-      _style: {
-        width: "15%",
-        fontSize: "14px",
-        textAlign: "center",
-        color: darkMode ? "#FFF" : "#222222",
-        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
-      },
-      filter: true,
-      sorter: true,
-    },
-    {
       key: "employee_name",
       label: "Employee Name",
       _style: {
@@ -263,8 +241,8 @@ const Reports: React.FC<ReportsProps> = ({
       sorter: true,
     },
     {
-      key: "project_name",
-      label: "Project Name",
+      key: "pickup_point",
+      label: "Request Type",
       _style: {
         width: "15%",
         fontSize: "14px",
@@ -275,10 +253,9 @@ const Reports: React.FC<ReportsProps> = ({
       filter: true,
       sorter: true,
     },
-
     {
-      key: "status",
-      label: "Status",
+      key: "drop_point",
+      label: "Employee Name",
       _style: {
         width: "15%",
         fontSize: "14px",
@@ -289,20 +266,18 @@ const Reports: React.FC<ReportsProps> = ({
       filter: true,
       sorter: true,
     },
-
     {
-      key: "action",
-      label: "Action",
+      key: "same_route",
+      label: "Return via Same Route",
       _style: {
-        width: "18%",
+        width: "15%",
         fontSize: "14px",
         textAlign: "center",
         color: darkMode ? "#FFF" : "#222222",
         backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
-        borderTopRightRadius: "5px",
       },
-      filter: false,
-      sorter: false,
+      filter: true,
+      sorter: true,
     },
   ];
   const passengerRouteColumns = [
@@ -538,8 +513,8 @@ const Reports: React.FC<ReportsProps> = ({
       sorter: true,
     },
     {
-      key: "project_name",
-      label: "Project Name",
+      key: "driver_name_no",
+      label: "Assigned Driver Name/No.",
       _style: {
         width: "15%",
         fontSize: "14px",
@@ -552,7 +527,7 @@ const Reports: React.FC<ReportsProps> = ({
     },
 
     {
-      key: "status",
+      key: "ride_start_time",
       label: "Status",
       _style: {
         width: "15%",
@@ -590,7 +565,7 @@ const Reports: React.FC<ReportsProps> = ({
   const handleLogClick = (logType) => {
     setActiveLog(logType);
     if (logType === "travelroute") {
-      setDoctypeName("FM_Travel_Route_Report");
+      setDoctypeName("FM_Travel_Route_Request");
       setColumns(travelRouteColumns);
       setSelectedRadio("all");
       setRadioOptions([
@@ -611,12 +586,11 @@ const Reports: React.FC<ReportsProps> = ({
       setSelectedRadio("all");
       setRadioOptions([
         { value: "all", label: "All" },
-        { value: "travel_within_office", label: "Travel within office" },
-        { value: "vendor", label: "Vendor" },
-        { value: "advisor", label: "Advisor" },
-        { value: "health_emergency", label: "Health Emergency" },
-        { value: "group_ride", label: "Group Ride" },
-        { value: "other", label: "Other" },
+        { value: "Travel within Office", label: "Travel within Office" },
+        { value: "Vendor Site Visit", label: "Vendor Site Visit" },
+        { value: "For Advisors", label: "Advisor" },
+        { value: "Health Emergency", label: "Health Emergency" },
+        { value: "Others", label: "Others" },
       ]);
     } else if (logType === "goods") {
       setDoctypeName("FM_Goods_Vehicle_Request");
@@ -624,8 +598,8 @@ const Reports: React.FC<ReportsProps> = ({
       setColumns(goodsRouteColumns);
       setRadioOptions([
         { value: "all", label: "All" },
-        { value: "pick_up", label: "Pick Up" },
-        { value: "drop", label: "Drop" },
+        { value: "Pickup", label: "Pick Up" },
+        { value: "Drop", label: "Drop" },
       ]);
     } else if (logType === "equipment") {
       setDoctypeName("FM_Equipment_Vehicle_Request");
@@ -633,7 +607,7 @@ const Reports: React.FC<ReportsProps> = ({
       setSelectedRadio("all");
       setRadioOptions([
         { value: "all", label: "All" },
-        { value: "crane", label: "Crane" },
+        { value: "Crane", label: "Crane" },
       ]);
     }
   };
@@ -645,15 +619,44 @@ const Reports: React.FC<ReportsProps> = ({
         field: "modified",
         order: "desc",
       },
-      limit: 10000,
+      limit: 9000000,
     });
 
   // Set table data when the fetched data changes
   useEffect(() => {
     if (ReportsData) {
-      setTableData(ReportsData);
+      // Calculate counts based on status
+      const approvedCount = ReportsData.filter(
+        (item) => item.status === "Approved"
+      ).length;
+      const rejectedCount = ReportsData.filter(
+        (item) => item.status === "Rejected"
+      ).length;
+      const pendingCount = ReportsData.filter(
+        (item) => item.status === "Pending"
+      ).length;
+      const totalRequests = ReportsData.length;
+
+      // Set counts
+      setApprovedRequests(approvedCount);
+      setRejectedRequests(rejectedCount);
+      setPendingRequests(pendingCount);
+      setAllRequests(totalRequests);
+      let filteredData = ReportsData;
+
+      // Apply filter based on selectedRadio
+      if (selectedRadio !== "all") {
+        filteredData = ReportsData.filter(
+          (item) =>
+            item.category === selectedRadio ||
+            item.type === selectedRadio ||
+            item.equipment_type === selectedRadio
+        );
+      }
+
+      setTableData(filteredData);
     }
-  }, [ReportsData, doctypeName]);
+  }, [ReportsData, selectedRadio, doctypeName]);
   return (
     <>
       <Box
@@ -672,75 +675,74 @@ const Reports: React.FC<ReportsProps> = ({
       >
         Report Details
       </Box>
-
-      {subHeadingLog && (
-        <>
-          <div>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-evenly",
-                gap: "5px",
-                margin: "10px",
-              }}
-            >
-              {["travelroute", "passenger", "goods", "equipment"].map(
-                (logType) => (
-                  <Typography
-                    key={logType}
-                    onClick={() => handleLogClick(logType)}
-                    sx={{
-                      backgroundColor:
-                        activeLog === logType ? "#E5F3E6" : "#f5f5f5",
-                      cursor: "pointer",
-                      padding: "10px",
-                      borderRadius: "4px 4px 0 0",
-                      width: "20vw",
-                      display: "flex",
-                      justifyContent: "center",
-                      fontSize: "16px",
-                      fontWeight: 600,
-                      color: activeLog === logType ? "#375d33" : "#A1A1A1",
-                      borderBottom:
-                        activeLog === logType
-                          ? "3px solid #487644"
-                          : "3px solid transparent",
-                    }}
-                  >
-                    {logType.charAt(0).toUpperCase() + logType.slice(1)}
-                  </Typography>
-                )
-              )}
-            </Box>
-          </div>
-        </>
-      )}
-
-      {subRadioReports && (
-        <>
-          <ThemeProvider theme={theme}>
-            <Box sx={{ margin: "20px" }}>
-              <RadioGroup
-                row
-                value={selectedRadio}
-                onChange={handleRadioChange}
+      <div style={{ backgroundColor: "#fff", padding: "10px" }}>
+        {subHeadingLog && (
+          <>
+            <div>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-evenly",
+                  gap: "5px",
+                  margin: "10px",
+                }}
               >
-                {radioOptions.map((option) => (
-                  <FormControlLabel
-                    key={option.value}
-                    value={option.value}
-                    control={<Radio />}
-                    label={option.label}
-                  />
-                ))}
-              </RadioGroup>
-            </Box>
-          </ThemeProvider>
-        </>
-      )}
+                {["travelroute", "passenger", "goods", "equipment"].map(
+                  (logType) => (
+                    <Typography
+                      key={logType}
+                      onClick={() => handleLogClick(logType)}
+                      sx={{
+                        backgroundColor:
+                          activeLog === logType ? "#E5F3E6" : "#f5f5f5",
+                        cursor: "pointer",
+                        padding: "10px",
+                        borderRadius: "4px 4px 0 0",
+                        width: "20vw",
+                        display: "flex",
+                        justifyContent: "center",
+                        fontSize: "16px",
+                        fontWeight: 600,
+                        color: activeLog === logType ? "#375d33" : "#A1A1A1",
+                        borderBottom:
+                          activeLog === logType
+                            ? "3px solid #487644"
+                            : "3px solid transparent",
+                      }}
+                    >
+                      {logType.charAt(0).toUpperCase() + logType.slice(1)}
+                    </Typography>
+                  )
+                )}
+              </Box>
+            </div>
+          </>
+        )}
 
-      {card && (
-        <>
+        {subRadioReports && (
+          <>
+            <ThemeProvider theme={theme}>
+              <Box sx={{ margin: "20px" }}>
+                <RadioGroup
+                  row
+                  value={selectedRadio}
+                  onChange={handleRadioChange}
+                >
+                  {radioOptions.map((option) => (
+                    <FormControlLabel
+                      key={option.value}
+                      value={option.value}
+                      control={<Radio />}
+                      label={option.label}
+                    />
+                  ))}
+                </RadioGroup>
+              </Box>
+            </ThemeProvider>
+          </>
+        )}
+
+        {cardData && (
           <Grid container spacing={2} sx={{ borderRadius: "10px" }}>
             {cardData.map((data, index) => (
               <Grid item xs={12} sm={6} md={3} key={index}>
@@ -749,10 +751,18 @@ const Reports: React.FC<ReportsProps> = ({
                     borderRadius: "10px",
                     borderLeft: `6px solid ${data.color}`,
                     backgroundColor: "#f9f9f9",
+                    p: 2,
+                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
                   }}
                 >
                   <CardContent>
-                    <div style={{ color: "#5B5B5B", fontWeight: "500" }}>
+                    <div
+                      style={{
+                        color: "#5B5B5B",
+                        fontWeight: "500",
+                        marginBottom: "10px",
+                      }}
+                    >
                       {data.title}
                     </div>
                     <Box
@@ -771,92 +781,116 @@ const Reports: React.FC<ReportsProps> = ({
               </Grid>
             ))}
           </Grid>
-        </>
-      )}
-      <br />
+        )}
+        <br />
 
-      {table && (
-        <>
-          <div
-            style={{
-              backgroundColor: darkMode ? "#222222" : "#fff",
-              padding: "15px",
-            }}
-          >
-            {JSON.stringify(tableData)}
-            <CSmartTable
-              cleaner
-              clickableRows
-              columns={columns}
-              columnFilter
-              columnSorter
-              items={tableData}
-              itemsPerPageSelect
-              itemsPerPage={10}
-              pagination
-              tableFilter
-              tableProps={{
-                className: "add-this-class red-border",
-                responsive: true,
-                striped: true,
-                hover: true,
+        {table && (
+          <>
+            <div
+              style={{
+                backgroundColor: darkMode ? "#222222" : "#fff",
+                padding: "15px",
               }}
-              onRowClick={(item) => handleRowClick(item)}
-              tableBodyProps={{
-                className: "align-middle tableData",
-              }}
-              scopedColumns={{
-                S_no: (_item, index) => <td>{index + 1}</td>,
-                incident_date: (item: any) => {
-                  const date = new Date(item.creation);
-                  const formattedDate = `${date
-                    .getDate()
-                    .toString()
-                    .padStart(2, "0")}-${(date.getMonth() + 1)
-                    .toString()
-                    .padStart(2, "0")}-${date.getFullYear()}`;
-                  return <td>{formattedDate}</td>;
-                },
-                creation: (item: any) => {
-                  const date = new Date(item.creation);
-                  const formattedDate = `${date
-                    .getDate()
-                    .toString()
-                    .padStart(2, "0")}-${(date.getMonth() + 1)
-                    .toString()
-                    .padStart(2, "0")}-${date.getFullYear()}`;
-                  return <td>{formattedDate}</td>;
-                },
-                // accident_date: (item: any) => {
-                //   const date = new Date(item.creation);
-                //   const formattedDate = `${date
-                //     .getDate()
-                //     .toString()
-                //     .padStart(2, "0")}-${(date.getMonth() + 1)
-                //     .toString()
-                //     .padStart(2, "0")}-${date.getFullYear()}`;
-                //   return <td>{formattedDate}</td>;
-                // },
+            >
+              {/* {JSON.stringify(tableData)} */}
+              <CSmartTable
+                cleaner
+                clickableRows
+                columns={columns}
+                columnFilter
+                columnSorter
+                items={tableData}
+                itemsPerPageSelect
+                itemsPerPage={10}
+                pagination
+                tableFilter
+                tableProps={{
+                  className: "add-this-class red-border",
+                  responsive: true,
+                  striped: true,
+                  hover: true,
+                }}
+                // onRowClick={(item) => handleRowClick(item)}
+                tableBodyProps={{
+                  className: "align-middle tableData",
+                }}
+                scopedColumns={{
+                  S_no: (_item, index) => <td>{index + 1}</td>,
+                  incident_date: (item: any) => {
+                    const date = new Date(item.creation);
+                    const formattedDate = `${date
+                      .getDate()
+                      .toString()
+                      .padStart(2, "0")}-${(date.getMonth() + 1)
+                      .toString()
+                      .padStart(2, "0")}-${date.getFullYear()}`;
+                    return <td>{formattedDate}</td>;
+                  },
+                  creation: (item: any) => {
+                    const date = new Date(item.creation);
+                    const formattedDate = `${date
+                      .getDate()
+                      .toString()
+                      .padStart(2, "0")}-${(date.getMonth() + 1)
+                      .toString()
+                      .padStart(2, "0")}-${date.getFullYear()}`;
+                    return <td>{formattedDate}</td>;
+                  },
+                  request_date_time: (item: any) => {
+                    const date = new Date(item.request_date_time);
+                    const formattedDate = `${date
+                      .getDate()
+                      .toString()
+                      .padStart(2, "0")}-${(date.getMonth() + 1)
+                      .toString()
+                      .padStart(2, "0")}-${date.getFullYear()}`;
+                    return <td>{formattedDate}</td>;
+                  },
+                  ride_start_time: (item: any) => {
+                    let status;
+                    if (item.ride_start_time && item.ride_end_time) {
+                      status = "Completed";
+                    } else if (item.ride_start_time) {
+                      status = "Ongoing";
+                    } else {
+                      status = "Not Started";
+                    }
+                    return <td style={{ textAlign: "center" }}>{status}</td>;
+                  },
+                  same_route: (item: any) => {
+                    return <td>{item.same_route === "1" ? "Yes" : "No"}</td>;
+                  },
+                  // accident_date: (item: any) => {
+                  //   const date = new Date(item.creation);
+                  //   const formattedDate = `${date
+                  //     .getDate()
+                  //     .toString()
+                  //     .padStart(2, "0")}-${(date.getMonth() + 1)
+                  //     .toString()
+                  //     .padStart(2, "0")}-${date.getFullYear()}`;
+                  //   return <td>{formattedDate}</td>;
+                  // },
 
-                // action: (item) => (
-                //   <td className="ActionData">
-                //     <div className="viewicon">
-                //       <MdOutlineVisibility
-                //         size={20}
-                //         onClick={() => {
-                //           toggleDrawer(true);
-                //           setView(true);
-                //           setDrawerDetails(item);
-                //         }}
-                //       />
-                //     </div>
-                //   </td>
-                // ),
-              }}
-            />
-          </div>
-        </>
-      )}
+                  // action: (item) => (
+                  //   <td className="ActionData">
+                  //     <div className="viewicon">
+                  //       <MdOutlineVisibility
+                  //         size={20}
+                  //         onClick={() => {
+                  //           toggleDrawer(true);
+                  //           setView(true);
+                  //           setDrawerDetails(item);
+                  //         }}
+                  //       />
+                  //     </div>
+                  //   </td>
+                  // ),
+                }}
+              />
+            </div>
+          </>
+        )}
+      </div>
     </>
   );
 };
