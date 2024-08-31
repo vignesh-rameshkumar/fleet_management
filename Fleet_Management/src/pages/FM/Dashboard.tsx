@@ -88,20 +88,13 @@ const Dashboard = () => {
 
   // Card All Request
 
-  const { data: totalCount } = useFrappeGetDocCount(activeAssignment, [
-    ["DATE_FORMAT(request_date_time, '%Y-%m-%d')", ">=", startDate],
-    ["DATE_FORMAT(request_date_time, '%Y-%m-%d')", "<=", endDate],
-  ]);
-
   const { data: allRequestCount } = useFrappeGetDocCount(activeAssignment, [
-    // ["request_date_time", ">=", startDate],
-    // ["request_date_time", "<=", endDate],
+    // ["DATE_FORMAT(request_date_time, '%Y-%m-%d')", ">=", startDate],
+    // ["DATE_FORMAT(request_date_time, '%Y-%m-%d')", "<=", endDate],
   ]);
 
   const { data: allApprovedCount } = useFrappeGetDocCount(activeAssignment, [
     ["status", "IN", ["Project Lead Approved", "Approved"]],
-    // ["request_date_time", ">=", startDate],
-    // ["request_date_time", "<=", endDate],
   ]);
   const { data: allRejectedCount } = useFrappeGetDocCount(activeAssignment, [
     ["status", "IN", ["Project Lead Rejected", "Rejected", "Cancelled"]],
@@ -114,10 +107,10 @@ const Dashboard = () => {
   //-------------Line Chart -----------------------------------------
   useEffect(() => {
     if (
-      allRequestCount &&
-      allApprovedCount &&
-      allRejectedCount &&
-      allPendingCount
+      allRequestCount !== undefined &&
+      allApprovedCount !== undefined &&
+      allRejectedCount !== undefined &&
+      allPendingCount !== undefined
     ) {
       const data = [
         {
@@ -128,7 +121,6 @@ const Dashboard = () => {
           Pending_Request: allPendingCount,
         },
       ];
-
       setChartData(data);
     }
   }, [
@@ -138,6 +130,28 @@ const Dashboard = () => {
     allPendingCount,
     startDate,
   ]);
+
+  function generateChartData(sDate: any, eDate: any) {
+    const start = dayjs(sDate);
+    const end = dayjs(eDate);
+    const data = [];
+    let currentDate = start;
+
+    while (currentDate <= end) {
+      const dateKey = currentDate.format("YYYY-MM-DD");
+      data.push({
+        name: dateKey,
+        All_Requests: 0,
+        Approved_Request: 0,
+        Rejected_Request: 0,
+        Pending_Request: 0,
+      });
+      currentDate = currentDate.add(1, "day");
+    }
+
+    setChartData(data);
+  }
+  console.log("Chart Data:", chartData);
 
   //-----------Bar Chart API---------------------------------
   const { data: PendingOnboarding } = useFrappeGetDocCount("Employee", [
@@ -166,27 +180,6 @@ const Dashboard = () => {
     ["assign_to", "=", clickedValue],
     ["status_hr", "=", "Completed Deboarding"],
   ]);
-
-  function generateChartData(sDate, eDate) {
-    const start = dayjs(sDate);
-    const end = dayjs(eDate);
-    const data = [];
-    let currentDate = start;
-
-    while (currentDate <= end) {
-      const dateKey = currentDate.format("YYYY-MM-DD");
-      data?.push({
-        name: dateKey,
-        All_Requests: 0,
-        Approved_Request: 0,
-        Rejected_Request: 0,
-        Pending_Request: 0,
-      });
-      currentDate = currentDate.add(1, "day");
-    }
-
-    setChartData(data);
-  }
 
   const handleDateChange = (direction) => {
     const newStartDate = dayjs(startDate)

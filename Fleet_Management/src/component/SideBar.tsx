@@ -44,6 +44,7 @@ import Goods from "../pages/BookRide/Goods";
 import Equipment from "../pages/BookRide/Equipment";
 import GroupRide from "../pages/BookRide/GroupRide";
 import TravelRoute from "../pages/BookRide/TravelRoute";
+import CreateRoute from "../pages/BookRide/CreateRoute";
 
 interface SideBarProps {
   onCloseDrawer: () => void;
@@ -142,8 +143,8 @@ const SideBar: React.FC<SideBarProps> = ({
         case roles.includes("Employee") && roles.includes("Fleet Manager"):
           role = "Fleet Manager";
           break;
-        case roles.includes("Employee") && roles.includes("Driver"):
-          role = "Driver";
+        case roles.includes("Vehicle"):
+          role = "Vehicle";
           break;
         case roles.includes("Employee"):
           role = "User";
@@ -209,6 +210,11 @@ const SideBar: React.FC<SideBarProps> = ({
       icon: <GoNote />,
     },
     {
+      path: "/Fleet_Management/coins",
+      name: "Coins",
+      icon: <PiCoinsLight />,
+    },
+    {
       path: "/Fleet_Management/calendar",
       name: "Calender",
       icon: <IoCalendarOutline />,
@@ -270,6 +276,24 @@ const SideBar: React.FC<SideBarProps> = ({
       path: "/Fleet_Management/bills",
       name: "Bills",
       icon: <GoNote />,
+    },
+    {
+      name: "Coins",
+      icon: <PiCoinsLight />,
+      submenu: [
+        {
+          path: "/Fleet_Management/Coins/yourspends",
+          name: "Your Spends",
+        },
+        {
+          path: "/Fleet_Management/Coins/projectspends",
+          name: "Project Spends",
+        },
+        {
+          path: "/Fleet_Management/Coins/departmentpends",
+          name: "Department Spends",
+        },
+      ],
     },
     {
       path: "/Fleet_Management/calendar",
@@ -335,6 +359,24 @@ const SideBar: React.FC<SideBarProps> = ({
       icon: <GoNote />,
     },
     {
+      name: "Coins",
+      icon: <PiCoinsLight />,
+      submenu: [
+        {
+          path: "/Fleet_Management/Coins/yourspends",
+          name: "Your Spends",
+        },
+        {
+          path: "/Fleet_Management/Coins/projectspends",
+          name: "Project Spends",
+        },
+        {
+          path: "/Fleet_Management/Coins/departmentpends",
+          name: "Department Spends",
+        },
+      ],
+    },
+    {
       path: "/Fleet_Management/calendar",
       name: "Calender",
       icon: <IoCalendarOutline />,
@@ -353,45 +395,45 @@ const SideBar: React.FC<SideBarProps> = ({
       path: "/Fleet_Management/dashboard",
       icon: <MdOutlineDashboard />,
     },
-    {
-      name: "Book Ride",
-      icon: <IoCarSportOutline />,
-      path: "/Fleet_Management/quickaccess",
-      submenu: [
-        {
-          path: "/Fleet_Management",
-          name: "Passenger",
-          onClick: () => toggleDrawer(true, "Passenger"),
-        },
-        {
-          path: "/Fleet_Management",
-          name: "Goods",
-          onClick: () => toggleDrawer(true, "Goods"),
-        },
-        {
-          path: "/Fleet_Management",
-          name: "Equipment",
-          onClick: () => toggleDrawer(true, "Equipment"),
-        },
-        {
-          path: "/Fleet_Management",
-          name: "Group Ride",
-          onClick: () => toggleDrawer(true, "GroupRide"),
-        },
-      ],
-    },
-    {
-      path: "/Fleet_Management/quickaccess",
-      name: "Travel Route",
-      icon: <MdOutlineRoute />,
-      onClick: () => toggleDrawer(true, "TravelRoute"),
-    },
 
-    {
-      path: "/Fleet_Management/trackrequest",
-      name: "Track Request",
-      icon: <RiFocus3Line />,
-    },
+    // {
+    //   name: "Book Ride",
+    //   icon: <IoCarSportOutline />,
+    //   path: "/Fleet_Management/quickaccess",
+    //   submenu: [
+    //     {
+    //       path: "/Fleet_Management",
+    //       name: "Passenger",
+    //       onClick: () => toggleDrawer(true, "Passenger"),
+    //     },
+    //     {
+    //       path: "/Fleet_Management",
+    //       name: "Goods",
+    //       onClick: () => toggleDrawer(true, "Goods"),
+    //     },
+    //     {
+    //       path: "/Fleet_Management",
+    //       name: "Equipment",
+    //       onClick: () => toggleDrawer(true, "Equipment"),
+    //     },
+    //     {
+    //       path: "/Fleet_Management",
+    //       name: "Group Ride",
+    //       onClick: () => toggleDrawer(true, "GroupRide"),
+    //     },
+    //   ],
+    // },
+    // {
+    //   path: "/Fleet_Management/quickaccess",
+    //   name: "Travel Route",
+    //   icon: <MdOutlineRoute />,
+    //   onClick: () => toggleDrawer(true, "TravelRoute"),
+    // },
+    // {
+    //   path: "/Fleet_Management/trackrequest",
+    //   name: "Track Request",
+    //   icon: <RiFocus3Line />,
+    // },
     {
       name: "Manage Fleet",
       icon: <LiaCarSideSolid />,
@@ -426,23 +468,29 @@ const SideBar: React.FC<SideBarProps> = ({
       icon: <MdOutlineManageAccounts />,
     },
     {
+      path: "/Fleet_Management/quickaccess",
+      name: "Create Route Id",
+      icon: <MdOutlineManageAccounts />,
+      onClick: () => toggleDrawer(true, "TravelRoute"),
+    },
+    {
       name: "Coins",
       icon: <PiCoinsLight />,
       submenu: [
         {
-          path: "/Fleet_Management",
+          path: "/Fleet_Management/fm/coins/createcoins",
+          name: "Create Coins",
+        },
+        {
+          path: "/Fleet_Management/fm/coins/coinsdashboard",
           name: "Coins Dashboard",
         },
         {
-          path: "/Fleet_Management",
-          name: "Coins Request",
-        },
-        {
-          path: "/Fleet_Management",
+          path: "/Fleet_Management/fm/coins/generatebills",
           name: "Generate Bills",
         },
         {
-          path: "/Fleet_Management",
+          path: "/Fleet_Management/fm/coins/trackbills",
           name: "Track Bills",
         },
       ],
@@ -1170,6 +1218,15 @@ const SideBar: React.FC<SideBarProps> = ({
           )}
           {currentDrawer === "TravelRoute" && (
             <TravelRoute
+              darkMode={darkMode}
+              onCloseDrawer={handleCloseDrawer}
+              userEmailId={userEmailId}
+              employeeID={employeeID}
+              userName={userName}
+            />
+          )}
+          {currentDrawer === "CreateRoute" && (
+            <CreateRoute
               darkMode={darkMode}
               onCloseDrawer={handleCloseDrawer}
               userEmailId={userEmailId}

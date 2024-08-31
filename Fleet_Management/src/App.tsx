@@ -28,6 +28,15 @@ import Vehicle from "./pages/FM/Vehicle.tsx";
 import Driver from "./pages/FM/Driver.tsx";
 import ExternalServices from "./pages/FM/ExternalServices.tsx";
 import Dashboard from "./pages/FM/Dashboard.tsx";
+import VehicleTracking from "./pages/FM/VehicleTracking.tsx";
+import Coin from "./pages/User/Coin.tsx";
+import YourSpends from "./pages/PL&DL Coins/Your Spends.tsx";
+import ProjectSpends from "./pages/PL&DL Coins/ProjectSpends.tsx";
+import DepartmentSpends from "./pages/PL&DL Coins/DepartmentSpends.tsx";
+import CreateCoins from "./pages/FM/Coins/CreateCoins.tsx";
+import CoinsDashBoard from "./pages/FM/Coins/CoinsDashBoard.tsx";
+import GenerateBills from "./pages/FM/Coins/GenerateBills.tsx";
+import TrackBills from "./pages/FM/Coins/TrackBills.tsx";
 
 // import Calendar from "./component/Calendar.tsx";
 
@@ -200,6 +209,17 @@ const App: React.FC = () => {
                       />
                     }
                   />
+                  <Route
+                    path="/Fleet_Management/coins"
+                    element={
+                      <Coin
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
+                  />
                   {/* <Route
                     path="/Fleet_Management/calendar"
                     element={
@@ -238,6 +258,39 @@ const App: React.FC = () => {
                     path="/Fleet_Management/requestapprovaldl"
                     element={
                       <RequestApprovalDL
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/Fleet_Management/Coins/yourspends"
+                    element={
+                      <YourSpends
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/Fleet_Management/Coins/projectspends"
+                    element={
+                      <ProjectSpends
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/Fleet_Management/Coins/departmentpends"
+                    element={
+                      <DepartmentSpends
                         darkMode={darkMode}
                         userEmailId={userEmailId}
                         userName={userName}
@@ -322,6 +375,54 @@ const App: React.FC = () => {
                         employeeID={employeeID}
                       />
                     }
+                  />
+                  <Route
+                    path="/Fleet_Management/fm/coins/createcoins"
+                    element={
+                      <CreateCoins
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/Fleet_Management/fm/coins/coinsdashboard"
+                    element={
+                      <CoinsDashBoard
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/Fleet_Management/fm/coins/generatebills"
+                    element={
+                      <GenerateBills
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/Fleet_Management/fm/coins/trackbills"
+                    element={
+                      <TrackBills
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/tracking/:vehicleNumber"
+                    element={VehicleTracking}
                   />
                 </>
               )}

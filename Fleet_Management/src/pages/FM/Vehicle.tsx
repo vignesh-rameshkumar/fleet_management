@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { CSmartTable } from "@coreui/react-pro";
 import {
   Box,
@@ -21,6 +21,22 @@ import {
   DialogContent,
   IconButton,
 } from "@mui/material";
+import { useParams, Link } from "react-router-dom";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
+import L from "leaflet";
+// import "leaflet/dist/leaflet.css";
+import { FaMapMarkerAlt } from "react-icons/fa";
+import { LuMapPin } from "react-icons/lu";
+import axios from "axios";
+import { LuMapPinOff } from "react-icons/lu";
+
 import DownloadIcon from "@mui/icons-material/Download";
 import jsPDF from "jspdf";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -48,6 +64,22 @@ interface VehicleProps {
   userEmailId: string;
   employeeID: string;
   userName: string;
+}
+interface Vehicle {
+  vehicle_number: string;
+  vehicle_id: string;
+  model_name: string;
+  gps_datetime: string;
+  lat_message: string;
+  lon_message: string;
+  speed: string;
+  branch_name: string;
+}
+
+interface ApiResponse {
+  status: string;
+  message: string;
+  data: Vehicle[];
 }
 
 const Vehicle: React.FC<VehicleProps> = ({
@@ -234,26 +266,6 @@ const Vehicle: React.FC<VehicleProps> = ({
       setTableData(FM_Vehicle_Details);
     }
   }, [FM_Vehicle_Details]);
-  // console.log("FM_Vehicle_Details",FM_Vehicle_Details)
-  // const doctypeName = drawerDetails.doctypename;
-  // const documentName = drawerDetails.request_id;
-  // const { data: specificData, isLoading: isLoadingSpecific } =
-  //   useFrappeGetDocList(doctypeName || "", {
-  //     fields: ["*"],
-  //     orderBy: {
-  //       field: "modified",
-  //       order: "desc",
-  //     },
-  //     filters: documentName ? [["name", "=", documentName]] : [],
-  //     limit: 1,
-  //   });
-
-  // Update drawer data when specific data changes
-  // useEffect(() => {
-  //   if (specificData) {
-  //     setDrawerData(specificData);
-  //   }
-  // }, [specificData]);
 
   // Handle drawer toggle
   const toggleDrawer = (open: boolean) => {
@@ -1020,6 +1032,40 @@ const Vehicle: React.FC<VehicleProps> = ({
       setDeductibles(drawerDetails.deductibles || " ");
     }
   }, [drawerDetails]);
+
+  // Vehicle API
+
+  const API_KEY = "e5cb15721fd22dfe1844b0d75b198d48";
+  const API_URL = "http://jtrack.in/api/pull_vts_details.php";
+
+  const [vehicleData, setVehicleData] = useState<Vehicle[] | null>(null);
+  const [apierror, setAPIError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchVehicleData = async () => {
+      try {
+        const response = await axios.get<ApiResponse>(
+          `${API_URL}?api_key=${API_KEY}`
+        );
+        setVehicleData(response.data.data);
+      } catch (error) {
+        if (axios.isAxiosError(apierror)) {
+          setAPIError(apierror?.response?.data?.message || error.message);
+        } else {
+          setAPIError("Unexpected error occurred");
+        }
+      }
+    };
+
+    fetchVehicleData();
+  }, []);
+
+  const filteredVehicles = vehicleData?.filter(
+    (y) =>
+      Array.isArray(tableData) &&
+      tableData.some((x) => x?.plate_number === y?.vehicle_number)
+  );
+
   return (
     <>
       <Box
@@ -1069,7 +1115,7 @@ const Vehicle: React.FC<VehicleProps> = ({
               <AddIcon sx={{ marginRight: "8px" }} />
               Add Vehicle Details
             </Box>
-
+            {/* {JSON.stringify(filteredVehicles)} */}
             <CSmartTable
               cleaner
               clickableRows
@@ -1087,7 +1133,7 @@ const Vehicle: React.FC<VehicleProps> = ({
                 striped: true,
                 hover: true,
               }}
-              onRowClick={(item) => handleRowClick(item)}
+              // onRowClick={(item) => handleRowClick(item)}
               tableBodyProps={{
                 className: "align-middle tableData",
               }}
@@ -1095,13 +1141,9 @@ const Vehicle: React.FC<VehicleProps> = ({
                 S_no: (_item: any, index: number) => {
                   return <td>{index + 1}</td>;
                 },
-                project_name: (item: any) => {
-                  return <td>{item?.project_name || "-"}</td>;
-                },
                 bill_amount: (item: any) => {
                   return <td>{item?.bill_amount || "-"}</td>;
                 },
-
                 creation: (item: any) => {
                   const date = new Date(item.creation);
                   const formattedDate = `${date
@@ -1113,6 +1155,15 @@ const Vehicle: React.FC<VehicleProps> = ({
                   return <td>{formattedDate}</td>;
                 },
                 action: (item: any) => {
+                  const isMatched = filteredVehicles?.some(
+                    (x) => x?.vehicle_number === item?.plate_number
+                  );
+                  const latitude = filteredVehicles
+                    ?.filter((x) => x?.vehicle_number === item?.plate_number)
+                    .map((x) => x.lat_message);
+                  const longitude = filteredVehicles
+                    ?.filter((x) => x?.vehicle_number === item?.plate_number)
+                    .map((x) => x.lon_message);
                   return (
                     <td className="ActionData">
                       <div className="viewicon">
@@ -1124,6 +1175,30 @@ const Vehicle: React.FC<VehicleProps> = ({
                             setDrawerDetails(item);
                           }}
                         />
+                      </div>
+
+                      <div className="viewicon">
+                        {isMatched ? (
+                          <LuMapPin
+                            size={20}
+                            style={{
+                              color: "green",
+                              cursor: "pointer",
+                            }}
+                            onClick={() => {
+                              const mapUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                              window.open(mapUrl, "_blank");
+                            }}
+                          />
+                        ) : (
+                          <LuMapPinOff
+                            size={20}
+                            style={{
+                              color: "red",
+                              cursor: "not-allowed",
+                            }}
+                          />
+                        )}
                       </div>
                     </td>
                   );
