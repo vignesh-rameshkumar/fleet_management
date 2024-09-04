@@ -1,0 +1,136 @@
+{
+ "actions": [],
+ "autoname": "FMB._.MM.YY._.####.",
+ "creation": "2024-09-02 18:26:36.418302",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "request_id",
+  "requested_by",
+  "pro_dept_name",
+  "type",
+  "service_type",
+  "requested_email_id",
+  "total_amount",
+  "bill_details",
+  "doctype_name",
+  "travel_bills_column",
+  "date_time",
+  "route_id",
+  "start_point",
+  "end_point",
+  "total_employees",
+  "present_count"
+ ],
+ "fields": [
+  {
+   "fieldname": "request_id",
+   "fieldtype": "Data",
+   "label": "Request ID"
+  },
+  {
+   "fieldname": "requested_by",
+   "fieldtype": "Data",
+   "label": "Requested By"
+  },
+  {
+   "fieldname": "pro_dept_name",
+   "fieldtype": "Data",
+   "label": "Project / Department Name"
+  },
+  {
+   "fieldname": "type",
+   "fieldtype": "Data",
+   "label": "Type of Services"
+  },
+  {
+   "fieldname": "service_type",
+   "fieldtype": "Data",
+   "label": "Service Type"
+  },
+  {
+   "fieldname": "requested_email_id",
+   "fieldtype": "Data",
+   "label": "Requested Email Id"
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Float",
+   "label": "Total Amount "
+  },
+  {
+   "fieldname": "bill_details",
+   "fieldtype": "Table",
+   "label": "Bill Details",
+   "options": "FM_Bill_Parameters"
+  },
+  {
+   "fieldname": "doctype_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Doctype Name"
+  },
+  {
+   "fieldname": "travel_bills_column",
+   "fieldtype": "Column Break",
+   "label": "Travel Bills"
+  },
+  {
+   "fieldname": "date_time",
+   "fieldtype": "Data",
+   "label": "Travel Date"
+  },
+  {
+   "fieldname": "route_id",
+   "fieldtype": "Data",
+   "label": "Route ID"
+  },
+  {
+   "fieldname": "start_point",
+   "fieldtype": "Data",
+   "label": "Start Point"
+  },
+  {
+   "fieldname": "end_point",
+   "fieldtype": "Data",
+   "label": "End Point"
+  },
+  {
+   "fieldname": "total_employees",
+   "fieldtype": "Data",
+   "label": "No of Request"
+  },
+  {
+   "fieldname": "present_count",
+   "fieldtype": "Data",
+   "label": "No of Scans"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-09-03 13:48:57.436510",
+ "modified_by": "Administrator",
+ "module": "Fleet Management",
+ "name": "FM_Bills",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

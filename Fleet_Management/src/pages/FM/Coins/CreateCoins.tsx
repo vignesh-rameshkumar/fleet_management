@@ -7,10 +7,25 @@ import {
   Typography,
   Grid,
   CircularProgress,
+  Select,
+  MenuItem,
+  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+  FormControl,
 } from "@mui/material";
 import { MdOutlineVisibility, MdDeleteForever } from "react-icons/md";
-import { useFrappeGetDocList, useFrappeUpdateDoc } from "frappe-react-sdk";
-
+import AddIcon from "@mui/icons-material/Add";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import { toast } from "react-toastify";
+import dayjs from "dayjs";
+import {
+  useFrappeGetDocList,
+  useFrappeUpdateDoc,
+  useFrappeCreateDoc,
+  useFrappeFileUpload,
+} from "frappe-react-sdk";
 interface CreateCoinsProps {
   darkMode: boolean;
   onCloseDrawer: () => void;
@@ -26,57 +41,26 @@ const CreateCoins: React.FC<CreateCoinsProps> = ({
 }) => {
   // State
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [drawerDetails, setDrawerDetails] = useState<any>({});
   const [tableData, setTableData] = useState<any[]>([]);
-  const [drawerData, setDrawerData] = useState<any[]>([]);
   const [view, setView] = useState<boolean>(false);
-
+  // State for Coins and Reason
+  const [coins, setCoins] = useState("");
+  const [coinsError, setCoinsError] = useState("");
+  const [reason, setReason] = useState("");
+  const [reasonError, setReasonError] = useState("");
+  // States for pagination
+  const [currentPage, setCurrentPage] = useState(1); // Start from the first page
+  const [itemsPerPage, setItemsPerPage] = useState(10); // Default items per page
+  //calendar
+  const [calendarView, setCalendarView] = useState<"month" | "year">("month");
+  const [selectedMonth, setSelectedMonth] = useState(dayjs().format("MMMM"));
+  const [selectedYear, setSelectedYear] = useState(dayjs().year()); // Current year
   useEffect(() => {
     const filterInput = document.querySelector(".form-control");
     if (filterInput) {
       filterInput.placeholder = "Request Type";
     }
   }, []);
-
-  const { data: FM_Request_Master, isLoading } = useFrappeGetDocList(
-    "FM_Request_Master",
-    {
-      fields: ["*"],
-      filters: [["owner", "=", userEmailId]],
-
-      orderBy: {
-        field: "modified",
-        order: "desc",
-      },
-    }
-  );
-
-  // Set table data when the fetched data changes
-  useEffect(() => {
-    if (FM_Request_Master) {
-      setTableData(FM_Request_Master);
-    }
-  }, [FM_Request_Master]);
-
-  const doctypeName = drawerDetails.doctypename;
-  const documentName = drawerDetails.request_id;
-  const { data: specificData, isLoading: isLoadingSpecific } =
-    useFrappeGetDocList(doctypeName || "", {
-      fields: ["*"],
-      orderBy: {
-        field: "modified",
-        order: "desc",
-      },
-      filters: documentName ? [["name", "=", documentName]] : [],
-      limit: 1,
-    });
-
-  // Update drawer data when specific data changes
-  useEffect(() => {
-    if (specificData) {
-      setDrawerData(specificData);
-    }
-  }, [specificData]);
 
   // Handle drawer toggle
   const toggleDrawer = (open: boolean) => {
@@ -86,24 +70,206 @@ const CreateCoins: React.FC<CreateCoinsProps> = ({
   const handleCloseDrawer = () => {
     toggleDrawer(false);
   };
+  // handle change
 
+  // validation  // Handler for validating and setting Coins input
+  const handleCoinsChange = (value) => {
+    if (/^\d*$/.test(value)) {
+      setCoins(value);
+      setCoinsError(value ? "" : "Coins is required");
+    } else {
+      setCoinsError("Only numbers are allowed");
+    }
+  };
+  // Handle items per page change
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
+
+  // Handle page change
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+  // Handler for validating and setting Reason input
+  const handleReasonChange = (value) => {
+    setReason(value);
+
+    if (value.length < 15) {
+      setReasonError("Reason must be at least 15 characters long.");
+    } else {
+      setReasonError("");
+    }
+  };
+  const handleCancel = () => {
+    setReason("");
+    setCoins("");
+  };
+  // calendar handle change
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const handleViewChange = (
+    event: React.MouseEvent<HTMLElement>,
+    newView: "month" | "year"
+  ) => {
+    if (newView !== null) {
+      setCalendarView(newView);
+    }
+  };
+
+  const handleMonthChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setSelectedMonth(event.target.value as string);
+  };
+
+  const handleYearChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setSelectedYear(event.target.value as number);
+  };
+
+  const renderMonths = () => {
+    return months.map((month) => (
+      <MenuItem key={month} value={month}>
+        {month}
+      </MenuItem>
+    ));
+  };
+  // Function to generate years (example: from 2000 to the current year)
+  const renderYears = () => {
+    const currentYear = dayjs().year();
+    const startYear = 2000;
+    const years = [];
+    for (let year = startYear; year <= currentYear; year++) {
+      years.push(year);
+    }
+    return years.map((year) => (
+      <MenuItem key={year} value={year}>
+        {year}
+      </MenuItem>
+    ));
+  };
+  //api
+  const {
+    createDoc,
+    loading: coinsLoading,
+    isCompleted,
+    error,
+    reset,
+  } = useFrappeCreateDoc();
+  const CreateCoinsDetails = async () => {
+    try {
+      // Base request body
+      const requestBody = {
+        reason: reason,
+        coins: coins,
+      };
+
+      // Create the document
+      await createDoc("FM_Manager_Coins", requestBody);
+      handleCancel();
+      toggleDrawer(false);
+
+      reset;
+      // Reset form if contractor process is completed
+
+      toast.success("Coins Created Successfully");
+    } catch (error) {
+      handleRequestError(error);
+      console.log("error", error);
+    }
+  };
+  // Helper function to handle errors
+  const handleRequestError = (error) => {
+    if (error.response) {
+      const statusCode = error.response.status;
+      const serverMessage = error.response.data?._server_messages;
+
+      switch (statusCode) {
+        case 400:
+          toast.error("Bad request. Please check your input.");
+          break;
+        case 401:
+          toast.error("Unauthorized. Please log in.");
+          break;
+        case 404:
+          toast.error("Resource not found.");
+          break;
+        case 500:
+          toast.error("Internal server error. Please try again later.");
+          break;
+        default:
+          if (serverMessage) {
+            const parsedMessages = JSON.parse(serverMessage);
+            const errorMessage = parsedMessages
+              .map((msg) => JSON.parse(msg).message)
+              .join(", ");
+            toast.error(errorMessage);
+          } else {
+            toast.error(`Error: ${statusCode}`);
+          }
+      }
+    } else if (error.request) {
+      toast.error("No response received from server. Please try again later.");
+    } else {
+      toast.error(`${error.exception}`);
+    }
+  };
+  const getFilter = () => {
+    if (calendarView === "month") {
+      const startOfMonth = dayjs()
+        .month(months.indexOf(selectedMonth))
+        .startOf("month")
+        .format("YYYY-MM-DD");
+      const endOfMonth = dayjs()
+        .month(months.indexOf(selectedMonth))
+        .endOf("month")
+        .format("YYYY-MM-DD");
+      return [
+        ["modified", ">=", `${startOfMonth} 00:00:00`],
+        ["modified", "<=", `${endOfMonth} 23:59:59`],
+      ];
+    } else {
+      const startOfYear = `${selectedYear}-01-01 00:00:00`;
+      const endOfYear = `${selectedYear}-12-31 23:59:59`;
+      return [
+        ["modified", ">=", startOfYear],
+        ["modified", "<=", endOfYear],
+      ];
+    }
+  };
+  const { data: FM_Manager_Coins, isLoading: coinLoading } =
+    useFrappeGetDocList("FM_Manager_Coins", {
+      fields: ["*"],
+      filters: getFilter(),
+
+      orderBy: {
+        field: "modified",
+        order: "desc",
+      },
+      limit: itemsPerPage,
+      start: (currentPage - 1) * itemsPerPage,
+    });
+
+  // Set table data when the fetched data changes
+  useEffect(() => {
+    if (FM_Manager_Coins) {
+      setTableData(FM_Manager_Coins);
+    }
+  }, [FM_Manager_Coins, currentPage, itemsPerPage]);
+
+  // console.log("year and month:", selectedMonth, selectedYear);
   // Columns definition for the table
   const columns = [
-    {
-      key: "S_no",
-      label: "S.No",
-      _style: {
-        width: "7%",
-        fontSize: "14px",
-        textAlign: "center",
-        color: darkMode ? "#FFF" : "#222222",
-        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
-        borderTopLeftRadius: "5px",
-      },
-      filter: false,
-      sorter: false,
-    },
-
     {
       key: "creation",
       label: "Date",
@@ -118,8 +284,8 @@ const CreateCoins: React.FC<CreateCoinsProps> = ({
       sorter: true,
     },
     {
-      key: "name",
-      label: "Request ID",
+      key: "coins",
+      label: "Created coins",
       _style: {
         width: "15%",
         fontSize: "14px",
@@ -131,8 +297,8 @@ const CreateCoins: React.FC<CreateCoinsProps> = ({
       sorter: true,
     },
     {
-      key: "type",
-      label: "Request Type",
+      key: "reason",
+      label: "Reason",
       _style: {
         width: "15%",
         fontSize: "14px",
@@ -140,93 +306,20 @@ const CreateCoins: React.FC<CreateCoinsProps> = ({
         color: darkMode ? "#FFF" : "#222222",
         backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
       },
-      filter: true,
-      sorter: true,
-    },
-    {
-      key: "project_name",
-      label: "Project Name",
-      _style: {
-        width: "15%",
-        fontSize: "14px",
-        textAlign: "center",
-        color: darkMode ? "#FFF" : "#222222",
-        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
-      },
-      filter: true,
-      sorter: true,
-    },
-
-    {
-      key: "bill_amount",
-      label: "Coins Consumed",
-      _style: {
-        width: "15%",
-        fontSize: "14px",
-        textAlign: "center",
-        color: darkMode ? "#FFF" : "#222222",
-        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
-      },
-      filter: true,
-      sorter: true,
-    },
-    {
-      key: "payment_status",
-      label: "Payment Status",
-      _style: {
-        width: "15%",
-        fontSize: "14px",
-        textAlign: "center",
-        color: darkMode ? "#FFF" : "#222222",
-        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
-      },
-      filter: true,
-      sorter: true,
-    },
-
-    {
-      key: "action",
-      label: "Action",
-      _style: {
-        width: "18%",
-        fontSize: "14px",
-        textAlign: "center",
-        color: darkMode ? "#FFF" : "#222222",
-        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
-        borderTopRightRadius: "5px",
-      },
-      filter: false,
-      sorter: false,
     },
   ];
-
-  // if (isLoading || isLoadingSpecific) {
-  //   return (
-  //     <Box
-  //       sx={{
-  //         display: "flex",
-  //         justifyContent: "center",
-  //         alignItems: "center",
-  //         minHeight: "100vh",
-  //       }}
-  //     >
-  //       <CircularProgress />
-  //     </Box>
-  //   );
-  // }
 
   const handleRowClick = (item: any) => {
     //setSelectedRowItem(item);
     toggleDrawer(true);
     setView(true);
-    setDrawerDetails(item);
   };
 
-  const totalcoinAmount = tableData.reduce(
-    (acc, item) => acc + parseFloat(item.bill_amount || 0),
+  const totalCoinAmount = tableData.reduce(
+    (acc, item) => acc + parseFloat(item.coins || 0), // Summing up the 'coins' field
     0
   );
-
+  // console.log("tableData", tableData);
   return (
     <>
       <Box
@@ -252,20 +345,82 @@ const CreateCoins: React.FC<CreateCoinsProps> = ({
           padding: "15px",
         }}
       >
-        <Box
-          sx={{
-            color: "#000",
-            backgroundColor: "#a5d0a9",
-            padding: "10px 20px",
-            borderRadius: "5px",
-            float: "right",
-            marginBottom: "5px",
-            fontSize: "15px",
-            fontWeight: 600,
-          }}
-        >
-          Coins Consumed : {totalcoinAmount}
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          {" "}
+          <Box sx={{ display: "flex", justifyContent: "start" }}>
+            <Box
+              sx={{
+                color: "#FFFFFF",
+                backgroundColor: "#487644",
+                padding: "10px 20px",
+                borderRadius: "8px",
+                float: "left",
+                marginBottom: "5px",
+                fontSize: "15px",
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                toggleDrawer(true);
+                setView(true);
+              }}
+            >
+              <AddIcon sx={{ marginRight: "8px" }} />
+              Create Coins
+            </Box>
+            <Typography
+              sx={{
+                color: "#625770",
+                backgroundColor: "#F4EBFF",
+                padding: "10px 20px",
+                borderRadius: "8px",
+                float: "left",
+                marginBottom: "5px",
+                marginLeft: "10px",
+                fontSize: "15px",
+                fontWeight: 600,
+                width: "12vw",
+                borderLeft: "4px solid #BA87FC",
+              }}
+            >
+              Coins {totalCoinAmount}
+            </Typography>
+          </Box>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <ToggleButtonGroup
+              value={calendarView}
+              exclusive
+              onChange={handleViewChange}
+              aria-label="Month Year Selector"
+              sx={{ marginRight: "20px" }}
+            >
+              <ToggleButton value="month" aria-label="Month">
+                Month
+              </ToggleButton>
+              <ToggleButton value="year" aria-label="Year">
+                Year
+              </ToggleButton>
+            </ToggleButtonGroup>
+
+            {calendarView === "month" ? (
+              <FormControl variant="outlined">
+                <Select value={selectedMonth} onChange={handleMonthChange}>
+                  {renderMonths()}
+                </Select>
+              </FormControl>
+            ) : (
+              <FormControl variant="outlined">
+                <Select value={selectedYear} onChange={handleYearChange}>
+                  {renderYears()}
+                </Select>
+              </FormControl>
+            )}
+          </div>
         </Box>
+
+        <br />
+        <br />
+        <br />
         <CSmartTable
           cleaner
           clickableRows
@@ -273,9 +428,14 @@ const CreateCoins: React.FC<CreateCoinsProps> = ({
           columnFilter
           columnSorter
           items={tableData}
-          itemsPerPageSelect
-          itemsPerPage={10}
-          pagination
+          itemsPerPageSelect={{
+            label: "Items helo per page",
+            values: [10, 20, 30, 50, 100], // Options for items per page
+            onItemsPerPageChange: handleItemsPerPageChange, // Function to handle change
+          }}
+          itemsPerPage={itemsPerPage} // Number of items per page
+          activePage={currentPage} // Current page number
+          onActivePageChange={handlePageChange} // Function
           tableFilter
           tableProps={{
             className: "add-this-class red-border",
@@ -288,17 +448,7 @@ const CreateCoins: React.FC<CreateCoinsProps> = ({
             className: "align-middle tableData",
           }}
           scopedColumns={{
-            S_no: (_item: any, index: number) => {
-              return <td>{index + 1}</td>;
-            },
-            project_name: (item: any) => {
-              return <td>{item?.project_name || "-"}</td>;
-            },
-            bill_amount: (item: any) => {
-              return <td>{item?.bill_amount || "-"}</td>;
-            },
-
-            creation: (item: any) => {
+            creation: (item) => {
               const date = new Date(item.creation);
               const formattedDate = `${date
                 .getDate()
@@ -307,22 +457,6 @@ const CreateCoins: React.FC<CreateCoinsProps> = ({
                 .toString()
                 .padStart(2, "0")}-${date.getFullYear()}`;
               return <td>{formattedDate}</td>;
-            },
-            action: (item: any) => {
-              return (
-                <td className="ActionData">
-                  <div className="viewicon">
-                    <MdOutlineVisibility
-                      size={20}
-                      onClick={() => {
-                        toggleDrawer(true);
-                        setView(true);
-                        setDrawerDetails(item);
-                      }}
-                    />
-                  </div>
-                </td>
-              );
             },
           }}
         />
@@ -360,7 +494,7 @@ const CreateCoins: React.FC<CreateCoinsProps> = ({
                       className="drawerTitle"
                       sx={{ color: darkMode ? "#d1d1d1" : "#5b5b5b" }}
                     >
-                      Request Type - {drawerDetails.type}
+                      Create Coins
                     </Box>
                     <Button
                       className="closeX"
@@ -370,252 +504,58 @@ const CreateCoins: React.FC<CreateCoinsProps> = ({
                       X
                     </Button>
                   </Box>
-                  <Grid container spacing={2} sx={{ marginTop: 2 }}>
-                    {doctypeName !== "FM_Equipment_Vehicle_Request" && (
-                      <>
-                        <Grid item xs={12} sm={6}>
-                          <Typography
-                            variant="body1"
-                            sx={{
-                              fontWeight: 600,
-                            }}
-                          >
-                            From Location
-                          </Typography>
-                          <Typography variant="body1">
-                            {drawerData[0]?.from_location || "N/A"}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Typography
-                            variant="body1"
-                            sx={{
-                              fontWeight: 600,
-                            }}
-                          >
-                            To Location
-                          </Typography>
-                          <Typography variant="body1">
-                            {drawerData[0]?.to_location || "N/A"}
-                          </Typography>
-                        </Grid>
-                      </>
-                    )}
-                    <Grid item xs={12} sm={6}>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: 600,
-                        }}
-                      >
-                        Request Date
-                      </Typography>
-                      <Typography variant="body1">
-                        {`${new Date(drawerDetails.creation)
-                          .getDate()
-                          .toString()
-                          .padStart(2, "0")}-${(
-                          new Date(drawerDetails.creation).getMonth() + 1
-                        )
-                          .toString()
-                          .padStart(2, "0")}-${new Date(
-                          drawerDetails.creation
-                        ).getFullYear()}`}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: 600,
-                        }}
-                      >
-                        Request Time
-                      </Typography>
-                      <Typography variant="body1">
-                        {new Date(drawerDetails.creation).toLocaleTimeString()}
-                      </Typography>
-                    </Grid>
-
-                    {doctypeName === "FM_Equipment_Vehicle_Request" && (
-                      <>
-                        <Grid item xs={12} sm={6}>
-                          <Typography
-                            variant="body1"
-                            sx={{
-                              fontWeight: 600,
-                            }}
-                          >
-                            From Time
-                          </Typography>
-                          <Typography variant="body1">
-                            {drawerData[0]?.from_time || "N/A"}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Typography
-                            variant="body1"
-                            sx={{
-                              fontWeight: 600,
-                            }}
-                          >
-                            To Time
-                          </Typography>
-                          <Typography variant="body1">
-                            {drawerData[0]?.to_time || "N/A"}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Typography
-                            variant="body1"
-                            sx={{
-                              fontWeight: 600,
-                            }}
-                          >
-                            Equipment Type:
-                          </Typography>
-                          <Typography variant="body1">
-                            {drawerData[0]?.equipment_type || "N/A"}
-                          </Typography>
-                        </Grid>
-                      </>
-                    )}
-
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: 600,
-                        }}
-                      >
-                        Project Name
-                      </Typography>
-                      <Typography variant="body1">
-                        {drawerDetails.project_name}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: 600,
-                        }}
-                      >
-                        Coins Consumed
-                      </Typography>
-                      <Typography variant="body1">
-                        {drawerDetails?.bill_amount}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: 600,
-                        }}
-                      >
-                        Ride Type
-                      </Typography>
-                      <Typography variant="body1">
-                        {drawerDetails?.type}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: 600,
-                        }}
-                      >
-                        Payment Status
-                      </Typography>
-                      <Typography variant="body1">
-                        {drawerDetails.payment_status}
-                      </Typography>
-                    </Grid>
-
-                    {drawerData[0]?.mod === 1 && (
-                      <>
-                        <Grid item xs={12}>
-                          <Typography
-                            variant="body1"
-                            sx={{
-                              fontWeight: 600,
-                            }}
-                          >
-                            Travel More Than One Day Dates:
-                          </Typography>
-                          <Typography
-                            variant="body1"
-                            sx={{ color: "blue", fontStyle: "italic" }}
-                          >
-                            {drawerData[0]?.mod_dates.split(",").join(" | ")}
-                          </Typography>
-                        </Grid>
-                      </>
-                    )}
-                    <Grid item xs={12}>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: 600,
-                        }}
-                      >
-                        Purpose
-                      </Typography>
-                      <Typography variant="body1">
-                        {drawerData[0]?.purpose}
-                      </Typography>
-                    </Grid>
-                    {doctypeName === "FM_Goods_Vehicle_Request" && (
-                      <>
-                        <Grid item xs={12}>
-                          <Typography
-                            variant="body1"
-                            sx={{
-                              fontWeight: 600,
-                            }}
-                          >
-                            Description:
-                          </Typography>
-                          <Typography variant="body1">
-                            {drawerData[0]?.description || "N/A"}
-                          </Typography>
-                        </Grid>
-                      </>
-                    )}
-                  </Grid>
                   <br />
-                  {drawerDetails?.status === "Rejected" ||
-                  drawerDetails?.status === "Project Lead Rejected" ? (
-                    <Box
-                      display="flex"
-                      flexDirection="column"
-                      alignItems="left"
+                  <br />
+                  {/* Coins Input Field */}
+                  <TextField
+                    sx={{ width: "100%", marginBottom: 2 }}
+                    label={
+                      <span>
+                        Coins <span style={{ color: "red" }}>*</span>
+                      </span>
+                    }
+                    value={coins}
+                    onChange={(e) => handleCoinsChange(e.target.value)}
+                    error={!!coinsError}
+                    helperText={coinsError}
+                    inputProps={{
+                      maxLength: 15,
+                    }}
+                  />
+
+                  {/* Reason Input Field */}
+                  <TextField
+                    sx={{ width: "100%", marginBottom: 2 }}
+                    label={
+                      <span>
+                        Reason <span style={{ color: "red" }}>*</span>
+                      </span>
+                    }
+                    value={reason}
+                    onChange={(e) => handleReasonChange(e.target.value)}
+                    error={!!reasonError}
+                    helperText={reasonError}
+                    inputProps={{
+                      maxLength: 500, // Assuming a reasonable max length for reason
+                    }}
+                    multiline
+                    rows={4}
+                  />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      padding: "20px",
+                    }}
+                  >
+                    <Button
+                      className="saveBtn"
+                      disabled={!reason || !coins || coinsError || reasonError}
+                      onClick={CreateCoinsDetails}
                     >
-                      <Box
-                        width={{ xs: "100%", sm: "100%", md: "90%" }}
-                        marginBottom="16px"
-                        textAlign={"left"}
-                      >
-                        <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                          Reject Reason
-                        </Typography>
-                        <Typography variant="body1" sx={{ color: "red" }}>
-                          {drawerDetails?.reason}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  ) : null}
-                  {drawerDetails.status === "Pending" && (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        marginTop: "20px",
-                      }}
-                    ></Box>
-                  )}
+                      {coinsLoading ? "Submitting..." : "Submit"}
+                    </Button>
+                  </Box>
                 </div>
               </Box>
             </Box>

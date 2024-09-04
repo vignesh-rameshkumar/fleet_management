@@ -10,6 +10,7 @@
   "date_time",
   "route_id",
   "ride_starting_point",
+  "bill_amount",
   "onboarded_employees"
  ],
  "fields": [
@@ -27,8 +28,7 @@
    "in_list_view": 1,
    "label": "Route ID",
    "options": "FM_Route_ID",
-   "reqd": 1,
-   "query": "fleet_management.doctype.fm_travel_route_report.fm_travel_route_report.get_link_field_filters"
+   "reqd": 1
   },
   {
    "fieldname": "ride_starting_point",
@@ -43,11 +43,16 @@
    "label": "Onboarded Employees",
    "options": "FM_Travel_Route_Members",
    "reqd": 1
+  },
+  {
+   "fieldname": "bill_amount",
+   "fieldtype": "Int",
+   "label": "Bill Amount"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-03 16:51:16.927937",
+ "modified": "2024-09-04 11:39:05.627553",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Travel_Route_Report",

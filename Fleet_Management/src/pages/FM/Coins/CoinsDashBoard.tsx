@@ -2,14 +2,25 @@ import React, { useState, useEffect } from "react";
 import { CSmartTable } from "@coreui/react-pro";
 import {
   Box,
-  Drawer,
-  Button,
   Typography,
+  Container,
+  Card,
+  CardContent,
   Grid,
-  CircularProgress,
+  FormControl,
+  Select,
+  ToggleButton,
+  ToggleButtonGroup,
+  MenuItem,
 } from "@mui/material";
-import { MdOutlineVisibility, MdDeleteForever } from "react-icons/md";
 import { useFrappeGetDocList, useFrappeUpdateDoc } from "frappe-react-sdk";
+import { Pie } from "react-chartjs-2";
+import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement } from "chart.js";
+import { borderRadius } from "@mui/system";
+import { PiCoins } from "react-icons/pi";
+import dayjs from "dayjs";
+
+ChartJS.register(Title, Tooltip, Legend, ArcElement);
 
 interface CoinsDashBoardProps {
   darkMode: boolean;
@@ -25,70 +36,228 @@ const CoinsDashBoard: React.FC<CoinsDashBoardProps> = ({
   userEmailId,
 }) => {
   // State
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [drawerDetails, setDrawerDetails] = useState<any>({});
   const [tableData, setTableData] = useState<any[]>([]);
-  const [drawerData, setDrawerData] = useState<any[]>([]);
-  const [view, setView] = useState<boolean>(false);
+  const [coinsData, setCoinsData] = useState<any[]>([]);
+  const [calendarView, setCalendarView] = useState("day"); // Default to "day"
+  const [selectedDay, setSelectedDay] = useState(dayjs().format("YYYY-MM-DD")); // Current date
+  const [selectedWeek, setSelectedWeek] = useState({
+    start: dayjs().startOf("week").format("YYYY-MM-DD"),
+    end: dayjs().endOf("week").format("YYYY-MM-DD"),
+  });
+  const [selectedMonth, setSelectedMonth] = useState(dayjs().format("MMMM"));
+  const [selectedYear, setSelectedYear] = useState(dayjs().year());
+
+  // States for pagination
+  const [currentPage, setCurrentPage] = useState(1); // Start from the first page
+  const [itemsPerPage, setItemsPerPage] = useState(10); // Default items per page
+
+  // handle change calendar
+  // handle calendar
+  const handleDayChange = (event) => {
+    setSelectedDay(event.target.value);
+  };
+
+  const handleWeekChange = (start, end) => {
+    setSelectedWeek({ start, end });
+  };
+
+  const handleMonthChange = (event) => {
+    setSelectedMonth(event.target.value);
+  };
+
+  const handleYearChange = (event) => {
+    setSelectedYear(event.target.value);
+  };
+
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const renderMonths = () => {
+    return months.map((month) => (
+      <MenuItem key={month} value={month}>
+        {month}
+      </MenuItem>
+    ));
+  };
+  const renderYears = () => {
+    const currentYear = dayjs().year();
+    const startYear = 2000;
+    const years = [];
+    for (let year = startYear; year <= currentYear; year++) {
+      years.push(year);
+    }
+    return years.map((year) => (
+      <MenuItem key={year} value={year}>
+        {year}
+      </MenuItem>
+    ));
+  };
+  const getFilter = () => {
+    if (calendarView === "day") {
+      const startOfDay = selectedDay + " 00:00:00";
+      const endOfDay = selectedDay + " 23:59:59";
+      return [
+        ["creation", ">=", startOfDay],
+        ["creation", "<=", endOfDay],
+      ];
+    } else if (calendarView === "week") {
+      const startOfWeek = selectedWeek.start + " 00:00:00";
+      const endOfWeek = selectedWeek.end + " 23:59:59";
+      return [
+        ["creation", ">=", startOfWeek],
+        ["creation", "<=", endOfWeek],
+      ];
+    } else if (calendarView === "month") {
+      const startOfMonth = dayjs()
+        .month(months.indexOf(selectedMonth))
+        .startOf("month")
+        .format("YYYY-MM-DD");
+      const endOfMonth = dayjs()
+        .month(months.indexOf(selectedMonth))
+        .endOf("month")
+        .format("YYYY-MM-DD");
+      return [
+        ["creation", ">=", `${startOfMonth} 00:00:00`],
+        ["creation", "<=", `${endOfMonth} 23:59:59`],
+      ];
+    } else if (calendarView === "year") {
+      const startOfYear = `${selectedYear}-01-01 00:00:00`;
+      const endOfYear = `${selectedYear}-12-31 23:59:59`;
+      return [
+        ["creation", ">=", startOfYear],
+        ["creation", "<=", endOfYear],
+      ];
+    }
+    return [];
+  };
+  const { data: FM_Bills, isLoading } = useFrappeGetDocList("FM_Bills", {
+    fields: ["*"],
+    filters: getFilter(),
+    orderBy: {
+      field: "modified",
+      order: "desc",
+    },
+    limit: itemsPerPage,
+    start: (currentPage - 1) * itemsPerPage,
+  });
 
   useEffect(() => {
-    const filterInput = document.querySelector(".form-control");
-    if (filterInput) {
-      filterInput.placeholder = "Request Type";
+    if (FM_Bills) {
+      setTableData(FM_Bills);
     }
-  }, []);
+  }, [FM_Bills, currentPage, itemsPerPage]);
 
-  const { data: FM_Request_Master, isLoading } = useFrappeGetDocList(
-    "FM_Request_Master",
-    {
+  const { data: FM_Manager_Coins, isLoading: coinsLoading } =
+    useFrappeGetDocList("FM_Manager_Coins", {
       fields: ["*"],
-      filters: [["owner", "=", userEmailId]],
-
+      filters: getFilter(),
       orderBy: {
         field: "modified",
         order: "desc",
       },
-    }
-  );
+    });
 
   // Set table data when the fetched data changes
   useEffect(() => {
-    if (FM_Request_Master) {
-      setTableData(FM_Request_Master);
+    if (FM_Manager_Coins) {
+      setCoinsData(FM_Manager_Coins);
     }
-  }, [FM_Request_Master]);
+  }, [FM_Manager_Coins]);
 
-  const doctypeName = drawerDetails.doctypename;
-  const documentName = drawerDetails.request_id;
-  const { data: specificData, isLoading: isLoadingSpecific } =
-    useFrappeGetDocList(doctypeName || "", {
-      fields: ["*"],
-      orderBy: {
-        field: "modified",
-        order: "desc",
-      },
-      filters: documentName ? [["name", "=", documentName]] : [],
-      limit: 1,
-    });
-
-  // Update drawer data when specific data changes
-  useEffect(() => {
-    if (specificData) {
-      setDrawerData(specificData);
-    }
-  }, [specificData]);
-
-  // Handle drawer toggle
-  const toggleDrawer = (open: boolean) => {
-    setIsOpen(open);
+  // Handle items per page change
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
   };
 
-  const handleCloseDrawer = () => {
-    toggleDrawer(false);
+  // Handle page change
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+  // Functions to handle changes in calendar views and pagination
+  const handleViewChange = (event, newView) => {
+    if (newView !== null) {
+      setCalendarView(newView);
+      if (newView === "day") {
+        setSelectedDay(dayjs().format("YYYY-MM-DD"));
+      } else if (newView === "week") {
+        setSelectedWeek({
+          start: dayjs().startOf("week").format("YYYY-MM-DD"),
+          end: dayjs().endOf("week").format("YYYY-MM-DD"),
+        });
+      } else if (newView === "month") {
+        setSelectedMonth(dayjs().format("MMMM"));
+      } else if (newView === "year") {
+        setSelectedYear(dayjs().year());
+      }
+    }
+  };
+  // pichart
+  const aggregateData = (data, key) => {
+    const counts = data.reduce((acc, item) => {
+      acc[item[key]] = (acc[item[key]] || 0) + 1;
+      return acc;
+    }, {});
+
+    return {
+      labels: Object.keys(counts),
+      datasets: [
+        {
+          data: Object.values(counts),
+          backgroundColor: [
+            "#FF6384",
+            "#36A2EB",
+            "#FFCE56",
+            "#4BC0C0",
+            "#9966FF",
+          ], // Add more colors if needed
+        },
+      ],
+    };
+  };
+
+  const typeData = aggregateData(tableData, "type");
+  const deptData = aggregateData(tableData, "pro_dept_name");
+
+  const pieOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "right", // Position the legend on the right
+        labels: {
+          color: darkMode ? "#FFF" : "#222222",
+        },
+      },
+      tooltip: {
+        callbacks: {
+          label: function (tooltipItem: any) {
+            const label = tooltipItem.label || "";
+            const value = tooltipItem.raw || 0;
+            const total = tooltipItem.dataset.data.reduce(
+              (acc: number, val: number) => acc + val,
+              0
+            );
+            const percentage = ((value / total) * 100).toFixed(2);
+            return `${label}: ${value} (${percentage}%)`;
+          },
+        },
+      },
+    },
   };
 
   // Columns definition for the table
-  const columns = [
+  const servicecolumns = [
     {
       key: "S_no",
       label: "S.No",
@@ -105,8 +274,8 @@ const CoinsDashBoard: React.FC<CoinsDashBoardProps> = ({
     },
 
     {
-      key: "creation",
-      label: "Date",
+      key: "type",
+      label: "Type of Service",
       _style: {
         width: "10%",
         fontSize: "14px",
@@ -118,115 +287,75 @@ const CoinsDashBoard: React.FC<CoinsDashBoardProps> = ({
       sorter: true,
     },
     {
-      key: "name",
-      label: "Request ID",
+      key: "total_amount",
+      label: "coins Spent",
       _style: {
         width: "15%",
-        fontSize: "14px",
-        textAlign: "center",
-        color: darkMode ? "#FFF" : "#222222",
-        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
-      },
-      filter: true,
-      sorter: true,
-    },
-    {
-      key: "type",
-      label: "Request Type",
-      _style: {
-        width: "15%",
-        fontSize: "14px",
-        textAlign: "center",
-        color: darkMode ? "#FFF" : "#222222",
-        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
-      },
-      filter: true,
-      sorter: true,
-    },
-    {
-      key: "project_name",
-      label: "Project Name",
-      _style: {
-        width: "15%",
-        fontSize: "14px",
-        textAlign: "center",
-        color: darkMode ? "#FFF" : "#222222",
-        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
-      },
-      filter: true,
-      sorter: true,
-    },
-
-    {
-      key: "bill_amount",
-      label: "Coins Consumed",
-      _style: {
-        width: "15%",
-        fontSize: "14px",
-        textAlign: "center",
-        color: darkMode ? "#FFF" : "#222222",
-        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
-      },
-      filter: true,
-      sorter: true,
-    },
-    {
-      key: "payment_status",
-      label: "Payment Status",
-      _style: {
-        width: "15%",
-        fontSize: "14px",
-        textAlign: "center",
-        color: darkMode ? "#FFF" : "#222222",
-        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
-      },
-      filter: true,
-      sorter: true,
-    },
-
-    {
-      key: "action",
-      label: "Action",
-      _style: {
-        width: "18%",
         fontSize: "14px",
         textAlign: "center",
         color: darkMode ? "#FFF" : "#222222",
         backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
         borderTopRightRadius: "5px",
       },
+      filter: true,
+      sorter: true,
+    },
+  ];
+  const projectcolumns = [
+    {
+      key: "S_no",
+      label: "S.No",
+      _style: {
+        width: "7%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+        borderTopLeftRadius: "5px",
+      },
       filter: false,
       sorter: false,
     },
+
+    {
+      key: "pro_dept_name",
+      label: "Pl / Dl",
+      _style: {
+        width: "10%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+      },
+      filter: true,
+      sorter: true,
+    },
+    {
+      key: "total_amount",
+      label: "Coins Spent",
+      _style: {
+        width: "15%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+        borderTopRightRadius: "5px",
+      },
+      filter: true,
+      sorter: true,
+    },
   ];
 
-  // if (isLoading || isLoadingSpecific) {
-  //   return (
-  //     <Box
-  //       sx={{
-  //         display: "flex",
-  //         justifyContent: "center",
-  //         alignItems: "center",
-  //         minHeight: "100vh",
-  //       }}
-  //     >
-  //       <CircularProgress />
-  //     </Box>
-  //   );
-  // }
-
-  const handleRowClick = (item: any) => {
-    //setSelectedRowItem(item);
-    toggleDrawer(true);
-    setView(true);
-    setDrawerDetails(item);
-  };
-
-  const totalcoinAmount = tableData.reduce(
-    (acc, item) => acc + parseFloat(item.bill_amount || 0),
+  // Calculate the total coins
+  const totalCoins = coinsData.reduce(
+    (acc, item) => acc + (item.coins || 0),
     0
   );
-
+  // Calculate the total spent coins
+  const totalCoinsSpent = tableData.reduce(
+    (acc, item) => acc + (item.total_amount || 0),
+    0
+  );
   return (
     <>
       <Box
@@ -248,380 +377,273 @@ const CoinsDashBoard: React.FC<CoinsDashBoardProps> = ({
 
       <div
         style={{
-          backgroundColor: darkMode ? "#222222" : "#fff",
+          backgroundColor: "#effaef",
           padding: "15px",
         }}
       >
         <Box
           sx={{
-            color: "#000",
-            backgroundColor: "#a5d0a9",
-            padding: "10px 20px",
-            borderRadius: "5px",
-            float: "right",
-            marginBottom: "5px",
-            fontSize: "15px",
-            fontWeight: 600,
+            display: "flex",
+            gap: 2,
+            p: 2,
+            flexWrap: "wrap",
+            alignItems: "flex-start",
           }}
         >
-          Coins Consumed : {totalcoinAmount}
-        </Box>
-        <CSmartTable
-          cleaner
-          clickableRows
-          columns={columns}
-          columnFilter
-          columnSorter
-          items={tableData}
-          itemsPerPageSelect
-          itemsPerPage={10}
-          pagination
-          tableFilter
-          tableProps={{
-            className: "add-this-class red-border",
-            responsive: true,
-            striped: true,
-            hover: true,
-          }}
-          onRowClick={(item) => handleRowClick(item)}
-          tableBodyProps={{
-            className: "align-middle tableData",
-          }}
-          scopedColumns={{
-            S_no: (_item: any, index: number) => {
-              return <td>{index + 1}</td>;
-            },
-            project_name: (item: any) => {
-              return <td>{item?.project_name || "-"}</td>;
-            },
-            bill_amount: (item: any) => {
-              return <td>{item?.bill_amount || "-"}</td>;
-            },
+          {/* Total Coins Card */}
+          <Card
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              padding: 1.5,
+              borderLeft: "4px solid #81C784",
+              backgroundColor: "#FFFFFF",
+              width: "200px",
+              height: "80px",
+            }}
+          >
+            <PiCoins
+              style={{ fontSize: 32, marginRight: 12, color: "#81C784" }}
+            />
+            <CardContent sx={{ padding: "0 !important" }}>
+              <Typography
+                variant="subtitle2"
+                sx={{ color: "#000000", fontWeight: "bold" }}
+              >
+                Total Coins
+              </Typography>
+              <Typography variant="h6" sx={{ color: "#000000" }}>
+                {totalCoins}
+              </Typography>
+            </CardContent>
+          </Card>
 
-            creation: (item: any) => {
-              const date = new Date(item.creation);
-              const formattedDate = `${date
-                .getDate()
-                .toString()
-                .padStart(2, "0")}-${(date.getMonth() + 1)
-                .toString()
-                .padStart(2, "0")}-${date.getFullYear()}`;
-              return <td>{formattedDate}</td>;
-            },
-            action: (item: any) => {
-              return (
-                <td className="ActionData">
-                  <div className="viewicon">
-                    <MdOutlineVisibility
-                      size={20}
-                      onClick={() => {
-                        toggleDrawer(true);
-                        setView(true);
-                        setDrawerDetails(item);
-                      }}
-                    />
-                  </div>
-                </td>
-              );
-            },
-          }}
-        />
-      </div>
-      <Drawer
-        sx={{
-          "& .MuiPaper-root": {
-            backgroundColor: darkMode ? "#222222" : "#FFF",
-            color: darkMode ? "#fff" : "#000",
-            width: "50%",
-          },
-          "@media (max-width: 600px)": {
-            "& .MuiPaper-root": {
-              width: "80%",
-            },
-          },
-          "@media (max-width: 1024px)": {
-            "& .MuiPaper-root": {
-              width: "85%",
-            },
-          },
-        }}
-        anchor="right"
-        open={isOpen}
-        onClose={handleCloseDrawer}
-      >
-        {view && (
-          <>
-            <Box sx={{ padding: "20px" }}>
-              <Box>
-                <div className="m-4">
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <Box
-                      flexGrow={1}
-                      className="drawerTitle"
-                      sx={{ color: darkMode ? "#d1d1d1" : "#5b5b5b" }}
-                    >
-                      Request Type - {drawerDetails.type}
-                    </Box>
-                    <Button
-                      className="closeX"
-                      sx={{ color: darkMode ? "#d1d1d1" : "#5b5b5b" }}
-                      onClick={handleCloseDrawer}
-                    >
-                      X
-                    </Button>
-                  </Box>
-                  <Grid container spacing={2} sx={{ marginTop: 2 }}>
-                    {doctypeName !== "FM_Equipment_Vehicle_Request" && (
-                      <>
-                        <Grid item xs={12} sm={6}>
-                          <Typography
-                            variant="body1"
-                            sx={{
-                              fontWeight: 600,
-                            }}
-                          >
-                            From Location
-                          </Typography>
-                          <Typography variant="body1">
-                            {drawerData[0]?.from_location || "N/A"}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Typography
-                            variant="body1"
-                            sx={{
-                              fontWeight: 600,
-                            }}
-                          >
-                            To Location
-                          </Typography>
-                          <Typography variant="body1">
-                            {drawerData[0]?.to_location || "N/A"}
-                          </Typography>
-                        </Grid>
-                      </>
-                    )}
-                    <Grid item xs={12} sm={6}>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: 600,
-                        }}
-                      >
-                        Request Date
-                      </Typography>
-                      <Typography variant="body1">
-                        {`${new Date(drawerDetails.creation)
-                          .getDate()
-                          .toString()
-                          .padStart(2, "0")}-${(
-                          new Date(drawerDetails.creation).getMonth() + 1
-                        )
-                          .toString()
-                          .padStart(2, "0")}-${new Date(
-                          drawerDetails.creation
-                        ).getFullYear()}`}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: 600,
-                        }}
-                      >
-                        Request Time
-                      </Typography>
-                      <Typography variant="body1">
-                        {new Date(drawerDetails.creation).toLocaleTimeString()}
-                      </Typography>
-                    </Grid>
+          {/* Total Coins Spent Card */}
+          <Card
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              padding: 1.5,
+              borderLeft: "4px solid #FF80AB",
+              backgroundColor: "#FFFFFF",
+              width: "200px",
+              height: "80px",
+            }}
+          >
+            <PiCoins
+              style={{ fontSize: 32, marginRight: 12, color: "#FF80AB" }}
+            />
+            <CardContent sx={{ padding: "0 !important" }}>
+              <Typography
+                variant="subtitle2"
+                sx={{ color: "#000000", fontWeight: "bold" }}
+              >
+                Total Coins Spent
+              </Typography>
+              <Typography variant="h6" sx={{ color: "#000000" }}>
+                {totalCoinsSpent}
+              </Typography>
+            </CardContent>
+          </Card>
+          <br />
+          <br />
+          <br />
+          {/* Calendar Control Section */}
+          <Box
+            sx={{
+              display: "flex",
+              // flexDirection: "column",
+              gap: 5,
+              minWidth: "250px",
+              padding: "23px",
+            }}
+          >
+            <ToggleButtonGroup
+              value={calendarView}
+              exclusive
+              onChange={handleViewChange}
+              aria-label="Calendar View Selector"
+              size="small"
+              sx={{
+                "& .MuiToggleButton-root": {
+                  padding: "4px 8px",
+                  fontSize: "0.8rem",
+                },
+                "& .MuiToggleButton-root.Mui-selected": {
+                  backgroundColor: "#5C8A58",
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: "#4A7046",
+                  },
+                },
+              }}
+            >
+              <ToggleButton value="day">Day</ToggleButton>
+              <ToggleButton value="week">Week</ToggleButton>
+              <ToggleButton value="month">Month</ToggleButton>
+              <ToggleButton value="year">Year</ToggleButton>
+            </ToggleButtonGroup>
 
-                    {doctypeName === "FM_Equipment_Vehicle_Request" && (
-                      <>
-                        <Grid item xs={12} sm={6}>
-                          <Typography
-                            variant="body1"
-                            sx={{
-                              fontWeight: 600,
-                            }}
-                          >
-                            From Time
-                          </Typography>
-                          <Typography variant="body1">
-                            {drawerData[0]?.from_time || "N/A"}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Typography
-                            variant="body1"
-                            sx={{
-                              fontWeight: 600,
-                            }}
-                          >
-                            To Time
-                          </Typography>
-                          <Typography variant="body1">
-                            {drawerData[0]?.to_time || "N/A"}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Typography
-                            variant="body1"
-                            sx={{
-                              fontWeight: 600,
-                            }}
-                          >
-                            Equipment Type:
-                          </Typography>
-                          <Typography variant="body1">
-                            {drawerData[0]?.equipment_type || "N/A"}
-                          </Typography>
-                        </Grid>
-                      </>
-                    )}
+            <Box sx={{ width: "100%" }}>
+              {calendarView === "day" && (
+                <input
+                  type="date"
+                  value={selectedDay}
+                  onChange={handleDayChange}
+                  style={{ width: "100%", padding: "4px", fontSize: "14px" }}
+                />
+              )}
 
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: 600,
-                        }}
-                      >
-                        Project Name
-                      </Typography>
-                      <Typography variant="body1">
-                        {drawerDetails.project_name}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: 600,
-                        }}
-                      >
-                        Coins Consumed
-                      </Typography>
-                      <Typography variant="body1">
-                        {drawerDetails?.bill_amount}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: 600,
-                        }}
-                      >
-                        Ride Type
-                      </Typography>
-                      <Typography variant="body1">
-                        {drawerDetails?.type}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: 600,
-                        }}
-                      >
-                        Payment Status
-                      </Typography>
-                      <Typography variant="body1">
-                        {drawerDetails.payment_status}
-                      </Typography>
-                    </Grid>
+              {calendarView === "week" && (
+                <Box sx={{ display: "flex", gap: "4px" }}>
+                  <input
+                    type="date"
+                    value={selectedWeek.start}
+                    onChange={(e) =>
+                      handleWeekChange(e.target.value, selectedWeek.end)
+                    }
+                    style={{ flex: 1, padding: "4px", fontSize: "14px" }}
+                  />
+                  <input
+                    type="date"
+                    value={selectedWeek.end}
+                    onChange={(e) =>
+                      handleWeekChange(selectedWeek.start, e.target.value)
+                    }
+                    style={{ flex: 1, padding: "4px", fontSize: "14px" }}
+                  />
+                </Box>
+              )}
 
-                    {drawerData[0]?.mod === 1 && (
-                      <>
-                        <Grid item xs={12}>
-                          <Typography
-                            variant="body1"
-                            sx={{
-                              fontWeight: 600,
-                            }}
-                          >
-                            Travel More Than One Day Dates:
-                          </Typography>
-                          <Typography
-                            variant="body1"
-                            sx={{ color: "blue", fontStyle: "italic" }}
-                          >
-                            {drawerData[0]?.mod_dates.split(",").join(" | ")}
-                          </Typography>
-                        </Grid>
-                      </>
-                    )}
-                    <Grid item xs={12}>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: 600,
-                        }}
-                      >
-                        Purpose
-                      </Typography>
-                      <Typography variant="body1">
-                        {drawerData[0]?.purpose}
-                      </Typography>
-                    </Grid>
-                    {doctypeName === "FM_Goods_Vehicle_Request" && (
-                      <>
-                        <Grid item xs={12}>
-                          <Typography
-                            variant="body1"
-                            sx={{
-                              fontWeight: 600,
-                            }}
-                          >
-                            Description:
-                          </Typography>
-                          <Typography variant="body1">
-                            {drawerData[0]?.description || "N/A"}
-                          </Typography>
-                        </Grid>
-                      </>
-                    )}
-                  </Grid>
-                  <br />
-                  {drawerDetails?.status === "Rejected" ||
-                  drawerDetails?.status === "Project Lead Rejected" ? (
-                    <Box
-                      display="flex"
-                      flexDirection="column"
-                      alignItems="left"
-                    >
-                      <Box
-                        width={{ xs: "100%", sm: "100%", md: "90%" }}
-                        marginBottom="16px"
-                        textAlign={"left"}
-                      >
-                        <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                          Reject Reason
-                        </Typography>
-                        <Typography variant="body1" sx={{ color: "red" }}>
-                          {drawerDetails?.reason}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  ) : null}
-                  {drawerDetails.status === "Pending" && (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        marginTop: "20px",
-                      }}
-                    ></Box>
-                  )}
-                </div>
-              </Box>
+              {calendarView === "month" && (
+                <FormControl variant="outlined" fullWidth size="small">
+                  <Select
+                    value={selectedMonth}
+                    onChange={handleMonthChange}
+                    fullWidth
+                  >
+                    {renderMonths()}
+                  </Select>
+                </FormControl>
+              )}
+
+              {calendarView === "year" && (
+                <FormControl variant="outlined" fullWidth size="small">
+                  <Select
+                    value={selectedYear}
+                    onChange={handleYearChange}
+                    fullWidth
+                  >
+                    {renderYears()}
+                  </Select>
+                </FormControl>
+              )}
             </Box>
-          </>
-        )}
-      </Drawer>
+          </Box>
+        </Box>
+
+        <br />
+        <Box
+          sx={{
+            display: "flex",
+            backgroundColor: "#fff",
+            padding: "10px",
+            borderRadius: "5px",
+          }}
+        >
+          <Box sx={{ width: "60%" }}>
+            {/* {JSON.stringify(coinsData)} */}
+            <CSmartTable
+              cleaner
+              clickableRows
+              columns={servicecolumns}
+              columnFilter
+              columnSorter
+              items={tableData}
+              tableFilter
+              itemsPerPageSelect={{
+                label: "Items helo per page",
+                values: [10, 20, 30, 50, 100], // Options for items per page
+                onItemsPerPageChange: handleItemsPerPageChange, // Function to handle change
+              }}
+              itemsPerPage={itemsPerPage} // Number of items per page
+              activePage={currentPage} // Current page number
+              onActivePageChange={handlePageChange} // Function
+              tableProps={{
+                className: "add-this-class red-border",
+                responsive: true,
+                striped: true,
+                hover: true,
+              }}
+              // onRowClick={(item) => handleRowClick(item)}
+              tableBodyProps={{
+                className: "align-middle tableData",
+              }}
+              scopedColumns={{
+                S_no: (_item: any, index: number) => {
+                  return <td>{index + 1}</td>;
+                },
+              }}
+            />
+          </Box>
+          <Box sx={{ padding: "20px" }}>
+            <Container>
+              <Typography variant="h6">
+                Pie Chart based on Type Of Service
+              </Typography>
+              <Pie data={typeData} options={pieOptions} />{" "}
+            </Container>
+          </Box>
+        </Box>
+
+        <Box
+          sx={{
+            display: "flex",
+            backgroundColor: "#fff",
+            padding: "10px",
+            marginTop: "20px",
+            borderRadius: "5px",
+          }}
+        >
+          <Box sx={{ width: "60%" }}>
+            <CSmartTable
+              // cleaner
+              clickableRows
+              columns={projectcolumns}
+              // columnFilter
+              // columnSorter
+              items={tableData}
+              itemsPerPageSelect
+              itemsPerPage={10}
+              pagination
+              // tableFilter
+              tableProps={{
+                className: "add-this-class red-border",
+                responsive: true,
+                striped: true,
+                hover: true,
+              }}
+              // onRowClick={(item) => handleRowClick(item)}
+              tableBodyProps={{
+                className: "align-middle tableData",
+              }}
+              scopedColumns={{
+                S_no: (_item: any, index: number) => {
+                  return <td>{index + 1}</td>;
+                },
+              }}
+            />
+          </Box>
+          <Box sx={{ padding: "20px" }}>
+            <Container>
+              <Typography variant="h6">
+                Chart based on Project / Department Name
+              </Typography>
+              <Pie data={deptData} options={pieOptions} />{" "}
+            </Container>
+          </Box>
+        </Box>
+      </div>
     </>
   );
 };
