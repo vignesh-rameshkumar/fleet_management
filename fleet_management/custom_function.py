@@ -129,3 +129,38 @@ def get_travel_route_report_by_email(employee_email):
         results.append(combined_data)
 
     return results
+@frappe.whitelist()
+def get_bill_details(request_id):
+    try:
+        # Fetch the document for the specified request_id from FM_Bills
+        bill_doc = frappe.get_all(
+            "FM_Bills",
+            filters={"request_id": request_id},
+            fields=["name", "creation"]  # Fetch the name and creation date of the document
+        )
+
+        if not bill_doc:
+            return {"message": "No document found with the provided request_id", "bill_details": [], "creation": None}
+
+        # Assuming there's only one document for the given request_id
+        document_name = bill_doc[0].name
+        creation_date = bill_doc[0].creation
+
+        # Retrieve the document to access the child table data
+        bill_doc = frappe.get_doc("FM_Bills", document_name)
+
+        # Retrieve the meta information for FM_Bill_Parameters to get all child field names
+        bill_parameters_meta = frappe.get_meta("FM_Bill_Parameters")
+        bill_details = []
+
+        # Iterate over each row in the child table (FM_Bill_Parameters)
+        for param in bill_doc.bill_details:
+            child_data = {field.fieldname: param.get(field.fieldname) for field in bill_parameters_meta.fields}
+            bill_details.append(child_data)
+
+        # Return the bill details along with the creation date
+        return {"bill_details": bill_details, "creation": creation_date}
+    except Exception as e:
+        frappe.log_error(message=str(e), title="Error in get_bill_details")
+        return {"error": str(e), "bill_details": [], "creation": None}
+

@@ -7,10 +7,25 @@ import {
   Typography,
   Grid,
   CircularProgress,
+  Select,
+  Card,
+  FormControl,
+  MenuItem,
+  CardContent,
+  ToggleButton,
+  ToggleButtonGroup,
+  InputLabel,
+  SvgIcon,
 } from "@mui/material";
+import dayjs from "dayjs";
 import { MdOutlineVisibility, MdDeleteForever } from "react-icons/md";
-import { useFrappeGetDocList, useFrappeUpdateDoc } from "frappe-react-sdk";
-
+import {
+  useFrappeGetDocList,
+  useFrappeUpdateDoc,
+  useFrappeGetCall,
+} from "frappe-react-sdk";
+import { IoCarSportSharp } from "react-icons/io5";
+import { PiCoinsBold } from "react-icons/pi";
 interface DepartmentSpendsProps {
   darkMode: boolean;
   onCloseDrawer: () => void;
@@ -30,7 +45,17 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
   const [tableData, setTableData] = useState<any[]>([]);
   const [drawerData, setDrawerData] = useState<any[]>([]);
   const [view, setView] = useState<boolean>(false);
-
+  const [billData, setBillData] = useState<any[]>([]);
+  const [calendarView, setCalendarView] = useState("day"); // Default to "day"
+  const [selectedDay, setSelectedDay] = useState(dayjs().format("YYYY-MM-DD")); // Current date
+  const [selectedWeek, setSelectedWeek] = useState({
+    start: dayjs().startOf("week").format("YYYY-MM-DD"),
+    end: dayjs().endOf("week").format("YYYY-MM-DD"),
+  });
+  const [selectedMonth, setSelectedMonth] = useState(dayjs().format("MMMM"));
+  const [selectedYear, setSelectedYear] = useState(dayjs().year());
+  const [projectleadlist, setProjectleadlist] = useState<any[]>([]);
+  const [selectedProjectName, setSelectedProjectName] = useState<string>("");
   useEffect(() => {
     const filterInput = document.querySelector(".form-control");
     if (filterInput) {
@@ -38,11 +63,125 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
     }
   }, []);
 
+  // handle calendar
+  const handleProjectNameChange = (
+    event: React.ChangeEvent<{ value: unknown }>
+  ) => {
+    setSelectedProjectName(event.target.value as string);
+  };
+  // Functions to handle changes in calendar views and pagination
+  const handleViewChange = (event, newView) => {
+    if (newView !== null) {
+      setCalendarView(newView);
+      if (newView === "day") {
+        setSelectedDay(dayjs().format("YYYY-MM-DD"));
+      } else if (newView === "week") {
+        setSelectedWeek({
+          start: dayjs().startOf("week").format("YYYY-MM-DD"),
+          end: dayjs().endOf("week").format("YYYY-MM-DD"),
+        });
+      } else if (newView === "month") {
+        setSelectedMonth(dayjs().format("MMMM"));
+      } else if (newView === "year") {
+        setSelectedYear(dayjs().year());
+      }
+    }
+  };
+
+  const handleDayChange = (event) => {
+    setSelectedDay(event.target.value);
+  };
+
+  const handleWeekChange = (start, end) => {
+    setSelectedWeek({ start, end });
+  };
+
+  const handleMonthChange = (event) => {
+    setSelectedMonth(event.target.value);
+  };
+
+  const handleYearChange = (event) => {
+    setSelectedYear(event.target.value);
+  };
+
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const renderMonths = () => {
+    return months.map((month) => (
+      <MenuItem key={month} value={month}>
+        {month}
+      </MenuItem>
+    ));
+  };
+  const renderYears = () => {
+    const currentYear = dayjs().year();
+    const startYear = 2000;
+    const years = [];
+    for (let year = startYear; year <= currentYear; year++) {
+      years.push(year);
+    }
+    return years.map((year) => (
+      <MenuItem key={year} value={year}>
+        {year}
+      </MenuItem>
+    ));
+  };
+
+  const getFilter = () => {
+    if (calendarView === "day") {
+      const startOfDay = selectedDay + " 00:00:00";
+      const endOfDay = selectedDay + " 23:59:59";
+      return [
+        ["creation", ">=", startOfDay],
+        ["creation", "<=", endOfDay],
+      ];
+    } else if (calendarView === "week") {
+      const startOfWeek = selectedWeek.start + " 00:00:00";
+      const endOfWeek = selectedWeek.end + " 23:59:59";
+      return [
+        ["creation", ">=", startOfWeek],
+        ["creation", "<=", endOfWeek],
+      ];
+    } else if (calendarView === "month") {
+      const startOfMonth = dayjs()
+        .month(months.indexOf(selectedMonth))
+        .startOf("month")
+        .format("YYYY-MM-DD");
+      const endOfMonth = dayjs()
+        .month(months.indexOf(selectedMonth))
+        .endOf("month")
+        .format("YYYY-MM-DD");
+      return [
+        ["creation", ">=", `${startOfMonth} 00:00:00`],
+        ["creation", "<=", `${endOfMonth} 23:59:59`],
+      ];
+    } else if (calendarView === "year") {
+      const startOfYear = `${selectedYear}-01-01 00:00:00`;
+      const endOfYear = `${selectedYear}-12-31 23:59:59`;
+      return [
+        ["creation", ">=", startOfYear],
+        ["creation", "<=", endOfYear],
+      ];
+    }
+    return [];
+  };
   const { data: FM_Request_Master, isLoading } = useFrappeGetDocList(
     "FM_Request_Master",
     {
       fields: ["*"],
-      filters: [["owner", "=", userEmailId]],
+      filters: getFilter(),
 
       orderBy: {
         field: "modified",
@@ -60,6 +199,8 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
 
   const doctypeName = drawerDetails.doctypename;
   const documentName = drawerDetails.request_id;
+  // const bill_details = billData?.message?.bill_details;
+
   const { data: specificData, isLoading: isLoadingSpecific } =
     useFrappeGetDocList(doctypeName || "", {
       fields: ["*"],
@@ -77,6 +218,45 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
       setDrawerData(specificData);
     }
   }, [specificData]);
+
+  const { data: FM_Bills_Projectlead } = useFrappeGetCall(
+    "fleet_management.custom_function.get_bill_details",
+    {
+      request_id: drawerDetails.request_id,
+    }
+  );
+
+  useEffect(() => {
+    if (FM_Bills_Projectlead?.message?.bill_details) {
+      setBillData(FM_Bills_Projectlead.message.bill_details);
+    } else {
+      console.error(
+        "Bill details are not available",
+        FM_Bills_Projectlead?.error
+      );
+    }
+  }, [FM_Bills_Projectlead]);
+  console.log("selectedProjectName", selectedProjectName);
+  // Fetch and set Project_Lead_List
+  const { data: Project_Lead_List, isLoading: projectnameloading } =
+    useFrappeGetDocList("RM_Project_Lead", {
+      fields: ["*"],
+      filters: [["project_lead_email", "=", userEmailId]],
+      orderBy: {
+        field: "modified",
+        order: "desc",
+      },
+    });
+
+  useEffect(() => {
+    if (Project_Lead_List) {
+      setProjectleadlist(Project_Lead_List);
+      // Set the default selected project to the first project in the list
+      if (Project_Lead_List.length > 0) {
+        setSelectedProjectName(Project_Lead_List[0].project_name);
+      }
+    }
+  }, [Project_Lead_List]);
 
   // Handle drawer toggle
   const toggleDrawer = (open: boolean) => {
@@ -143,36 +323,10 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
       filter: true,
       sorter: true,
     },
-    {
-      key: "project_name",
-      label: "Project Name",
-      _style: {
-        width: "15%",
-        fontSize: "14px",
-        textAlign: "center",
-        color: darkMode ? "#FFF" : "#222222",
-        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
-      },
-      filter: true,
-      sorter: true,
-    },
 
     {
       key: "bill_amount",
       label: "Coins Consumed",
-      _style: {
-        width: "15%",
-        fontSize: "14px",
-        textAlign: "center",
-        color: darkMode ? "#FFF" : "#222222",
-        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
-      },
-      filter: true,
-      sorter: true,
-    },
-    {
-      key: "payment_status",
-      label: "Payment Status",
       _style: {
         width: "15%",
         fontSize: "14px",
@@ -222,10 +376,10 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
     setDrawerDetails(item);
   };
 
-  const totalcoinAmount = tableData.reduce(
-    (acc, item) => acc + parseFloat(item.bill_amount || 0),
-    0
-  );
+  // const totalcoinAmount = tableData.reduce(
+  //   (acc, item) => acc + parseFloat(item.bill_amount || 0),
+  //   0
+  // );
 
   return (
     <>
@@ -252,7 +406,7 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
           padding: "15px",
         }}
       >
-        <Box
+        {/* <Box
           sx={{
             color: "#000",
             backgroundColor: "#a5d0a9",
@@ -265,14 +419,196 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
           }}
         >
           Coins Consumed : {totalcoinAmount}
+        </Box> */}
+        <Box
+          sx={{
+            display: "flex",
+            gap: 2, // Adjusted gap for better spacing
+            p: 2,
+            flexWrap: "wrap",
+            alignItems: "center", // Aligned items to the center
+            justifyContent: "space-between", // Distributes items evenly across the row
+          }}
+        >
+          {/* Project Name Dropdown */}
+          <Box sx={{ flex: "1 1 20%" }}>
+            <FormControl variant="outlined" fullWidth>
+              <InputLabel>Project Name</InputLabel>
+              <Select
+                value={selectedProjectName}
+                onChange={handleProjectNameChange}
+                label="Project Name"
+              >
+                {projectleadlist.map((project, index) => (
+                  <MenuItem
+                    key={project.name}
+                    value={project.project_name}
+                    style={{
+                      backgroundColor:
+                        selectedProjectName === project.project_name
+                          ? index === 0
+                            ? "#ADD8E6"
+                            : "lightgreen"
+                          : "transparent",
+                    }}
+                  >
+                    {project.project_name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+
+          {/* Total Project Spends Card */}
+          <Box sx={{ flex: "2 1 20%" }}>
+            <Card
+              sx={{
+                borderLeft: "solid 5px blue",
+                backgroundColor: "white",
+                width: "100%", // Ensure the card takes up available width within the flexbox
+                height: "100px", // Adjusted height for a smaller card
+                padding: "4px", // Adjusted padding inside the card
+              }}
+            >
+              <CardContent sx={{ padding: "8px" }}>
+                <Typography
+                  variant="h6"
+                  align="center"
+                  sx={{ mb: 1, fontSize: "0.875rem" }}
+                >
+                  Total Project Spends
+                </Typography>
+                <Grid
+                  container
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <Grid item>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <IoCarSportSharp />
+                      <Typography
+                        variant="body1"
+                        sx={{ ml: 1, fontSize: "0.875rem" }}
+                      >
+                        24
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <PiCoinsBold />
+                      <Typography
+                        variant="body1"
+                        sx={{ ml: 1, fontSize: "0.875rem" }}
+                      >
+                        100000000
+                      </Typography>
+                    </Box>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Box>
+
+          {/* Calendar View Selector and Date Input */}
+          <Box
+            sx={{
+              display: "flex",
+              flex: "1 1 40%", // Adjusted flex properties for better scaling
+              gap: 2,
+              alignItems: "center", // Center items vertically
+              justifyContent: "flex-end", // Align to the right
+            }}
+          >
+            <ToggleButtonGroup
+              value={calendarView}
+              exclusive
+              onChange={handleViewChange}
+              aria-label="Calendar View Selector"
+              size="small"
+              sx={{
+                "& .MuiToggleButton-root": {
+                  padding: "4px 8px",
+                  fontSize: "0.8rem",
+                },
+                "& .MuiToggleButton-root.Mui-selected": {
+                  backgroundColor: "#5C8A58",
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: "#4A7046",
+                  },
+                },
+              }}
+            >
+              <ToggleButton value="day">Day</ToggleButton>
+              <ToggleButton value="week">Week</ToggleButton>
+              <ToggleButton value="month">Month</ToggleButton>
+              <ToggleButton value="year">Year</ToggleButton>
+            </ToggleButtonGroup>
+
+            <Box sx={{ flex: 1 }}>
+              {calendarView === "day" && (
+                <input
+                  type="date"
+                  value={selectedDay}
+                  onChange={handleDayChange}
+                  style={{ width: "100%", padding: "4px", fontSize: "14px" }}
+                />
+              )}
+              {calendarView === "week" && (
+                <Box sx={{ display: "flex", gap: "4px" }}>
+                  <input
+                    type="date"
+                    value={selectedWeek.start}
+                    onChange={(e) =>
+                      handleWeekChange(e.target.value, selectedWeek.end)
+                    }
+                    style={{ flex: 1, padding: "4px", fontSize: "14px" }}
+                  />
+                  <input
+                    type="date"
+                    value={selectedWeek.end}
+                    onChange={(e) =>
+                      handleWeekChange(selectedWeek.start, e.target.value)
+                    }
+                    style={{ flex: 1, padding: "4px", fontSize: "14px" }}
+                  />
+                </Box>
+              )}
+              {calendarView === "month" && (
+                <FormControl variant="outlined" fullWidth size="small">
+                  <Select
+                    value={selectedMonth}
+                    onChange={handleMonthChange}
+                    fullWidth
+                  >
+                    {renderMonths()}
+                  </Select>
+                </FormControl>
+              )}
+              {calendarView === "year" && (
+                <FormControl variant="outlined" fullWidth size="small">
+                  <Select
+                    value={selectedYear}
+                    onChange={handleYearChange}
+                    fullWidth
+                  >
+                    {renderYears()}
+                  </Select>
+                </FormControl>
+              )}
+            </Box>
+          </Box>
         </Box>
+
+        {/* {JSON.stringify(FM_Bills_Projectlead)} */}
         <CSmartTable
           cleaner
           clickableRows
           columns={columns}
           columnFilter
           columnSorter
-          items={tableData}
+          items={tableData.filter((item) => item.bill_amount !== null)}
           itemsPerPageSelect
           itemsPerPage={10}
           pagination
@@ -584,7 +920,49 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
                         </Grid>
                       </>
                     )}
+                    <table className="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th>Parameter</th>
+                          <th>Cost per Qty</th>
+                          <th>Total Qty</th>
+                          <th>Coins</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {billData?.map((item, index) => {
+                          const calculatedCoins =
+                            item?.cost_per_qty * item?.total_quantity;
+
+                          return (
+                            <tr key={index}>
+                              <td>{item?.parameter || "N/A"}</td>
+                              <td>{item?.cost_per_qty || "N/A"}</td>
+                              <td>{item?.total_quantity || "N/A"}</td>
+                              <td>{calculatedCoins || "N/A"}</td>
+                            </tr>
+                          );
+                        })}
+                        <tr>
+                          <td colSpan="3" style={{ textAlign: "right" }}>
+                            <strong>Total Amount:</strong>
+                          </td>
+                          <td>
+                            <strong>
+                              {billData?.reduce(
+                                (acc, item) =>
+                                  acc +
+                                  (item?.cost_per_qty || 0) *
+                                    (item?.total_quantity || 0),
+                                0
+                              )}
+                            </strong>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </Grid>
+
                   <br />
                   {drawerDetails?.status === "Rejected" ||
                   drawerDetails?.status === "Project Lead Rejected" ? (

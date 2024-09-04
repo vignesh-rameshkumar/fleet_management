@@ -42,7 +42,7 @@ const ProjectSpends: React.FC<ProjectSpendsProps> = ({
     "FM_Request_Master",
     {
       fields: ["*"],
-      filters: [["owner", "=", userEmailId]],
+      // filters: [["owner", "=", userEmailId]],
 
       orderBy: {
         field: "modified",
@@ -60,6 +60,7 @@ const ProjectSpends: React.FC<ProjectSpendsProps> = ({
 
   const doctypeName = drawerDetails.doctypename;
   const documentName = drawerDetails.request_id;
+  
   const { data: specificData, isLoading: isLoadingSpecific } =
     useFrappeGetDocList(doctypeName || "", {
       fields: ["*"],
