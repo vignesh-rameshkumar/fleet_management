@@ -143,6 +143,7 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
   const getFilter = (): [string, string, string][] => {
     let filters: [string, string, string][] = [];
 
+    // Check for calendar-based filters
     if (calendarView === "day") {
       const startOfDay = selectedDay + " 00:00:00";
       const endOfDay = selectedDay + " 23:59:59";
@@ -179,7 +180,10 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
       ];
     }
 
-    // Add the project_name filter to the existing filters
+    // Add the ride_status filter
+    filters.push(["ride_status", "=", "Completed"]);
+
+    // Add the department name filter if available
     if (selectedDepartmentName) {
       filters.push(["department", "=", selectedDepartmentName]);
     }

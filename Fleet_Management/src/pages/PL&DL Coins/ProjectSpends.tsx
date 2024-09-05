@@ -177,10 +177,12 @@ const ProjectSpends: React.FC<ProjectSpendsProps> = ({
         ["creation", "<=", endOfYear],
       ];
     }
+    // Add the ride_status filter
+    filters.push(["ride_status", "=", "Completed"]);
 
     // Add the project_name filter to the existing filters
     if (selectedProjectName) {
-      filters.push(["department", "=", selectedProjectName]);
+      filters.push(["project_name", "=", selectedProjectName]);
     }
 
     return filters;

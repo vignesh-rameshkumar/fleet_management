@@ -161,7 +161,8 @@ const Coin: React.FC<CoinProps> = ({
   };
   const getFilter = () => {
     const filters = [
-      ["owner", "=", userEmailId], // Filter by user email ID
+      ["employee_email", "=", userEmailId], // Filter by user email ID
+      ["ride_status", "=", "Completed"], // Filter by ride status
     ];
 
     if (calendarView === "day") {

@@ -86,7 +86,7 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
     "FM_Request_Master",
     {
       fields: ["*"],
-      // filters: [["ride_status", "=", "Completed"]],
+      filters: [["ride_status", "=", "Completed"]],
       orderBy: {
         field: "modified",
         order: "desc",
@@ -536,7 +536,7 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
                 alignItems: "center",
                 justifyContent: "center",
                 minWidth: "200px",
-                width:"38%"
+                width: "38%",
               }}
             >
               <Typography
@@ -565,7 +565,7 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
                 </Typography>
               </Box>
             </Box>
-            <Box sx={{ flex: 1,padding:4 }}>
+            <Box sx={{ flex: 1, padding: 4 }}>
               <Box
                 sx={{
                   display: "flex",
@@ -619,13 +619,8 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
           columnSorter
           items={
             activeLog === "bookRide"
-              ? tableData.filter(
-                  (item) =>
-                    item.bill_amount === null ||
-                    item.bill_amount === "" ||
-                    item.bill_amount === 0
-                ) // Filter when bill_amount is null, empty, or 0
-              : travelData?.message || [] // Fallback if travelData.message is undefined
+              ? tableData // Show tableData when activeLog is "bookRide"
+              : travelData?.message || [] // Fallback to travelData.message if available, or an empty array
           }
           itemsPerPage={itemsPerPage} // Current items per page
           activePage={currentPage} // Current page
