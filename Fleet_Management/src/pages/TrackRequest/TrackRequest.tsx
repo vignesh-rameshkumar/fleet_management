@@ -1190,18 +1190,18 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
                     )}
                     {doctypeNames !== "FM_Equipment_Vehicle_Request" && (
                       <>
-                          <Grid item xs={12} sm={6}>
-                            <Typography variant="body1">From Location</Typography>
-                            <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                              {drawerData[0]?.from_location || "N/A"}
-                            </Typography>
-                          </Grid>
-                          <Grid item xs={12} sm={6}>
-                            <Typography variant="body1">To Location</Typography>
-                            <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                              {drawerData[0]?.to_location || "N/A"}
-                            </Typography>
-                          </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="body1">From Location</Typography>
+                          <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                            {drawerData[0]?.from_location || "N/A"}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="body1">To Location</Typography>
+                          <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                            {drawerData[0]?.to_location || "N/A"}
+                          </Typography>
+                        </Grid>
                       </>
                     )}
                     {doctypeNames === "FM_Equipment_Vehicle_Request" && (
@@ -2488,7 +2488,8 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
 
         {btnShow && (
           <>
-            {drawerDetails.status === "Pending" && (
+            {(drawerDetails.status === "Pending" ||
+              drawerDetails.employee_email === drawerDetails.reports_to) && (
               <Box
                 sx={{
                   display: "flex",
