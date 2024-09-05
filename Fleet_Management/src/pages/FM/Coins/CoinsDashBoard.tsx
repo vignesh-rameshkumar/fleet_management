@@ -549,10 +549,10 @@ const CoinsDashBoard: React.FC<CoinsDashBoardProps> = ({
             backgroundColor: "#fff",
             padding: "10px",
             borderRadius: "5px",
+            flexDirection: { xs: "column", md: "row" }, // Responsive stacking
           }}
         >
-          <Box sx={{ width: "60%" }}>
-            {/* {JSON.stringify(coinsData)} */}
+          <Box sx={{ width: { xs: "100%", md: "60%" } }}>
             <CSmartTable
               cleaner
               clickableRows
@@ -562,36 +562,43 @@ const CoinsDashBoard: React.FC<CoinsDashBoardProps> = ({
               items={tableData}
               tableFilter
               itemsPerPageSelect={{
-                label: "Items helo per page",
-                values: [10, 20, 30, 50, 100], // Options for items per page
-                onItemsPerPageChange: handleItemsPerPageChange, // Function to handle change
+                label: "Items per page",
+                values: [10, 20, 30, 50, 100],
+                onItemsPerPageChange: handleItemsPerPageChange,
               }}
-              itemsPerPage={itemsPerPage} // Number of items per page
-              activePage={currentPage} // Current page number
-              onActivePageChange={handlePageChange} // Function
+              itemsPerPage={itemsPerPage}
+              activePage={currentPage}
+              onActivePageChange={handlePageChange}
               tableProps={{
                 className: "add-this-class red-border",
                 responsive: true,
                 striped: true,
                 hover: true,
               }}
-              // onRowClick={(item) => handleRowClick(item)}
               tableBodyProps={{
                 className: "align-middle tableData",
               }}
               scopedColumns={{
-                S_no: (_item: any, index: number) => {
-                  return <td>{index + 1}</td>;
-                },
+                S_no: (_item: any, index: number) => <td>{index + 1}</td>,
               }}
             />
           </Box>
-          <Box sx={{ padding: "20px" }}>
-            <Container>
-              <Typography variant="h6">
+          <Box
+            sx={{
+              padding: "20px",
+              width: { xs: "100%", md: "40%" },
+              display: "flex",
+              justifyContent: "center", // Center the chart horizontally
+              alignItems: "center", // Vertically align the chart
+            }}
+          >
+            <Container sx={{ maxWidth: "350px" }}>
+              {" "}
+              {/* Increased maxWidth to improve alignment */}
+              <Typography variant="h6" align="center">
                 Pie Chart based on Type Of Service
               </Typography>
-              <Pie data={typeData} options={pieOptions} />{" "}
+              <Pie data={typeData} options={pieOptions} />
             </Container>
           </Box>
         </Box>
@@ -603,43 +610,45 @@ const CoinsDashBoard: React.FC<CoinsDashBoardProps> = ({
             padding: "10px",
             marginTop: "20px",
             borderRadius: "5px",
+            flexDirection: { xs: "column", md: "row" },
           }}
         >
-          <Box sx={{ width: "60%" }}>
+          <Box sx={{ width: { xs: "100%", md: "60%" } }}>
             <CSmartTable
-              // cleaner
               clickableRows
               columns={projectcolumns}
-              // columnFilter
-              // columnSorter
               items={tableData}
               itemsPerPageSelect
               itemsPerPage={10}
               pagination
-              // tableFilter
               tableProps={{
                 className: "add-this-class red-border",
                 responsive: true,
                 striped: true,
                 hover: true,
               }}
-              // onRowClick={(item) => handleRowClick(item)}
               tableBodyProps={{
                 className: "align-middle tableData",
               }}
               scopedColumns={{
-                S_no: (_item: any, index: number) => {
-                  return <td>{index + 1}</td>;
-                },
+                S_no: (_item: any, index: number) => <td>{index + 1}</td>,
               }}
             />
           </Box>
-          <Box sx={{ padding: "20px" }}>
-            <Container>
-              <Typography variant="h6">
+          <Box
+            sx={{
+              padding: "20px",
+              width: { xs: "100%", md: "40%" },
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Container sx={{ maxWidth: "350px" }}>
+              <Typography variant="h6" align="center">
                 Chart based on Project / Department Name
               </Typography>
-              <Pie data={deptData} options={pieOptions} />{" "}
+              <Pie data={deptData} options={pieOptions} />
             </Container>
           </Box>
         </Box>

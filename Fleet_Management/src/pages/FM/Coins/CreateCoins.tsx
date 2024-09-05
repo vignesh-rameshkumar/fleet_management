@@ -345,7 +345,7 @@ const CreateCoins: React.FC<CreateCoinsProps> = ({
           padding: "15px",
         }}
       >
-        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Box sx={{ display: "flex", justifyContent: "space-around" }}>
           {" "}
           <Box sx={{ display: "flex", justifyContent: "start" }}>
             <Box
@@ -394,10 +394,34 @@ const CreateCoins: React.FC<CreateCoinsProps> = ({
               aria-label="Month Year Selector"
               sx={{ marginRight: "20px" }}
             >
-              <ToggleButton value="month" aria-label="Month">
+              <ToggleButton
+                value="month"
+                aria-label="Month"
+                sx={{
+                  "&.Mui-selected": {
+                    backgroundColor: "#5C8A58", // Active background color
+                    color: "white", // Active text color
+                    "&:hover": {
+                      backgroundColor: "#4e724a", // Slightly darker hover color
+                    },
+                  },
+                }}
+              >
                 Month
               </ToggleButton>
-              <ToggleButton value="year" aria-label="Year">
+              <ToggleButton
+                value="year"
+                aria-label="Year"
+                sx={{
+                  "&.Mui-selected": {
+                    backgroundColor: "#5C8A58", // Active background color
+                    color: "white", // Active text color
+                    "&:hover": {
+                      backgroundColor: "#4e724a", // Slightly darker hover color
+                    },
+                  },
+                }}
+              >
                 Year
               </ToggleButton>
             </ToggleButtonGroup>

@@ -13,6 +13,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
+import { PiCoins } from "react-icons/pi";
 import { MdOutlineVisibility, MdDeleteForever } from "react-icons/md";
 import { CFormSelect } from "@coreui/react";
 import {
@@ -47,7 +48,7 @@ const TrackBills: React.FC<TrackBillsProps> = ({
   const [childTravelData, setChildTravelData] = useState<any[]>([]);
   const [view, setView] = useState<boolean>(false);
   const [activeLog, setActiveLog] = useState("bookRide");
-  const [totalBillAmount, setTotalBillAmount] = useState(0);
+  // const [totalBillAmount, setTotalBillAmount] = useState(0);
   const [calendarView, setCalendarView] = useState("day"); // Default to "day"
   const [selectedDay, setSelectedDay] = useState(dayjs().format("YYYY-MM-DD")); // Current date
   const [selectedWeek, setSelectedWeek] = useState({
@@ -477,10 +478,6 @@ const TrackBills: React.FC<TrackBillsProps> = ({
     setDrawerDetails(item);
   };
 
-  const totalcoinAmount = tableData.reduce(
-    (acc, item) => acc + parseFloat(item.bill_amount || 0),
-    0
-  );
   const filteredData = tableData.filter((item) => {
     if (activeLog === "bookRide") {
       return item.doctype_name !== "FM_Travel_Route_Report";
@@ -489,6 +486,12 @@ const TrackBills: React.FC<TrackBillsProps> = ({
     }
     return true; // In case activeLog has a different value, show all items
   });
+  const totalcoinAmount = filteredData.reduce(
+    (acc, item) => acc + parseFloat(item.bill_amount || 0),
+    0
+  );
+  const tableDataLength = filteredData.length;
+
   return (
     <>
       <Box
@@ -514,188 +517,217 @@ const TrackBills: React.FC<TrackBillsProps> = ({
           padding: "15px",
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: { xs: "column", md: "row" }, // Stack vertically on small screens, horizontal on medium and up
-            justifyContent: "space-between",
-            margin: "10px",
-            // gap: "10px",
-            // backgroundColor: "blue",
-          }}
-        >
+        <Box sx={{ padding: "20px" }}>
           <Box
             sx={{
-              backgroundColor: "#DAEAEA",
-              padding: "10px 20px",
-              borderRadius: "4px",
-              borderTop: "4px solid #5A6868",
               display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "fit-content",
-              // gap: "240px",
-              marginBottom: { xs: "10px", md: "0" }, // Adjust margin for separation
-              // marginRight: "90px",
+              flexDirection: { xs: "column", md: "row" },
+              alignItems: { xs: "stretch", md: "center" },
+              justifyContent: "space-between",
+              gap: "20px",
             }}
           >
-            <Typography
+            {/* Bills To Be Generated */}
+            <Box
               sx={{
-                color: "#5A6868",
-                fontSize: { xs: "12px", md: "14px" }, // Responsive font size
-                fontWeight: 600,
-                marginBottom: "8px",
-                textAlign: "center",
-                width: { xs: "100%", md: "100%" },
+                backgroundColor: "#DAEAEA",
+                padding: "10px 20px",
+                borderRadius: "4px",
+                borderTop: "4px solid #5A6868",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                minWidth: "200px",
               }}
             >
-              Bills To Be Generated
-            </Typography>
+              <Typography
+                sx={{
+                  color: "#5A6868",
+                  fontSize: { xs: "12px", md: "14px" },
+                  fontWeight: 600,
+                  marginBottom: "8px",
+                  textAlign: "center",
+                }}
+              >
+                Bills To Be Generated
+              </Typography>
+              <Box sx={{ display: "flex", gap: "45px" }}>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <DirectionsCarFilledIcon
+                    sx={{ color: "#5A6868", marginRight: "5px" }}
+                  />
+                  <Typography
+                    sx={{
+                      fontSize: { xs: "18px", md: "24px" },
+                      fontWeight: 700,
+                      color: "#5A6868",
+                    }}
+                  >
+                    {tableDataLength}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <PiCoins
+                    size={24}
+                    style={{ color: "#5A6868", marginRight: "5px" }}
+                  />
+                  <Typography
+                    sx={{
+                      fontSize: { xs: "18px", md: "24px" },
+                      fontWeight: 700,
+                      color: "#5A6868",
+                    }}
+                  >
+                    {totalcoinAmount}
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+            {/* Buttons Section */}
             <Box
               sx={{
                 display: "flex",
-                alignItems: "center",
+                gap: "10px",
               }}
             >
-              <DirectionsCarFilledIcon
-                sx={{ color: "#5A6868", marginRight: "5px" }}
-              />
-              <Typography
+              {["bookRide", "travelRoute"].map((logType) => (
+                <Typography
+                  key={logType}
+                  onClick={() => handleLogClick(logType)}
+                  sx={{
+                    backgroundColor:
+                      activeLog === logType ? "#E5F3E6" : "#f5f5f5",
+                    cursor: "pointer",
+                    padding: "8px",
+                    borderRadius: "4px 4px 0 0",
+                    minWidth: "120px",
+                    textAlign: "center",
+                    fontSize: { xs: "12px", md: "14px" },
+                    fontWeight: 600,
+                    color: activeLog === logType ? "#375d33" : "#A1A1A1",
+                    height: "40px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderBottom:
+                      activeLog === logType
+                        ? "2px solid #487644"
+                        : "2px solid transparent",
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      backgroundColor:
+                        activeLog === logType ? "#E5F3E6" : "#e0e0e0",
+                    },
+                  }}
+                >
+                  {logType === "bookRide" ? "Booked Rides" : "Travel Route"}
+                </Typography>
+              ))}
+            </Box>
+            {/* Calendar and Buttons */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", md: "row" },
+                alignItems: { xs: "stretch", md: "center" },
+                gap: "20px",
+                flex: 1,
+              }}
+            >
+              {/* Calendar Section */}
+              <Box
                 sx={{
-                  fontSize: { xs: "18px", md: "24px" }, // Responsive font size
-                  fontWeight: 700,
-                  color: "#5A6868",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  flex: 1,
                 }}
               >
-                {totalBillAmount}
-              </Typography>
-            </Box>
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" }, // Stack vertically on small screens, horizontal on medium and up
-              gap: "5px",
-              margin: "10px",
-              width: "100%", // Full width on small screens
-              // justifyContent: "center",
-            }}
-          >
-            <Typography
-              onClick={() => handleLogClick("bookRide")}
-              sx={{
-                backgroundColor:
-                  activeLog === "bookRide" ? "#E5F3E6" : "#f5f5f5",
-                cursor: "pointer",
-                padding: "8px",
-                borderRadius: "4px 4px 0 0",
-                width: { xs: "100%", sm: "45%", md: "25%" }, // Responsive width
-                display: "flex",
-                justifyContent: "center",
-                fontSize: { xs: "12px", md: "14px" }, // Responsive font size
-                fontWeight: 600,
-                color: activeLog === "bookRide" ? "#375d33" : "#A1A1A1",
-                height: "8vh",
-                borderBottom:
-                  activeLog === "bookRide"
-                    ? "2px solid #487644"
-                    : "2px solid transparent",
-              }}
-            >
-              Booked Rides
-            </Typography>
-            <Typography
-              onClick={() => handleLogClick("travelRoute")}
-              sx={{
-                backgroundColor:
-                  activeLog === "travelRoute" ? "#E5F3E6" : "#f5f5f5",
-                cursor: "pointer",
-                padding: "8px",
-                borderRadius: "4px 4px 0 0",
-                width: { xs: "100%", sm: "45%", md: "25%" }, // Responsive width
-                display: "flex",
-                justifyContent: "center",
-                fontSize: { xs: "12px", md: "14px" }, // Responsive font size
-                fontWeight: 600,
-                color: activeLog === "travelRoute" ? "#375d33" : "#A1A1A1",
-                borderBottom:
-                  activeLog === "travelRoute"
-                    ? "2px solid #487644"
-                    : "2px solid transparent",
-                height: "8vh",
-              }}
-            >
-              Travel Route
-            </Typography>
-          </Box>
-          {/* Calendar Control */}
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "10px",
-            }}
-          >
-            <ToggleButtonGroup
-              value={calendarView}
-              exclusive
-              onChange={handleViewChange}
-              aria-label="Calendar View Selector"
-              sx={{ marginBottom: "10px" }}
-            >
-              <ToggleButton value="day">Day</ToggleButton>
-              <ToggleButton value="week">Week</ToggleButton>
-              <ToggleButton value="month">Month</ToggleButton>
-              <ToggleButton value="year">Year</ToggleButton>
-            </ToggleButtonGroup>
+                <ToggleButtonGroup
+                  value={calendarView}
+                  exclusive
+                  onChange={handleViewChange}
+                  aria-label="Calendar View Selector"
+                  size="small"
+                  sx={{
+                    "& .MuiToggleButton-root": {
+                      padding: "4px 8px",
+                      fontSize: "0.8rem",
+                    },
+                    "& .MuiToggleButton-root.Mui-selected": {
+                      backgroundColor: "#5C8A58",
+                      color: "white",
+                      "&:hover": {
+                        backgroundColor: "#4A7046",
+                      },
+                    },
+                  }}
+                >
+                  <ToggleButton value="day">Day</ToggleButton>
+                  <ToggleButton value="week">Week</ToggleButton>
+                  <ToggleButton value="month">Month</ToggleButton>
+                  <ToggleButton value="year">Year</ToggleButton>
+                </ToggleButtonGroup>
 
-            {calendarView === "day" && (
-              <FormControl variant="outlined">
-                <input
-                  type="date"
-                  value={selectedDay}
-                  onChange={handleDayChange}
-                />
-              </FormControl>
-            )}
-
-            {calendarView === "week" && (
-              <Box>
-                <Typography>Select Start and End Date for Week:</Typography>
-                <input
-                  type="date"
-                  value={selectedWeek.start}
-                  onChange={(e) =>
-                    handleWeekChange(e.target.value, selectedWeek.end)
-                  }
-                />
-                <input
-                  type="date"
-                  value={selectedWeek.end}
-                  onChange={(e) =>
-                    handleWeekChange(selectedWeek.start, e.target.value)
-                  }
-                />
+                <Box sx={{ flex: 1, minWidth: "120px" }}>
+                  {calendarView === "day" && (
+                    <input
+                      type="date"
+                      value={selectedDay}
+                      onChange={handleDayChange}
+                      style={{
+                        width: "100%",
+                        padding: "4px",
+                        fontSize: "14px",
+                      }}
+                    />
+                  )}
+                  {calendarView === "week" && (
+                    <Box sx={{ display: "flex", gap: "4px" }}>
+                      <input
+                        type="date"
+                        value={selectedWeek.start}
+                        onChange={(e) =>
+                          handleWeekChange(e.target.value, selectedWeek.end)
+                        }
+                        style={{ flex: 1, padding: "4px", fontSize: "14px" }}
+                      />
+                      <input
+                        type="date"
+                        value={selectedWeek.end}
+                        onChange={(e) =>
+                          handleWeekChange(selectedWeek.start, e.target.value)
+                        }
+                        style={{ flex: 1, padding: "4px", fontSize: "14px" }}
+                      />
+                    </Box>
+                  )}
+                  {calendarView === "month" && (
+                    <FormControl variant="outlined" fullWidth size="small">
+                      <Select
+                        value={selectedMonth}
+                        onChange={handleMonthChange}
+                        fullWidth
+                      >
+                        {renderMonths()}
+                      </Select>
+                    </FormControl>
+                  )}
+                  {calendarView === "year" && (
+                    <FormControl variant="outlined" fullWidth size="small">
+                      <Select
+                        value={selectedYear}
+                        onChange={handleYearChange}
+                        fullWidth
+                      >
+                        {renderYears()}
+                      </Select>
+                    </FormControl>
+                  )}
+                </Box>
               </Box>
-            )}
-
-            {calendarView === "month" && (
-              <FormControl variant="outlined">
-                <Select value={selectedMonth} onChange={handleMonthChange}>
-                  {renderMonths()}
-                </Select>
-              </FormControl>
-            )}
-
-            {calendarView === "year" && (
-              <FormControl variant="outlined">
-                <Select value={selectedYear} onChange={handleYearChange}>
-                  {renderYears()}
-                </Select>
-              </FormControl>
-            )}
+            </Box>
           </Box>
         </Box>
         {/* {JSON.stringify(drawerDetails)} */}

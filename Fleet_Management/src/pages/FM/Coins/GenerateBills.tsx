@@ -350,7 +350,7 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
   };
 
   const { createDoc } = useFrappeCreateDoc();
-  const { updateDoc, loading, error } = useFrappeUpdateDoc();
+  // const { updateDoc, loading, error } = useFrappeUpdateDoc();
 
   const CreateBillRequest = async () => {
     try {
@@ -392,11 +392,11 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
         throw new Error("Failed to create parent document.");
       }
 
-      // Step 2: Conditionally update the document if activeLog is "travelRoute"
-      if (activeLog === "travelRoute") {
-        const updateData = { total_amount: totalCost.toFixed(2) };
-        await updateDoc("FM_Travel_Route_Report", drawerData.name, updateData);
-      }
+      // // Step 2: Conditionally update the document if activeLog is "travelRoute"
+      // if (activeLog === "travelRoute") {
+      //   const updateData = { total_amount: totalCost.toFixed(2) };
+      //   await updateDoc("FM_Travel_Route_Report", drawerData.name, updateData);
+      // }
 
       // Step 3: Create Child Documents
       const childCreationPromises = rows.map((row) => {
@@ -490,6 +490,7 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
   };
+  const tableDataLength = tableData.length;
   return (
     <>
       <Box
@@ -515,120 +516,94 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
           padding: "15px",
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: { xs: "column", md: "row" }, // Stack vertically on small screens, horizontal on medium and up
-            justifyContent: "space-between",
-            margin: "10px",
-            // gap: "10px",
-            // backgroundColor: "blue",
-          }}
-        >
+        <Box sx={{ padding: "20px" }}>
           <Box
             sx={{
-              backgroundColor: "#DAEAEA",
-              padding: "10px 20px",
-              borderRadius: "4px",
-              borderTop: "4px solid #5A6868",
               display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "fit-content",
-              // gap: "240px",
-              marginBottom: { xs: "10px", md: "0" }, // Adjust margin for separation
-              // marginRight: "90px",
+              flexDirection: { xs: "column", md: "row" },
+              alignItems: { xs: "stretch", md: "flex-start" },
+              gap: "20px",
             }}
           >
-            <Typography
-              sx={{
-                color: "#5A6868",
-                fontSize: { xs: "12px", md: "14px" }, // Responsive font size
-                fontWeight: 600,
-                marginBottom: "8px",
-                textAlign: "center",
-                width: { xs: "100%", md: "100%" },
-              }}
-            >
-              Bills To Be Generated
-            </Typography>
             <Box
               sx={{
+                backgroundColor: "#DAEAEA",
+                padding: "20px",
+                borderRadius: "8px",
+                borderTop: "4px solid #5A6868",
                 display: "flex",
+                flexDirection: "column",
                 alignItems: "center",
+                justifyContent: "center",
+                minWidth: "200px",
+                width:"38%"
               }}
             >
-              <DirectionsCarFilledIcon
-                sx={{ color: "#5A6868", marginRight: "5px" }}
-              />
               <Typography
                 sx={{
-                  fontSize: { xs: "18px", md: "24px" }, // Responsive font size
-                  fontWeight: 700,
                   color: "#5A6868",
+                  fontSize: { xs: "14px", md: "16px" },
+                  fontWeight: 600,
+                  marginBottom: "8px",
+                  textAlign: "center",
                 }}
               >
-                {totalBillAmount}
+                Bills To Be Generated
               </Typography>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <DirectionsCarFilledIcon
+                  sx={{ color: "#5A6868", marginRight: "8px" }}
+                />
+                <Typography
+                  sx={{
+                    fontSize: { xs: "24px", md: "32px" },
+                    fontWeight: 700,
+                    color: "#5A6868",
+                  }}
+                >
+                  {tableDataLength}
+                </Typography>
+              </Box>
             </Box>
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" }, // Stack vertically on small screens, horizontal on medium and up
-              gap: "5px",
-              margin: "10px",
-              width: "100%", // Full width on small screens
-              // justifyContent: "center",
-            }}
-          >
-            <Typography
-              onClick={() => handleLogClick("bookRide")}
-              sx={{
-                backgroundColor:
-                  activeLog === "bookRide" ? "#E5F3E6" : "#f5f5f5",
-                cursor: "pointer",
-                padding: "8px",
-                borderRadius: "4px 4px 0 0",
-                width: { xs: "100%", sm: "45%", md: "25%" }, // Responsive width
-                display: "flex",
-                justifyContent: "center",
-                fontSize: { xs: "12px", md: "14px" }, // Responsive font size
-                fontWeight: 600,
-                color: activeLog === "bookRide" ? "#375d33" : "#A1A1A1",
-                height: "8vh",
-                borderBottom:
-                  activeLog === "bookRide"
-                    ? "2px solid #487644"
-                    : "2px solid transparent",
-              }}
-            >
-              Booked Rides
-            </Typography>
-            <Typography
-              onClick={() => handleLogClick("travelRoute")}
-              sx={{
-                backgroundColor:
-                  activeLog === "travelRoute" ? "#E5F3E6" : "#f5f5f5",
-                cursor: "pointer",
-                padding: "8px",
-                borderRadius: "4px 4px 0 0",
-                width: { xs: "100%", sm: "45%", md: "25%" }, // Responsive width
-                display: "flex",
-                justifyContent: "center",
-                fontSize: { xs: "12px", md: "14px" }, // Responsive font size
-                fontWeight: 600,
-                color: activeLog === "travelRoute" ? "#375d33" : "#A1A1A1",
-                borderBottom:
-                  activeLog === "travelRoute"
-                    ? "2px solid #487644"
-                    : "2px solid transparent",
-                height: "8vh",
-              }}
-            >
-              Travel Route
-            </Typography>
+            <Box sx={{ flex: 1,padding:4 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: { xs: "column", sm: "row" },
+                  gap: "10px",
+                }}
+              >
+                {["bookRide", "travelRoute"].map((logType) => (
+                  <Typography
+                    key={logType}
+                    onClick={() => handleLogClick(logType)}
+                    sx={{
+                      backgroundColor:
+                        activeLog === logType ? "#E5F3E6" : "#f5f5f5",
+                      cursor: "pointer",
+                      padding: "16px",
+                      borderRadius: "8px 8px 0 0",
+                      flex: 1,
+                      textAlign: "center",
+                      fontSize: { xs: "14px", md: "16px" },
+                      fontWeight: 600,
+                      color: activeLog === logType ? "#375d33" : "#A1A1A1",
+                      borderBottom:
+                        activeLog === logType
+                          ? "2px solid #487644"
+                          : "2px solid transparent",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        backgroundColor:
+                          activeLog === logType ? "#E5F3E6" : "#e0e0e0",
+                      },
+                    }}
+                  >
+                    {logType === "bookRide" ? "Booked Rides" : "Travel Route"}
+                  </Typography>
+                ))}
+              </Box>
+            </Box>
           </Box>
         </Box>
 
@@ -649,8 +624,8 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
                     item.bill_amount === null ||
                     item.bill_amount === "" ||
                     item.bill_amount === 0
-                )
-              : travelData.message
+                ) // Filter when bill_amount is null, empty, or 0
+              : travelData?.message || [] // Fallback if travelData.message is undefined
           }
           itemsPerPage={itemsPerPage} // Current items per page
           activePage={currentPage} // Current page

@@ -54,8 +54,9 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
   });
   const [selectedMonth, setSelectedMonth] = useState(dayjs().format("MMMM"));
   const [selectedYear, setSelectedYear] = useState(dayjs().year());
-  const [projectleadlist, setProjectleadlist] = useState<any[]>([]);
-  const [selectedProjectName, setSelectedProjectName] = useState<string>("");
+  const [departmentlist, setDepartmentlist] = useState<any[]>([]);
+  const [selectedDepartmentName, setSelectedDepartmentName] =
+    useState<string>("");
   useEffect(() => {
     const filterInput = document.querySelector(".form-control");
     if (filterInput) {
@@ -67,7 +68,7 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
   const handleProjectNameChange = (
     event: React.ChangeEvent<{ value: unknown }>
   ) => {
-    setSelectedProjectName(event.target.value as string);
+    setSelectedDepartmentName(event.target.value as string);
   };
   // Functions to handle changes in calendar views and pagination
   const handleViewChange = (event, newView) => {
@@ -139,18 +140,20 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
     ));
   };
 
-  const getFilter = () => {
+  const getFilter = (): [string, string, string][] => {
+    let filters: [string, string, string][] = [];
+
     if (calendarView === "day") {
       const startOfDay = selectedDay + " 00:00:00";
       const endOfDay = selectedDay + " 23:59:59";
-      return [
+      filters = [
         ["creation", ">=", startOfDay],
         ["creation", "<=", endOfDay],
       ];
     } else if (calendarView === "week") {
       const startOfWeek = selectedWeek.start + " 00:00:00";
       const endOfWeek = selectedWeek.end + " 23:59:59";
-      return [
+      filters = [
         ["creation", ">=", startOfWeek],
         ["creation", "<=", endOfWeek],
       ];
@@ -163,20 +166,27 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
         .month(months.indexOf(selectedMonth))
         .endOf("month")
         .format("YYYY-MM-DD");
-      return [
+      filters = [
         ["creation", ">=", `${startOfMonth} 00:00:00`],
         ["creation", "<=", `${endOfMonth} 23:59:59`],
       ];
     } else if (calendarView === "year") {
       const startOfYear = `${selectedYear}-01-01 00:00:00`;
       const endOfYear = `${selectedYear}-12-31 23:59:59`;
-      return [
+      filters = [
         ["creation", ">=", startOfYear],
         ["creation", "<=", endOfYear],
       ];
     }
-    return [];
+
+    // Add the project_name filter to the existing filters
+    if (selectedDepartmentName) {
+      filters.push(["department", "=", selectedDepartmentName]);
+    }
+
+    return filters;
   };
+
   const { data: FM_Request_Master, isLoading } = useFrappeGetDocList(
     "FM_Request_Master",
     {
@@ -236,12 +246,12 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
       );
     }
   }, [FM_Bills_Projectlead]);
-  console.log("selectedProjectName", selectedProjectName);
-  // Fetch and set Project_Lead_List
-  const { data: Project_Lead_List, isLoading: projectnameloading } =
-    useFrappeGetDocList("RM_Project_Lead", {
+  console.log("selectedDepartmentName", selectedDepartmentName);
+  // Fetch and set Department_Lead_List
+  const { data: Department_Lead_List, isLoading: projectnameloading } =
+    useFrappeGetDocList("RM_Department", {
       fields: ["*"],
-      filters: [["project_lead_email", "=", userEmailId]],
+      filters: [["employee_email", "=", userEmailId]],
       orderBy: {
         field: "modified",
         order: "desc",
@@ -249,15 +259,15 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
     });
 
   useEffect(() => {
-    if (Project_Lead_List) {
-      setProjectleadlist(Project_Lead_List);
+    if (Department_Lead_List) {
+      setDepartmentlist(Department_Lead_List);
       // Set the default selected project to the first project in the list
-      if (Project_Lead_List.length > 0) {
-        setSelectedProjectName(Project_Lead_List[0].project_name);
+      if (Department_Lead_List.length > 0) {
+        setSelectedDepartmentName(Department_Lead_List[0].department_name);
       }
     }
-  }, [Project_Lead_List]);
-
+  }, [Department_Lead_List]);
+  console.log("Department_Lead_List", Department_Lead_List);
   // Handle drawer toggle
   const toggleDrawer = (open: boolean) => {
     setIsOpen(open);
@@ -354,32 +364,26 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
     },
   ];
 
-  // if (isLoading || isLoadingSpecific) {
-  //   return (
-  //     <Box
-  //       sx={{
-  //         display: "flex",
-  //         justifyContent: "center",
-  //         alignItems: "center",
-  //         minHeight: "100vh",
-  //       }}
-  //     >
-  //       <CircularProgress />
-  //     </Box>
-  //   );
-  // }
-
   const handleRowClick = (item: any) => {
     //setSelectedRowItem(item);
     toggleDrawer(true);
     setView(true);
     setDrawerDetails(item);
   };
+  const filteredData = tableData.filter(
+    (item) =>
+      item.bill_amount !== null &&
+      item.bill_amount !== 0 &&
+      item.bill_amount !== ""
+  );
 
-  // const totalcoinAmount = tableData.reduce(
-  //   (acc, item) => acc + parseFloat(item.bill_amount || 0),
-  //   0
-  // );
+  // Calculate total project spends (number of items)
+  const totalProjectSpends = filteredData.length;
+
+  // Calculate total bill amount
+  const totalBillAmount = filteredData.reduce((acc, item) => {
+    return acc + (item.bill_amount ? Number(item.bill_amount) : 0);
+  }, 0);
 
   return (
     <>
@@ -406,20 +410,6 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
           padding: "15px",
         }}
       >
-        {/* <Box
-          sx={{
-            color: "#000",
-            backgroundColor: "#a5d0a9",
-            padding: "10px 20px",
-            borderRadius: "5px",
-            float: "right",
-            marginBottom: "5px",
-            fontSize: "15px",
-            fontWeight: 600,
-          }}
-        >
-          Coins Consumed : {totalcoinAmount}
-        </Box> */}
         <Box
           sx={{
             display: "flex",
@@ -430,29 +420,29 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
             justifyContent: "space-between", // Distributes items evenly across the row
           }}
         >
-          {/* Project Name Dropdown */}
+          {/* Department Name Dropdown */}
           <Box sx={{ flex: "1 1 20%" }}>
             <FormControl variant="outlined" fullWidth>
-              <InputLabel>Project Name</InputLabel>
+              <InputLabel>Department Name</InputLabel>
               <Select
-                value={selectedProjectName}
+                value={selectedDepartmentName}
                 onChange={handleProjectNameChange}
-                label="Project Name"
+                label="Department Name"
               >
-                {projectleadlist.map((project, index) => (
+                {departmentlist.map((project, index) => (
                   <MenuItem
                     key={project.name}
-                    value={project.project_name}
+                    value={project.department_name}
                     style={{
                       backgroundColor:
-                        selectedProjectName === project.project_name
+                        selectedDepartmentName === project.department_name
                           ? index === 0
                             ? "#ADD8E6"
                             : "lightgreen"
                           : "transparent",
                     }}
                   >
-                    {project.project_name}
+                    {project.department_name}
                   </MenuItem>
                 ))}
               </Select>
@@ -490,7 +480,7 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
                         variant="body1"
                         sx={{ ml: 1, fontSize: "0.875rem" }}
                       >
-                        24
+                        {totalProjectSpends}
                       </Typography>
                     </Box>
                   </Grid>
@@ -501,7 +491,7 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
                         variant="body1"
                         sx={{ ml: 1, fontSize: "0.875rem" }}
                       >
-                        100000000
+                        {totalBillAmount.toLocaleString()}
                       </Typography>
                     </Box>
                   </Grid>
@@ -608,7 +598,7 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
           columns={columns}
           columnFilter
           columnSorter
-          items={tableData.filter((item) => item.bill_amount !== null)}
+          items={filteredData}
           itemsPerPageSelect
           itemsPerPage={10}
           pagination
