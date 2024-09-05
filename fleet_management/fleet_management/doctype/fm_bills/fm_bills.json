@@ -26,23 +26,32 @@
  ],
  "fields": [
   {
+   "fetch_if_empty": 1,
    "fieldname": "request_id",
    "fieldtype": "Data",
-   "label": "Request ID"
+   "in_list_view": 1,
+   "label": "Request ID",
+   "options": "FM_Request_Master",
+   "reqd": 1
   },
   {
+   "fetch_from": "request_id.employee_name",
    "fieldname": "requested_by",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Requested By"
   },
   {
    "fieldname": "pro_dept_name",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Project / Department Name"
   },
   {
+   "fetch_from": "request_id.type",
    "fieldname": "type",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Type of Services"
   },
   {
@@ -51,6 +60,7 @@
    "label": "Service Type"
   },
   {
+   "fetch_from": "request_id.employee_email",
    "fieldname": "requested_email_id",
    "fieldtype": "Data",
    "label": "Requested Email Id"
@@ -58,18 +68,19 @@
   {
    "fieldname": "total_amount",
    "fieldtype": "Float",
-   "label": "Total Amount "
+   "label": "Total Amount ",
+   "reqd": 1
   },
   {
    "fieldname": "bill_details",
    "fieldtype": "Table",
    "label": "Bill Details",
-   "options": "FM_Bill_Parameters"
+   "options": "FM_Bill_Parameters",
+   "reqd": 1
   },
   {
    "fieldname": "doctype_name",
    "fieldtype": "Data",
-   "in_list_view": 1,
    "label": "Doctype Name"
   },
   {
@@ -110,7 +121,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-03 13:48:57.436510",
+ "modified": "2024-09-05 12:45:54.759023",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Bills",

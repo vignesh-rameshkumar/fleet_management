@@ -55,10 +55,10 @@ def auto_append_route_points(doc, method):
 def sync_to_fm_request_master(doc, method):
     # Define the mapping of doctypes and their specific fields to sync
     doctype_field_mapping = {
-        "FM_Passenger_Vehicle_Request": ["project_name", "employee_name", "employee_email", "type", "doctypename", "status", "reports_to", "reason", "bill_amount", "payment_status"],
-        "FM_Goods_Vehicle_Request": ["project_name", "employee_name", "employee_email", "type", "doctypename", "status", "reports_to", "reason", "bill_amount", "payment_status"],
-        "FM_Equipment_Vehicle_Request": ["project_name", "employee_name", "employee_email", "type", "doctypename", "status", "reports_to", "reason", "bill_amount", "payment_status"],
-        "FM_Group_Vehicle_Request": ["project_name", "employee_name", "employee_email", "type", "doctypename", "status", "reports_to", "reason", "bill_amount", "payment_status"]
+        "FM_Passenger_Vehicle_Request": ["project_name", "employee_name", "employee_email", "type", "doctypename", "department", "status", "reports_to", "reason", "bill_amount", "payment_status"],
+        "FM_Goods_Vehicle_Request": ["project_name", "employee_name", "employee_email", "type", "doctypename", "department", "status", "reports_to", "reason", "bill_amount", "payment_status"],
+        "FM_Equipment_Vehicle_Request": ["project_name", "employee_name", "employee_email", "type", "doctypename", "department", "status", "reports_to", "reason", "bill_amount", "payment_status"],
+        "FM_Group_Vehicle_Request": ["project_name", "employee_name", "employee_email", "type", "doctypename", "department", "status", "reports_to", "reason", "bill_amount", "payment_status"]
     }
     
     # Check if the current doctype is in the mapping
@@ -169,3 +169,30 @@ def equipment_duplicate(doc, method):
 @frappe.whitelist()
 def before_save_eq(doc, method):
     equipment_duplicate(doc, method)
+
+
+def bill_amount(doc, method):
+    request_id = doc.request_id
+    doctype_name = doc.doctype_name
+    
+    # Check if both request_id and doctype_name are provided
+    if not request_id or not doctype_name:
+        frappe.throw("Request ID and Doctype Name are required.")
+    
+    # Check if the document exists in the given doctype
+    try:
+        target_doc = frappe.get_doc(doctype_name, request_id)
+    except frappe.DoesNotExistError:
+        frappe.throw(f"Document with Request ID {request_id} not found in Doctype {doctype_name}")
+    
+    # Get the total_amount from the FM_Bills doc
+    total_amount = doc.total_amount
+    
+    if total_amount is not None:
+        # Update the bill_amount field in the target document with total_amount
+        target_doc.bill_amount = total_amount
+        
+        # Save the target document to update the bill_amount
+        target_doc.save()
+    else:
+        frappe.throw("Total Amount is not available in FM_Bills.")

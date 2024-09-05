@@ -40,7 +40,10 @@ doc_events = {
     },
     "FM_Route_ID": {
         "before_save": "fleet_management.validate.auto_append_route_points"
-    }
+    },
+    "FM_Bills": {
+        "before_insert": "fleet_management.validate.bill_amount"
+        }
 }
 
 # Includes in <head>
