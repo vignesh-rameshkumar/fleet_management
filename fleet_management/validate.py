@@ -66,7 +66,7 @@ def sync_to_fm_request_master(doc, method):
         # Prepare data for FM_Request_Master
         master_data = {
             "doctype": "FM_Request_Master",
-            "request_id": doc.name,  # Use the name of the current document as requestid
+            "request_id": doc.name,  # Use the name of the current document as request_id
         }
         
         # Populate fields from the current document
@@ -75,9 +75,16 @@ def sync_to_fm_request_master(doc, method):
                 master_data[field] = getattr(doc, field)
             else:
                 master_data[field] = None  # Set to None if field doesn't exist
+
+        # Check ride_start_time and ride_end_time to update ride_status
+        if doc.ride_start_time and not doc.ride_end_time:
+            master_data["ride_status"] = "In-progress"
+        elif doc.ride_end_time:
+            master_data["ride_status"] = "Completed"
+        else:
+            master_data["ride_status"] = "Yet to Start"
         
-        
-        # Check if a PR_Request_Master document already exists
+        # Check if a FM_Request_Master document already exists
         existing_master = frappe.db.exists("FM_Request_Master", {"request_id": doc.name})
         
         if existing_master:
@@ -91,6 +98,7 @@ def sync_to_fm_request_master(doc, method):
             new_master.insert(ignore_permissions=True)
         
         frappe.db.commit()
+
 
 def before_insert(doc, method):
     if doc.project_name:

@@ -1,0 +1,70 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:request_id",
+ "creation": "2024-09-09 16:42:19.509619",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "request_id",
+  "employee_name",
+  "from_location",
+  "to_location",
+  "approved_date_time"
+ ],
+ "fields": [
+  {
+   "fieldname": "request_id",
+   "fieldtype": "Data",
+   "label": "Request ID",
+   "unique": 1
+  },
+  {
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name"
+  },
+  {
+   "fieldname": "from_location",
+   "fieldtype": "Data",
+   "label": "Pickup Point"
+  },
+  {
+   "fieldname": "to_location",
+   "fieldtype": "Data",
+   "label": "Drop Point"
+  },
+  {
+   "fieldname": "approved_date_time",
+   "fieldtype": "Data",
+   "label": "Pickup Time"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-09-09 16:42:19.509619",
+ "modified_by": "Administrator",
+ "module": "Fleet Management",
+ "name": "FM_Vehicle_Task",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

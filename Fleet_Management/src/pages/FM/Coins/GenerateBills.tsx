@@ -60,10 +60,10 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
   const [currentPage, setCurrentPage] = useState(1); // Start from the first page
   const [itemsPerPage, setItemsPerPage] = useState(10); // Default items per page
 
+  const [tableDataLength, setTableDataLength] = useState<number>(0);
   //Doctype name and Document name
   const [doctypeName, setDoctypeName] = useState("");
   const [documentName, setDocumentName] = useState("");
-
   // Bills table
   const [rows, setRows] = useState([
     { parameter: "", costPerQty: "", totalQty: "", coins: "" }, // Initial row
@@ -82,11 +82,24 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
     }
   }, []);
   //api
+  // Fetch the total count of documents
+  const { data: totalCountData, isLoading: isLoadingTotalCount } =
+    useFrappeGetDocList("FM_Request_Master", {
+      fields: ["name"], // Fetching just the name to get count
+      filters: [["ride_status", "=", "Completed"]],
+      limit: 0, // No pagination here, only count
+    });
+
+  useEffect(() => {
+    if (totalCountData) {
+      setTableDataLength(totalCountData.length);
+    }
+  }, [totalCountData]);
   const { data: FM_Request_Master, isLoading } = useFrappeGetDocList(
     "FM_Request_Master",
     {
       fields: ["*"],
-      filters: [["ride_status", "=", "Completed"]],
+      // filters: [["ride_status", "=", "Completed"]],
       orderBy: {
         field: "modified",
         order: "desc",
@@ -102,6 +115,7 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
       setTableData(FM_Request_Master);
     }
   }, [FM_Request_Master, currentPage, itemsPerPage]);
+
   const { data: specificData, isLoading: specificDataloading } =
     useFrappeGetDocList(doctypeName, {
       fields: ["*"],
@@ -137,7 +151,7 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
       setTravelData(Travel_route);
     }
   }, [Travel_route]);
-  console.log("api", travelData);
+  // console.log("api", travelData);
   // Handle drawer toggle
   const toggleDrawer = (open: boolean) => {
     setIsOpen(open);
@@ -490,7 +504,7 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
   };
-  const tableDataLength = tableData.length;
+  // const tableDataLength = tableData.length;
   return (
     <>
       <Box

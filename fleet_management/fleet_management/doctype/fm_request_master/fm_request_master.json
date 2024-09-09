@@ -18,7 +18,8 @@
   "reports_to",
   "reason",
   "bill_amount",
-  "payment_status"
+  "payment_status",
+  "ride_status"
  ],
  "fields": [
   {
@@ -94,12 +95,18 @@
    "fieldtype": "Data",
    "label": "Department",
    "reqd": 1
+  },
+  {
+   "fieldname": "ride_status",
+   "fieldtype": "Select",
+   "label": "Ride Status",
+   "options": "Yet to Start\nIn-progress\nCompleted"
   }
  ],
  "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-05 11:30:22.677747",
+ "modified": "2024-09-09 15:52:56.912895",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Request_Master",

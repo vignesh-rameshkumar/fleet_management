@@ -15,7 +15,7 @@ import {
   Checkbox,
   useMediaQuery,
 } from "@mui/material";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useFrappeGetDoc } from "frappe-react-sdk";
 // Icons
 import { PiCoinsLight } from "react-icons/pi";
@@ -144,7 +144,7 @@ const SideBar: React.FC<SideBarProps> = ({
           role = "Fleet Manager";
           break;
         case roles.includes("Vehicle"):
-          role = "Vehicle";
+          role = "Driver";
           break;
         case roles.includes("Employee"):
           role = "User";
@@ -646,6 +646,13 @@ const SideBar: React.FC<SideBarProps> = ({
     }
   }, []);
 
+  const navigate = useNavigate(); // Use useNavigate hook
+
+  useEffect(() => {
+    if (employeeRole === "Driver") {
+      navigate("/Fleet_Management/driver"); // Navigate to /driver route
+    }
+  }, [employeeRole, navigate]);
   return (
     <Box
       sx={{
@@ -654,496 +661,517 @@ const SideBar: React.FC<SideBarProps> = ({
         bgcolor: darkMode ? "#222222" : "",
       }}
     >
-      <Box
-        sx={{
-          width: isOpenMenu ? "260px" : "45px",
-          transition: "width 0.3s ease",
-          bgcolor: darkMode ? "#222222" : "#fff",
-          color: darkMode ? "primary.contrastText" : "text.primary",
-          position: isMobile ? "absolute" : "fixed",
-          top: 0,
-          bottom: 0,
-          zIndex: 1,
-          overflowY: "auto",
-          boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
-        }}
-      >
-        <div className="top-section">
-          <IconButton
-            onClick={() => {
-              toggleMenu();
-            }}
+      {employeeRole !== "Driver" && (
+        <>
+          <Box
             sx={{
-              cursor: "pointer",
-              color: darkMode ? "#eeeeed" : "#000000",
-              "&:hover": {
-                animation: "pulse 1s infinite",
-              },
-              transform: rotateIcon ? "rotate(90deg)" : "rotate(0deg)", // Rotate the icon based on the state
-              transition: "transform 0.4s ease", // Add transition for smooth rotation effect
+              width: isOpenMenu ? "260px" : "45px",
+              transition: "width 0.3s ease",
+              bgcolor: darkMode ? "#222222" : "#fff",
+              color: darkMode ? "primary.contrastText" : "text.primary",
+              position: isMobile ? "absolute" : "fixed",
+              top: 0,
+              bottom: 0,
+              zIndex: 1,
+              overflowY: "auto",
+              boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
             }}
           >
-            <AiOutlineBars size={22} />
-          </IconButton>
-        </div>
-        {/* User menu items */}
-        {employeeRole === "User" && (
-          <>
-            {usermenuItems.map((item, index) => (
-              <div key={index} className="menu" onClick={item.onClick}>
-                <Box
-                  component={Link}
-                  to={item.path}
-                  onClick={() => {
-                    item.submenu && toggleSubMenu(index);
-                    toggleActiveMenu(index);
-                  }}
-                  sx={{
-                    display: "flex",
+            <div className="top-section">
+              <IconButton
+                onClick={() => {
+                  toggleMenu();
+                }}
+                sx={{
+                  cursor: "pointer",
+                  color: darkMode ? "#eeeeed" : "#000000",
+                  "&:hover": {
+                    animation: "pulse 1s infinite",
+                  },
+                  transform: rotateIcon ? "rotate(90deg)" : "rotate(0deg)", // Rotate the icon based on the state
+                  transition: "transform 0.4s ease", // Add transition for smooth rotation effect
+                }}
+              >
+                <AiOutlineBars size={22} />
+              </IconButton>
+            </div>
+            {/* User menu items */}
+            {employeeRole === "User" && (
+              <>
+                {usermenuItems.map((item, index) => (
+                  <div key={index} className="menu" onClick={item.onClick}>
+                    <Box
+                      component={Link}
+                      to={item.path}
+                      onClick={() => {
+                        item.submenu && toggleSubMenu(index);
+                        toggleActiveMenu(index);
+                      }}
+                      sx={{
+                        display: "flex",
 
-                    alignItems: "center",
-                    textDecoration: "none",
-                    // color: "red",
-                    bgcolor: item.isActive
-                      ? darkMode
-                        ? "#4d8c52"
-                        : "#4D8C52"
-                      : "",
-                    "&:hover": {
-                      bgcolor: item.isActive
-                        ? darkMode
-                          ? "#4d8c52d1"
-                          : "#4d8c52d1"
-                        : darkMode
-                        ? "#363636"
-                        : "#f0f0f0",
-                      // color: darkMode ? "red" : "#000",
-                    },
-                  }}
-                  style={{
-                    color: item.isActive
-                      ? darkMode
-                        ? "#fff"
-                        : "#FFF" // Active and darkMode
-                      : darkMode
-                      ? "#fff"
-                      : "#323232", // Normal darkMode: red, Otherwise: black
-                  }}
-                >
-                  <div>
-                    {!isOpenMenu ? (
-                      <div className="menuicon">{item.icon}</div>
-                    ) : (
-                      <Box
-                        className="menuicons"
-                        sx={{
-                          padding: "5px",
-                          // width: "200px",
-                          // backgroundColor: "red",
-                          // display: "flex",
-                          // justifyContent: "space-evenly",
-                          // float: "left",
-                          animation: isOpenMenu
-                            ? `slideInLeft ${index * 0.2}s ease forwards`
-                            : "none",
-                        }}
-                      >
-                        {item.icon}
-                        <span className="menuName">{item.name}</span>
-                        {item.submenu && (
-                          <div className="arrow-container">
-                            <MdKeyboardArrowDown
-                              className={
-                                isOpenSubMenu[index]
-                                  ? "arrow-open"
-                                  : "arrow-closed"
-                              }
-                            />
-                          </div>
+                        alignItems: "center",
+                        textDecoration: "none",
+                        // color: "red",
+                        bgcolor: item.isActive
+                          ? darkMode
+                            ? "#4d8c52"
+                            : "#4D8C52"
+                          : "",
+                        "&:hover": {
+                          bgcolor: item.isActive
+                            ? darkMode
+                              ? "#4d8c52d1"
+                              : "#4d8c52d1"
+                            : darkMode
+                            ? "#363636"
+                            : "#f0f0f0",
+                          // color: darkMode ? "red" : "#000",
+                        },
+                      }}
+                      style={{
+                        color: item.isActive
+                          ? darkMode
+                            ? "#fff"
+                            : "#FFF" // Active and darkMode
+                          : darkMode
+                          ? "#fff"
+                          : "#323232", // Normal darkMode: red, Otherwise: black
+                      }}
+                    >
+                      <div>
+                        {!isOpenMenu ? (
+                          <div className="menuicon">{item.icon}</div>
+                        ) : (
+                          <Box
+                            className="menuicons"
+                            sx={{
+                              padding: "5px",
+                              // width: "200px",
+                              // backgroundColor: "red",
+                              // display: "flex",
+                              // justifyContent: "space-evenly",
+                              // float: "left",
+                              animation: isOpenMenu
+                                ? `slideInLeft ${index * 0.2}s ease forwards`
+                                : "none",
+                            }}
+                          >
+                            {item.icon}
+                            <span className="menuName">{item.name}</span>
+                            {item.submenu && (
+                              <div className="arrow-container">
+                                <MdKeyboardArrowDown
+                                  className={
+                                    isOpenSubMenu[index]
+                                      ? "arrow-open"
+                                      : "arrow-closed"
+                                  }
+                                />
+                              </div>
+                            )}
+                          </Box>
                         )}
+                      </div>
+                    </Box>
+                    {item.submenu && isOpenSubMenu[index] && isOpenMenu && (
+                      <Box
+                        className="submenu"
+                        sx={{ bgcolor: darkMode ? "#222222" : "#e6fde8" }}
+                      >
+                        {item.submenu.map((subItem, subIndex) => (
+                          <Box
+                            key={subIndex}
+                            component={Link}
+                            to={subItem.path}
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              textDecoration: "none",
+                              color: "inherit",
+                              "&:hover": {
+                                bgcolor: darkMode ? "#363636" : "#f0f0f0",
+                                color: darkMode ? "#fff" : "#000",
+                              },
+                            }}
+                            onClick={subItem.onClick}
+                          >
+                            <div className="submenuName1">
+                              <span className="submenuName">
+                                {subItem.name}
+                              </span>
+                            </div>
+                          </Box>
+                        ))}
                       </Box>
                     )}
                   </div>
-                </Box>
-                {item.submenu && isOpenSubMenu[index] && isOpenMenu && (
-                  <Box
-                    className="submenu"
-                    sx={{ bgcolor: darkMode ? "#222222" : "#e6fde8" }}
-                  >
-                    {item.submenu.map((subItem, subIndex) => (
-                      <Box
-                        key={subIndex}
-                        component={Link}
-                        to={subItem.path}
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          textDecoration: "none",
-                          color: "inherit",
-                          "&:hover": {
-                            bgcolor: darkMode ? "#363636" : "#f0f0f0",
-                            color: darkMode ? "#fff" : "#000",
-                          },
-                        }}
-                        onClick={subItem.onClick}
-                      >
-                        <div className="submenuName1">
-                          <span className="submenuName">{subItem.name}</span>
-                        </div>
-                      </Box>
-                    ))}
-                  </Box>
-                )}
-              </div>
-            ))}
-          </>
-        )}
+                ))}
+              </>
+            )}
 
-        {/* PL menu items */}
-        {employeeRole === "Project Manager" && (
-          <>
-            {plmenuItems.map((item, index) => (
-              <div key={index} className="menu" onClick={item.onClick}>
-                <Box
-                  component={Link}
-                  to={item.path}
-                  onClick={() => {
-                    item.submenu && toggleSubMenu(index);
-                    toggleActiveMenuPL(index);
-                  }}
-                  sx={{
-                    display: "flex",
+            {/* PL menu items */}
+            {employeeRole === "Project Manager" && (
+              <>
+                {plmenuItems.map((item, index) => (
+                  <div key={index} className="menu" onClick={item.onClick}>
+                    <Box
+                      component={Link}
+                      to={item.path}
+                      onClick={() => {
+                        item.submenu && toggleSubMenu(index);
+                        toggleActiveMenuPL(index);
+                      }}
+                      sx={{
+                        display: "flex",
 
-                    alignItems: "center",
-                    textDecoration: "none",
-                    // color: "red",
-                    bgcolor: item.isActive
-                      ? darkMode
-                        ? "#4d8c52"
-                        : "#4D8C52"
-                      : "",
-                    "&:hover": {
-                      bgcolor: item.isActive
-                        ? darkMode
-                          ? "#4d8c52d1"
-                          : "#4d8c52d1"
-                        : darkMode
-                        ? "#363636"
-                        : "#f0f0f0",
-                      // color: darkMode ? "red" : "#000",
-                    },
-                  }}
-                  style={{
-                    color: item.isActive
-                      ? darkMode
-                        ? "#fff"
-                        : "#FFF" // Active and darkMode
-                      : darkMode
-                      ? "#fff"
-                      : "#323232", // Normal darkMode: red, Otherwise: black
-                  }}
-                >
-                  <div>
-                    {!isOpenMenu ? (
-                      <div className="menuicon">{item.icon}</div>
-                    ) : (
-                      <Box
-                        className="menuicons"
-                        sx={{
-                          padding: "5px",
-                          // width: "200px",
-                          // backgroundColor: "red",
-                          // display: "flex",
-                          // justifyContent: "space-evenly",
-                          // float: "left",
-                          animation: isOpenMenu
-                            ? `slideInLeft ${index * 0.2}s ease forwards`
-                            : "none",
-                        }}
-                      >
-                        {item.icon}
-                        <span className="menuName">{item.name}</span>
-                        {item.submenu && (
-                          <div className="arrow-container">
-                            <MdKeyboardArrowDown
-                              className={
-                                isOpenSubMenu[index]
-                                  ? "arrow-open"
-                                  : "arrow-closed"
-                              }
-                            />
-                          </div>
+                        alignItems: "center",
+                        textDecoration: "none",
+                        // color: "red",
+                        bgcolor: item.isActive
+                          ? darkMode
+                            ? "#4d8c52"
+                            : "#4D8C52"
+                          : "",
+                        "&:hover": {
+                          bgcolor: item.isActive
+                            ? darkMode
+                              ? "#4d8c52d1"
+                              : "#4d8c52d1"
+                            : darkMode
+                            ? "#363636"
+                            : "#f0f0f0",
+                          // color: darkMode ? "red" : "#000",
+                        },
+                      }}
+                      style={{
+                        color: item.isActive
+                          ? darkMode
+                            ? "#fff"
+                            : "#FFF" // Active and darkMode
+                          : darkMode
+                          ? "#fff"
+                          : "#323232", // Normal darkMode: red, Otherwise: black
+                      }}
+                    >
+                      <div>
+                        {!isOpenMenu ? (
+                          <div className="menuicon">{item.icon}</div>
+                        ) : (
+                          <Box
+                            className="menuicons"
+                            sx={{
+                              padding: "5px",
+                              // width: "200px",
+                              // backgroundColor: "red",
+                              // display: "flex",
+                              // justifyContent: "space-evenly",
+                              // float: "left",
+                              animation: isOpenMenu
+                                ? `slideInLeft ${index * 0.2}s ease forwards`
+                                : "none",
+                            }}
+                          >
+                            {item.icon}
+                            <span className="menuName">{item.name}</span>
+                            {item.submenu && (
+                              <div className="arrow-container">
+                                <MdKeyboardArrowDown
+                                  className={
+                                    isOpenSubMenu[index]
+                                      ? "arrow-open"
+                                      : "arrow-closed"
+                                  }
+                                />
+                              </div>
+                            )}
+                          </Box>
                         )}
+                      </div>
+                    </Box>
+                    {item.submenu && isOpenSubMenu[index] && isOpenMenu && (
+                      <Box
+                        className="submenu"
+                        sx={{ bgcolor: darkMode ? "#222222" : "#e6fde8" }}
+                      >
+                        {item.submenu.map((subItem, subIndex) => (
+                          <Box
+                            key={subIndex}
+                            component={Link}
+                            to={subItem.path}
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              textDecoration: "none",
+                              color: "inherit",
+                              "&:hover": {
+                                bgcolor: darkMode ? "#363636" : "#f0f0f0",
+                                color: darkMode ? "#fff" : "#000",
+                              },
+                            }}
+                            onClick={subItem.onClick}
+                          >
+                            <div className="submenuName1">
+                              <span className="submenuName">
+                                {subItem.name}
+                              </span>
+                            </div>
+                          </Box>
+                        ))}
                       </Box>
                     )}
                   </div>
-                </Box>
-                {item.submenu && isOpenSubMenu[index] && isOpenMenu && (
-                  <Box
-                    className="submenu"
-                    sx={{ bgcolor: darkMode ? "#222222" : "#e6fde8" }}
-                  >
-                    {item.submenu.map((subItem, subIndex) => (
-                      <Box
-                        key={subIndex}
-                        component={Link}
-                        to={subItem.path}
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          textDecoration: "none",
-                          color: "inherit",
-                          "&:hover": {
-                            bgcolor: darkMode ? "#363636" : "#f0f0f0",
-                            color: darkMode ? "#fff" : "#000",
-                          },
-                        }}
-                        onClick={subItem.onClick}
-                      >
-                        <div className="submenuName1">
-                          <span className="submenuName">{subItem.name}</span>
-                        </div>
-                      </Box>
-                    ))}
-                  </Box>
-                )}
-              </div>
-            ))}
-          </>
-        )}
+                ))}
+              </>
+            )}
 
-        {/* DL menu items */}
-        {employeeRole === "Department Manager" && (
-          <>
-            {dlmenuItems.map((item, index) => (
-              <div key={index} className="menu" onClick={item.onClick}>
-                <Box
-                  component={Link}
-                  to={item.path}
-                  onClick={() => {
-                    item.submenu && toggleSubMenu(index);
-                    toggleActiveMenuDL(index);
-                  }}
-                  sx={{
-                    display: "flex",
+            {/* DL menu items */}
+            {employeeRole === "Department Manager" && (
+              <>
+                {dlmenuItems.map((item, index) => (
+                  <div key={index} className="menu" onClick={item.onClick}>
+                    <Box
+                      component={Link}
+                      to={item.path}
+                      onClick={() => {
+                        item.submenu && toggleSubMenu(index);
+                        toggleActiveMenuDL(index);
+                      }}
+                      sx={{
+                        display: "flex",
 
-                    alignItems: "center",
-                    textDecoration: "none",
-                    // color: "red",
-                    bgcolor: item.isActive
-                      ? darkMode
-                        ? "#4d8c52"
-                        : "#4D8C52"
-                      : "",
-                    "&:hover": {
-                      bgcolor: item.isActive
-                        ? darkMode
-                          ? "#4d8c52d1"
-                          : "#4d8c52d1"
-                        : darkMode
-                        ? "#363636"
-                        : "#f0f0f0",
-                      // color: darkMode ? "red" : "#000",
-                    },
-                  }}
-                  style={{
-                    color: item.isActive
-                      ? darkMode
-                        ? "#fff"
-                        : "#FFF" // Active and darkMode
-                      : darkMode
-                      ? "#fff"
-                      : "#323232", // Normal darkMode: red, Otherwise: black
-                  }}
-                >
-                  <div>
-                    {!isOpenMenu ? (
-                      <div className="menuicon">{item.icon}</div>
-                    ) : (
-                      <Box
-                        className="menuicons"
-                        sx={{
-                          padding: "5px",
-                          // width: "200px",
-                          // backgroundColor: "red",
-                          // display: "flex",
-                          // justifyContent: "space-evenly",
-                          // float: "left",
-                          animation: isOpenMenu
-                            ? `slideInLeft ${index * 0.2}s ease forwards`
-                            : "none",
-                        }}
-                      >
-                        {item.icon}
-                        <span className="menuName">{item.name}</span>
-                        {item.submenu && (
-                          <div className="arrow-container">
-                            <MdKeyboardArrowDown
-                              className={
-                                isOpenSubMenu[index]
-                                  ? "arrow-open"
-                                  : "arrow-closed"
-                              }
-                            />
-                          </div>
+                        alignItems: "center",
+                        textDecoration: "none",
+                        // color: "red",
+                        bgcolor: item.isActive
+                          ? darkMode
+                            ? "#4d8c52"
+                            : "#4D8C52"
+                          : "",
+                        "&:hover": {
+                          bgcolor: item.isActive
+                            ? darkMode
+                              ? "#4d8c52d1"
+                              : "#4d8c52d1"
+                            : darkMode
+                            ? "#363636"
+                            : "#f0f0f0",
+                          // color: darkMode ? "red" : "#000",
+                        },
+                      }}
+                      style={{
+                        color: item.isActive
+                          ? darkMode
+                            ? "#fff"
+                            : "#FFF" // Active and darkMode
+                          : darkMode
+                          ? "#fff"
+                          : "#323232", // Normal darkMode: red, Otherwise: black
+                      }}
+                    >
+                      <div>
+                        {!isOpenMenu ? (
+                          <div className="menuicon">{item.icon}</div>
+                        ) : (
+                          <Box
+                            className="menuicons"
+                            sx={{
+                              padding: "5px",
+                              // width: "200px",
+                              // backgroundColor: "red",
+                              // display: "flex",
+                              // justifyContent: "space-evenly",
+                              // float: "left",
+                              animation: isOpenMenu
+                                ? `slideInLeft ${index * 0.2}s ease forwards`
+                                : "none",
+                            }}
+                          >
+                            {item.icon}
+                            <span className="menuName">{item.name}</span>
+                            {item.submenu && (
+                              <div className="arrow-container">
+                                <MdKeyboardArrowDown
+                                  className={
+                                    isOpenSubMenu[index]
+                                      ? "arrow-open"
+                                      : "arrow-closed"
+                                  }
+                                />
+                              </div>
+                            )}
+                          </Box>
                         )}
+                      </div>
+                    </Box>
+                    {item.submenu && isOpenSubMenu[index] && isOpenMenu && (
+                      <Box
+                        className="submenu"
+                        sx={{ bgcolor: darkMode ? "#222222" : "#e6fde8" }}
+                      >
+                        {item.submenu.map((subItem, subIndex) => (
+                          <Box
+                            key={subIndex}
+                            component={Link}
+                            to={subItem.path}
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              textDecoration: "none",
+                              color: "inherit",
+                              "&:hover": {
+                                bgcolor: darkMode ? "#363636" : "#f0f0f0",
+                                color: darkMode ? "#fff" : "#000",
+                              },
+                            }}
+                            onClick={subItem.onClick}
+                          >
+                            <div className="submenuName1">
+                              <span className="submenuName">
+                                {subItem.name}
+                              </span>
+                            </div>
+                          </Box>
+                        ))}
                       </Box>
                     )}
                   </div>
-                </Box>
-                {item.submenu && isOpenSubMenu[index] && isOpenMenu && (
-                  <Box
-                    className="submenu"
-                    sx={{ bgcolor: darkMode ? "#222222" : "#e6fde8" }}
-                  >
-                    {item.submenu.map((subItem, subIndex) => (
-                      <Box
-                        key={subIndex}
-                        component={Link}
-                        to={subItem.path}
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          textDecoration: "none",
-                          color: "inherit",
-                          "&:hover": {
-                            bgcolor: darkMode ? "#363636" : "#f0f0f0",
-                            color: darkMode ? "#fff" : "#000",
-                          },
-                        }}
-                        onClick={subItem.onClick}
-                      >
-                        <div className="submenuName1">
-                          <span className="submenuName">{subItem.name}</span>
-                        </div>
-                      </Box>
-                    ))}
-                  </Box>
-                )}
-              </div>
-            ))}
-          </>
-        )}
-        {/* Fleet M menu items */}
-        {employeeRole === "Fleet Manager" && (
-          <>
-            {fmmenuItems.map((item, index) => (
-              <div key={index} className="menu" onClick={item.onClick}>
-                <Box
-                  component={Link}
-                  to={item.path}
-                  onClick={() => {
-                    item.submenu && toggleSubMenu(index);
-                    toggleActiveMenuFM(index);
-                  }}
-                  sx={{
-                    display: "flex",
+                ))}
+              </>
+            )}
+            {/* Fleet M menu items */}
+            {employeeRole === "Fleet Manager" && (
+              <>
+                {fmmenuItems.map((item, index) => (
+                  <div key={index} className="menu" onClick={item.onClick}>
+                    <Box
+                      component={Link}
+                      to={item.path}
+                      onClick={() => {
+                        item.submenu && toggleSubMenu(index);
+                        toggleActiveMenuFM(index);
+                      }}
+                      sx={{
+                        display: "flex",
 
-                    alignItems: "center",
-                    textDecoration: "none",
-                    // color: "red",
-                    bgcolor: item.isActive
-                      ? darkMode
-                        ? "#4d8c52"
-                        : "#4D8C52"
-                      : "",
-                    "&:hover": {
-                      bgcolor: item.isActive
-                        ? darkMode
-                          ? "#4d8c52d1"
-                          : "#4d8c52d1"
-                        : darkMode
-                        ? "#363636"
-                        : "#f0f0f0",
-                      // color: darkMode ? "red" : "#000",
-                    },
-                  }}
-                  style={{
-                    color: item.isActive
-                      ? darkMode
-                        ? "#fff"
-                        : "#FFF" // Active and darkMode
-                      : darkMode
-                      ? "#fff"
-                      : "#323232", // Normal darkMode: red, Otherwise: black
-                  }}
-                >
-                  <div>
-                    {!isOpenMenu ? (
-                      <div className="menuicon">{item.icon}</div>
-                    ) : (
-                      <Box
-                        className="menuicons"
-                        sx={{
-                          padding: "5px",
-                          // width: "200px",
-                          // backgroundColor: "red",
-                          // display: "flex",
-                          // justifyContent: "space-evenly",
-                          // float: "left",
-                          animation: isOpenMenu
-                            ? `slideInLeft ${index * 0.2}s ease forwards`
-                            : "none",
-                        }}
-                      >
-                        {item.icon}
-                        <span className="menuName">{item.name}</span>
-                        {item.submenu && (
-                          <div className="arrow-container">
-                            <MdKeyboardArrowDown
-                              className={
-                                isOpenSubMenu[index]
-                                  ? "arrow-open"
-                                  : "arrow-closed"
-                              }
-                            />
-                          </div>
+                        alignItems: "center",
+                        textDecoration: "none",
+                        // color: "red",
+                        bgcolor: item.isActive
+                          ? darkMode
+                            ? "#4d8c52"
+                            : "#4D8C52"
+                          : "",
+                        "&:hover": {
+                          bgcolor: item.isActive
+                            ? darkMode
+                              ? "#4d8c52d1"
+                              : "#4d8c52d1"
+                            : darkMode
+                            ? "#363636"
+                            : "#f0f0f0",
+                          // color: darkMode ? "red" : "#000",
+                        },
+                      }}
+                      style={{
+                        color: item.isActive
+                          ? darkMode
+                            ? "#fff"
+                            : "#FFF" // Active and darkMode
+                          : darkMode
+                          ? "#fff"
+                          : "#323232", // Normal darkMode: red, Otherwise: black
+                      }}
+                    >
+                      <div>
+                        {!isOpenMenu ? (
+                          <div className="menuicon">{item.icon}</div>
+                        ) : (
+                          <Box
+                            className="menuicons"
+                            sx={{
+                              padding: "5px",
+                              // width: "200px",
+                              // backgroundColor: "red",
+                              // display: "flex",
+                              // justifyContent: "space-evenly",
+                              // float: "left",
+                              animation: isOpenMenu
+                                ? `slideInLeft ${index * 0.2}s ease forwards`
+                                : "none",
+                            }}
+                          >
+                            {item.icon}
+                            <span className="menuName">{item.name}</span>
+                            {item.submenu && (
+                              <div className="arrow-container">
+                                <MdKeyboardArrowDown
+                                  className={
+                                    isOpenSubMenu[index]
+                                      ? "arrow-open"
+                                      : "arrow-closed"
+                                  }
+                                />
+                              </div>
+                            )}
+                          </Box>
                         )}
+                      </div>
+                    </Box>
+                    {item.submenu && isOpenSubMenu[index] && isOpenMenu && (
+                      <Box
+                        className="submenu"
+                        sx={{ bgcolor: darkMode ? "#222222" : "#e6fde8" }}
+                      >
+                        {item.submenu.map((subItem, subIndex) => (
+                          <Box
+                            key={subIndex}
+                            component={Link}
+                            to={subItem.path}
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              textDecoration: "none",
+                              color: "inherit",
+                              "&:hover": {
+                                bgcolor: darkMode ? "#363636" : "#f0f0f0",
+                                color: darkMode ? "#fff" : "#000",
+                              },
+                            }}
+                            onClick={subItem.onClick}
+                          >
+                            <div className="submenuName1">
+                              <span className="submenuName">
+                                {subItem.name}
+                              </span>
+                            </div>
+                          </Box>
+                        ))}
                       </Box>
                     )}
                   </div>
-                </Box>
-                {item.submenu && isOpenSubMenu[index] && isOpenMenu && (
-                  <Box
-                    className="submenu"
-                    sx={{ bgcolor: darkMode ? "#222222" : "#e6fde8" }}
-                  >
-                    {item.submenu.map((subItem, subIndex) => (
-                      <Box
-                        key={subIndex}
-                        component={Link}
-                        to={subItem.path}
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          textDecoration: "none",
-                          color: "inherit",
-                          "&:hover": {
-                            bgcolor: darkMode ? "#363636" : "#f0f0f0",
-                            color: darkMode ? "#fff" : "#000",
-                          },
-                        }}
-                        onClick={subItem.onClick}
-                      >
-                        <div className="submenuName1">
-                          <span className="submenuName">{subItem.name}</span>
-                        </div>
-                      </Box>
-                    ))}
-                  </Box>
-                )}
-              </div>
-            ))}
-          </>
-        )}
-      </Box>
+                ))}
+              </>
+            )}
+          </Box>
+        </>
+      )}
       <Box
         sx={{
           flexGrow: 1,
           //   background: "#effaef",
-          bgcolor: darkMode ? "#222222" : "#effaef",
+          bgcolor: "#effaef",
           paddingTop: "64px",
-          paddingLeft: isOpenMenu ? (isMobile ? "20px" : "230px") : "20px",
+          // paddingLeft: isOpenMenu ? (isMobile ? "20px" : "230px") : "20px",
+
+          paddingLeft:
+            employeeRole === "Driver"
+              ? "20px"
+              : isOpenMenu
+              ? isMobile
+                ? "230px"
+                : "260px"
+              : "20px",
           overflowY: "auto",
         }}
       >

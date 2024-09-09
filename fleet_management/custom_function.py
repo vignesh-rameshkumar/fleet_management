@@ -3,8 +3,10 @@ from frappe import _
 
 @frappe.whitelist()
 def get_all_travel_route_reports():
-    # Fetch all documents of the FM_Travel_Route_Report doctype
-    route_reports = frappe.get_all("FM_Travel_Route_Report", fields=["name", "date_time", "route_id", "bill_amount"])
+    # Fetch all documents of the FM_Travel_Route_Report doctype where ride_status is "Completed"
+    route_reports = frappe.get_all("FM_Travel_Route_Report", 
+                                   filters={"ride_status": "Completed"}, 
+                                   fields=["name", "date_time", "route_id", "bill_amount"])
     
     results = []
 
@@ -163,4 +165,32 @@ def get_bill_details(request_id):
     except Exception as e:
         frappe.log_error(message=str(e), title="Error in get_bill_details")
         return {"error": str(e), "bill_details": [], "creation": None}
+@frappe.whitelist()
+def get_user_roles():
+    try:
+        # Get the current user's email
+        user_email = frappe.session.user
 
+        # Fetch the user's roles
+        user_roles = frappe.get_roles(user_email)
+
+        # Define role categories
+        role_categories = {
+            'Employee': 'Employee roles',
+            'Project Lead': 'Project Lead roles',
+            'Department Head': 'Department Head roles',
+            'Fleet Manager': 'Fleet Manager roles'
+        }
+
+        # Determine which categories the user belongs to
+        roles_enabled = []
+        for role, category in role_categories.items():
+            if role in user_roles:
+                roles_enabled.append(role)
+
+        # Return the roles enabled for the current user
+        return {'roles_enabled': roles_enabled}
+
+    except Exception as e:
+        frappe.log_error(message=str(e), title="Error in get_user_roles")
+        return {'error': str(e), 'roles_enabled': []}

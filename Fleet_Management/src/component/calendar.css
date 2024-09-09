@@ -1,0 +1,100 @@
+@import "rsuite/dist/rsuite.min.css";
+@import "rsuite/dist/rsuite.css";
+
+.calendar-todo-list {
+  text-align: left;
+  padding: 0;
+  list-style: none;
+}
+
+.calendar-todo-list li {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calendar-todo-item-badge {
+  vertical-align: top;
+  margin-top: 8px;
+  width: 6px;
+  height: 6px;
+}
+.rs-calendar {
+  background-color: white;
+  padding: 20px; /* Optional, for better spacing */
+  border-radius: 8px; /* Optional, for rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional, for a subtle shadow */
+}
+/* Styling for multi-day events */
+.calendar-cell-content {
+  position: relative;
+}
+
+.calendar-event-marker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 128, 0, 0.2); /* Light green for illustration */
+  border-left: 3px solid green;
+  z-index: 1;
+  pointer-events: none; /* Ensure it doesn't interfere with other interactions */
+}
+
+.calendar-wrapper {
+  position: relative;
+}
+
+.calendar-event-line {
+  position: absolute;
+  height: 10px;
+  border-radius: 5px;
+  background-color: rgba(0, 128, 0, 0.2); /* Light green for illustration */
+  z-index: 1;
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.navigator {
+  flex: 0 0 auto;
+  margin-bottom: 10px;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.toolbar-group {
+  display: flex;
+}
+
+.toolbar-group button {
+  margin-right: 10px;
+}
+
+.toolbar-group .selected {
+  background-color: #007bff;
+  color: white;
+}
+
+.today-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
