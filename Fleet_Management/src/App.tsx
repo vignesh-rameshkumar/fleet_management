@@ -37,6 +37,7 @@ import CreateCoins from "./pages/FM/Coins/CreateCoins.tsx";
 import CoinsDashBoard from "./pages/FM/Coins/CoinsDashBoard.tsx";
 import GenerateBills from "./pages/FM/Coins/GenerateBills.tsx";
 import TrackBills from "./pages/FM/Coins/TrackBills.tsx";
+import DriverLanding from "../src/pages/Driver/DriverLanding.tsx";
 
 // import Calendar from "./component/Calendar.tsx";
 
@@ -139,6 +140,7 @@ const App: React.FC = () => {
             employeeID={employeeID}
             userImage={userImage}
           />
+
           <SideBar
             darkMode={darkMode}
             isOpenMenu={isOpenMenu}
@@ -423,6 +425,18 @@ const App: React.FC = () => {
                   <Route
                     path="/tracking/:vehicleNumber"
                     element={VehicleTracking}
+                  />
+                  {/* Driver section */}
+                  <Route
+                    path="/Fleet_Management/driver"
+                    element={
+                      <DriverLanding
+                        darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
+                      />
+                    }
                   />
                 </>
               )}
