@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { CSmartTable } from "@coreui/react-pro";
+import { ThemeProvider } from "@mui/material";
 import {
   Box,
   Drawer,
@@ -29,6 +30,8 @@ import { MdOutlineVisibility, MdDeleteForever } from "react-icons/md";
 import { toast } from "react-toastify";
 import { PDFViewer } from "@react-pdf-viewer/core";
 import { saveAs } from "file-saver";
+import { createTheme } from "@mui/material/styles";
+
 import {
   useFrappeGetDocList,
   useFrappeUpdateDoc,
@@ -40,6 +43,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs, { Dayjs } from "dayjs";
@@ -137,6 +141,85 @@ const Driver: React.FC<DriverProps> = ({
   const [medicalCertificateError, setMedicalCertificateError] = useState<
     string | null
   >(null);
+
+  const ThemeColor = createTheme({
+    palette: {
+      primary: {
+        main: darkMode ? "#d1d1d1" : "#2D5831",
+      },
+    },
+    components: {
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+            "& fieldset": {
+              borderColor: darkMode ? "#d1d1d1" : "",
+              color: darkMode ? "#d1d1d1" : "#000",
+            },
+            "&:hover fieldset": {
+              borderColor: darkMode ? "#d1d1d1" : "#3f9747",
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: darkMode ? "#d1d1d1" : "#3f9747",
+            },
+            "& input::placeholder": {
+              color: darkMode ? "#d1d1d1" : "#000",
+            },
+            "& input": {
+              color: darkMode ? "#d1d1d1" : "#5b5b5b",
+            },
+          },
+        },
+      },
+      MuiMenuItem: {
+        styleOverrides: {
+          root: {
+            backgroundColor: "#EFFFEF !important",
+            color: darkMode ? "#5b5b5b" : "#5b5b5b",
+            "&:hover": {
+              backgroundColor: "#4D8C52 !important",
+              color: "#fff !important",
+            },
+          },
+        },
+      },
+
+      MuiInputLabel: {
+        styleOverrides: {
+          root: {
+            color: darkMode ? "#d1d1d1" : "#5b5b5b",
+          },
+        },
+      },
+      MuiInputBase: {
+        styleOverrides: {
+          input: {
+            "&::placeholder": {
+              color: darkMode ? "#d1d1d1" : "#000",
+            },
+            color: darkMode ? "#d1d1d1" : "#5b5b5b",
+          },
+        },
+      },
+
+      MuiSvgIcon: {
+        styleOverrides: {
+          root: {
+            color: darkMode ? "#d1d1d1" : "#5b5b5b",
+          },
+        },
+      },
+      MuiRadio: {
+        styleOverrides: {
+          root: {
+            "&$checked": {
+              color: "#d1d1d1",
+            },
+          },
+        },
+      },
+    },
+  });
 
   useEffect(() => {
     const filterInput = document.querySelector(".form-control");
@@ -986,7 +1069,7 @@ const Driver: React.FC<DriverProps> = ({
         <>
           <div
             style={{
-              backgroundColor: darkMode ? "#222222" : "#fff",
+              backgroundColor: "#fff",
               padding: "15px",
             }}
           >
@@ -1073,892 +1156,131 @@ const Driver: React.FC<DriverProps> = ({
 
       {driverDetails && (
         <>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              gap: "100px",
-              padding: "40px",
-              justifyContent: "flex-start",
-              flexWrap: "wrap",
-            }}
-          >
-            {/* Column 1: Type of Ownership */}
-            <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              <Typography>Type of Ownership:</Typography>
-              <RadioGroup
-                row
-                value={ownership}
-                onChange={handleOwnershipChange}
-              >
-                <FormControlLabel
-                  value="Own"
-                  control={
-                    <Radio
-                      sx={{
-                        color: "#454545",
-                        "&.Mui-checked": {
-                          color: "#66BB6A",
-                        },
-                      }}
-                    />
-                  }
-                  label="Own"
-                />
-                <FormControlLabel
-                  value="Contract"
-                  control={
-                    <Radio
-                      sx={{
-                        color: "#454545",
-                        "&.Mui-checked": {
-                          color: "#66BB6A",
-                        },
-                      }}
-                    />
-                  }
-                  label="Contract"
-                />
-              </RadioGroup>
-            </Box>
-
-            {/* Column 2: Vehicle Available */}
-            <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              <Typography>Driver Available:</Typography>
-              <RadioGroup
-                row
-                value={driverAvailability}
-                onChange={handleDriverAvailabilityChange}
-              >
-                <FormControlLabel
-                  value="Online"
-                  control={
-                    <Radio
-                      sx={{
-                        color: "#454545",
-                        "&.Mui-checked": {
-                          color: "#66BB6A",
-                        },
-                      }}
-                    />
-                  }
-                  label="Online"
-                />
-                <FormControlLabel
-                  value="Offline"
-                  control={
-                    <Radio
-                      sx={{
-                        color: "#454545",
-                        "&.Mui-checked": {
-                          color: "#66BB6A",
-                        },
-                      }}
-                    />
-                  }
-                  label="Offline"
-                />
-              </RadioGroup>
-            </Box>
-          </Box>
-
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Typography
-              sx={{
-                backgroundColor: "#B3CCB3",
-                flexGrow: 1,
-                color: "#454545",
-                borderRadius: 1,
-                margin: 2,
-              }}
-            >
-              <IconButton
-                onClick={() => {
-                  setDriverDetails(false);
-                  setTable(true);
-                }}
-              >
-                <ArrowBackIcon />
-              </IconButton>
-              Add Own Driver Details:
-            </Typography>
-          </Box>
-
-          {/* Conditional Rendering based on Ownership Type */}
-          {ownership === "Own" && (
+          <ThemeProvider theme={ThemeColor}>
             <Box
               sx={{
-                display: "grid",
-                gridTemplateColumns: {
-                  xs: "1fr",
-                  sm: "1fr 1fr",
-                  md: "1fr 1fr 1fr",
-                },
-                gap: "10px",
-                padding: "20px",
+                backgroundColor: "#fff",
+                display: "flex",
+                flexDirection: "row",
+                gap: "100px",
+                padding: "40px",
+                justifyContent: "flex-start",
+                flexWrap: "wrap",
               }}
             >
-              <Autocomplete
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  margin: "10 auto",
-                }}
-                options={employeeDetails || []}
-                getOptionLabel={(option) => option.name}
-                value={
-                  employeeDetails.find(
-                    (emp) => emp.name === selectedEmployee
-                  ) || null
-                }
-                onChange={handleEmployeeChange}
-                renderInput={(params) => (
-                  <TextField {...params} label="Driver ID" variant="outlined" />
-                )}
-              />
-              <Autocomplete
-                freeSolo
-                options={employeeDetails.map((emp) => emp.employee_name) || []}
-                value={driverName}
-                onInputChange={(event, newValue) =>
-                  handleDriverNameChange(event, newValue)
-                }
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Driver Name"
-                    variant="outlined"
-                    error={driverError}
-                    helperText={driverHelperText}
-                  />
-                )}
-              />
-              <Modal
-                open={isDriverModalOpen}
-                onClose={closeDriverImagePreview}
-                aria-labelledby="modal-title"
-                aria-describedby="modal-description"
-              >
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: "80%",
-                    bgcolor: "background.paper",
-                    boxShadow: 24,
-                    p: 4,
-                  }}
-                >
-                  <IconButton
-                    aria-label="close"
-                    onClick={closeDriverImagePreview}
-                    sx={{ position: "absolute", top: 8, right: 16 }}
-                  >
-                    <CloseIcon />
-                  </IconButton>
-                  <Typography id="modal-title" variant="h6" component="h2">
-                    Driver Image Preview
-                  </Typography>
-                  <img
-                    src={driverImagePreviewUrl || ""}
-                    alt="Vehicle Preview"
-                    style={{ width: "100%", marginTop: 16 }}
-                  />
-                </Box>
-              </Modal>
-
+              {/* Column 1: Type of Ownership */}
               <Box
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  margin: "10 auto",
-                }}
+                sx={{ display: "flex", flexDirection: "column", gap: "10px" }}
               >
-                <TextField
-                  sx={{ margin: "0 auto" }}
-                  label={<Typography>Driver Image </Typography>}
-                  className={`inputsimage ${fileError ? "input-invalid" : ""}`}
-                  type="text"
-                  placeholder="Images"
-                  value={driverImage ? driverImage.name : ""}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const fileInput = document.getElementById(
-                      "fileInputVehicle"
-                    ) as HTMLInputElement;
-                    if (fileInput) {
-                      fileInput.click();
-                    }
-                  }}
-                  sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        {!driverImage && (
-                          <>
-                            <UploadFileIcon
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const fileInput = document.getElementById(
-                                  "fileInputVehicle"
-                                ) as HTMLInputElement;
-                                if (fileInput) {
-                                  fileInput.click();
-                                }
-                              }}
-                              className="AttachReporticon"
-                              style={{ cursor: "pointer" }}
-                            />
-                          </>
-                        )}
-                        {driverImage && (
-                          <>
-                            <VisibilityIcon
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                openDriverImagePreview();
-                              }}
-                              className="PreviewIcon"
-                              style={{
-                                cursor: "pointer",
-                                marginLeft: "8px",
-                              }}
-                            />
-                          </>
-                        )}
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                <input
-                  type="file"
-                  id="fileInputVehicle"
-                  name="vehicle_photo"
-                  accept="image/*"
-                  style={{ display: "none" }}
-                  onChange={handleDriverFileChange}
-                />
-                {fileError && <span className="ErrorMsg">{fileError}</span>}
-              </Box>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <Box>
-                  <DatePicker
-                    sx={{
-                      width: {
-                        xs: "100%",
-                        sm: "100%",
-                        md: "90%",
-                      },
-                    }}
-                    label="Date Of Birth"
-                    value={dateOfBirth}
-                    format="DD/MM/YYYY"
-                    onChange={handleDateOfBirthChange}
-                    disableFuture
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        fullWidth
-                        variant="outlined"
-                        required
+                <Typography>Type of Ownership:</Typography>
+                <RadioGroup
+                  row
+                  value={ownership}
+                  onChange={handleOwnershipChange}
+                >
+                  <FormControlLabel
+                    value="Own"
+                    control={
+                      <Radio
                         sx={{
-                          width: {
-                            xs: "100%",
-                            sm: "100%",
-                            md: "90%",
-                          },
-                          "& .MuiInputBase-root": {
-                            height: {
-                              xs: "100%",
-                              sm: "100%",
-                              md: "50px",
-                            },
+                          color: "#454545",
+                          "&.Mui-checked": {
+                            color: "#66BB6A",
                           },
                         }}
                       />
-                    )}
+                    }
+                    label="Own"
                   />
-                </Box>
-              </LocalizationProvider>
-              <TextField
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  height: "auto",
-                  textAlign: "left",
-                }}
-                label={<span>Contact Number</span>}
-                value={contactNumber}
-                onChange={(e) => validateContactNumber(e.target.value)}
-                error={!!contactNumberError}
-                helperText={contactNumberError}
-                sx={{ width: "100%", marginBottom: 2 }}
-                inputProps={{
-                  maxLength: 10,
-                }}
-              />
-              <TextField
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  height: "auto",
-                  textAlign: "left",
-                }}
-                label={
-                  <span>
-                    License Plate Number <span style={{ color: "red" }}>*</span>
-                  </span>
-                }
-                value={licensePlateNumber}
-                onChange={(e) => {
-                  const newValue = e.target.value;
-                  setLicensePlateNumber(newValue);
-                  validateLicensePlateNumber(newValue);
-                }}
-                error={licensePlateError}
-                helperText={licensePlateHelperText}
-              />
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="License Expired Date"
-                  value={licenseExpiredDate}
-                  onChange={handleRCExpiredDateChange}
-                  sx={{
-                    width: "90%",
-                    "& .MuiInputBase-root": {
-                      height: "auto",
-                    },
-                    "& .MuiInputLabel-root": {
-                      lineHeight: "40px",
-                    },
-                  }}
-                  renderInput={(params) => <TextField {...params} />}
-                  format="DD/MM/YYYY"
-                />
-              </LocalizationProvider>
-              <TextField
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  height: "auto",
-                  textAlign: "left",
-                }}
-                label={<span>Emergency Contact Number </span>}
-                value={emergencyContactNumber}
-                onChange={(e) => validateEmergencyNumber(e.target.value)}
-                error={!!emergencyContactNumberError}
-                helperText={emergencyContactNumberError}
-                sx={{ width: "100%", marginBottom: 2 }}
-                inputProps={{
-                  maxLength: 10,
-                }}
-              />
-              <TextField
-                select
-                label="Type of License"
-                value={typeofLicense}
-                onChange={(e) => setTypeofLicense(e.target.value)}
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  "& .MuiSelect-icon": {
-                    color: "#66BB6A",
-                  },
-                  "& .MuiInputLabel-root": {
-                    color: "#000",
-                  },
-                }}
-                SelectProps={{ native: true }}
-                InputLabelProps={{ shrink: true }}
-              >
-                <option value="">Select License Type</option>
-                <option value="LMV">LMV</option>
-                <option value="LMV Badge">LMV Badge</option>
-                <option value="HMV">HMV</option>
-                <option value="Hazardous">Hazardous</option>
-              </TextField>
-              <Box
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  margin: "10 auto",
-                }}
-              >
-                <TextField
-                  sx={{ margin: "0 auto" }}
-                  label={<Typography>Aadhar Card</Typography>}
-                  value={aadharCardImage ? aadharCardImage.name : ""}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    document.getElementById("fileInputAadhar")?.click();
-                  }}
-                  sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        {!aadharCardImage && (
-                          <UploadFileIcon
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              document
-                                .getElementById("fileInputAadhar")
-                                ?.click();
-                            }}
-                            style={{ cursor: "pointer" }}
-                          />
-                        )}
-                        {aadharCardImage && (
-                          <VisibilityIcon
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setIsAadharModalOpen(true);
-                            }}
-                            style={{ cursor: "pointer", marginLeft: "8px" }}
-                          />
-                        )}
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                <input
-                  type="file"
-                  id="fileInputAadhar"
-                  accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx"
-                  style={{ display: "none" }}
-                  onChange={handleAadharFileChange}
-                />
-                {aadharError && <span className="ErrorMsg">{aadharError}</span>}
+                  <FormControlLabel
+                    value="Contract"
+                    control={
+                      <Radio
+                        sx={{
+                          color: "#454545",
+                          "&.Mui-checked": {
+                            color: "#66BB6A",
+                          },
+                        }}
+                      />
+                    }
+                    label="Contract"
+                  />
+                </RadioGroup>
               </Box>
 
-              <Modal
-                open={isAadharModalOpen}
-                onClose={closeAadharImagePreview}
-                aria-labelledby="aadhar-modal-title"
-              >
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: "80%",
-                    bgcolor: "background.paper",
-                    boxShadow: 24,
-                    p: 4,
-                  }}
-                >
-                  <IconButton
-                    aria-label="close"
-                    onClick={closeAadharImagePreview}
-                    sx={{ position: "absolute", top: 8, right: 16 }}
-                  >
-                    <CloseIcon />
-                  </IconButton>
-                  <Typography id="aadhar-modal-title" variant="h6">
-                    Aadhar Card Preview
-                  </Typography>
-                  <img
-                    src={aadharCardPreviewUrl || ""}
-                    alt="Aadhar Card Preview"
-                    style={{ width: "100%", marginTop: 16 }}
-                  />
-                </Box>
-              </Modal>
+              {/* Column 2: Vehicle Available */}
               <Box
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "100%" },
-                  margin: "10 auto",
-                }}
+                sx={{ display: "flex", flexDirection: "column", gap: "10px" }}
               >
-                <TextField
-                  sx={{ margin: "0 auto" }}
-                  label={<Typography>License Copy</Typography>}
-                  value={licenseCopy ? licenseCopy.name : ""}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    document.getElementById("fileInputLicense")?.click();
-                  }}
-                  sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        {!licenseCopy && (
-                          <UploadFileIcon
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              document
-                                .getElementById("fileInputLicense")
-                                ?.click();
-                            }}
-                            style={{ cursor: "pointer" }}
-                          />
-                        )}
-                        {licenseCopy && (
-                          <VisibilityIcon
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setIsLicenseModalOpen(true);
-                            }}
-                            style={{ cursor: "pointer", marginLeft: "8px" }}
-                          />
-                        )}
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                <input
-                  type="file"
-                  id="fileInputLicense"
-                  accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx"
-                  style={{ display: "none" }}
-                  onChange={handleLicenseFileChange}
-                />
-                {licenseError && (
-                  <span className="ErrorMsg">{licenseError}</span>
-                )}
-              </Box>
-
-              <Modal
-                open={isLicenseModalOpen}
-                onClose={closeLicenseImagePreview}
-                aria-labelledby="license-modal-title"
-              >
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: "80%",
-                    bgcolor: "background.paper",
-                    boxShadow: 24,
-                    p: 4,
-                  }}
+                <Typography>Driver Available:</Typography>
+                <RadioGroup
+                  row
+                  value={driverAvailability}
+                  onChange={handleDriverAvailabilityChange}
                 >
-                  <IconButton
-                    aria-label="close"
-                    onClick={closeLicenseImagePreview}
-                    sx={{ position: "absolute", top: 8, right: 16 }}
-                  >
-                    <CloseIcon />
-                  </IconButton>
-                  <Typography id="license-modal-title" variant="h6">
-                    License Copy Preview
-                  </Typography>
-                  <img
-                    src={licenseCopyPreviewUrl || ""}
-                    alt="License Copy Preview"
-                    style={{ width: "100%", marginTop: 16 }}
+                  <FormControlLabel
+                    value="Online"
+                    control={
+                      <Radio
+                        sx={{
+                          color: "#454545",
+                          "&.Mui-checked": {
+                            color: "#66BB6A",
+                          },
+                        }}
+                      />
+                    }
+                    label="Online"
                   />
-                </Box>
-              </Modal>
-              <Box
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  margin: "10 auto",
-                }}
-              >
-                <TextField
-                  sx={{
-                    margin: "0 auto",
-                    width: { xs: "100%", sm: "100%", md: "100%" },
-                  }}
-                  label={
-                    <Typography>Police Verification Certificate</Typography>
-                  }
-                  value={
-                    policeVerificationCertificate
-                      ? policeVerificationCertificate.name
-                      : ""
-                  }
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    document
-                      .getElementById("fileInputPoliceVerification")
-                      ?.click();
-                  }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        {!policeVerificationCertificate && (
-                          <UploadFileIcon
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              document
-                                .getElementById("fileInputPoliceVerification")
-                                ?.click();
-                            }}
-                            style={{ cursor: "pointer" }}
-                          />
-                        )}
-                        {policeVerificationCertificate &&
-                          policeVerificationCertificatePreviewUrl && (
-                            <VisibilityIcon
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setIsPoliceVerificationModalOpen(true);
-                              }}
-                              style={{ cursor: "pointer", marginLeft: "8px" }}
-                            />
-                          )}
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                <input
-                  type="file"
-                  id="fileInputPoliceVerification"
-                  accept=".pdf,image/*,.doc,.docx" // Accepting pdf, all image types, doc, and docx
-                  style={{ display: "none" }}
-                  onChange={handlePoliceVerificationFileChange}
-                />
-                {policeVerificationError && (
-                  <span className="ErrorMsg">{policeVerificationError}</span>
-                )}
-              </Box>
-
-              <Modal
-                open={isPoliceVerificationModalOpen}
-                onClose={closePoliceVerificationImagePreview}
-                aria-labelledby="police-verification-modal-title"
-              >
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: "80%",
-                    bgcolor: "background.paper",
-                    boxShadow: 24,
-                    p: 4,
-                  }}
-                >
-                  <IconButton
-                    aria-label="close"
-                    onClick={closePoliceVerificationImagePreview}
-                    sx={{ position: "absolute", top: 8, right: 16 }}
-                  >
-                    <CloseIcon />
-                  </IconButton>
-                  <Typography id="police-verification-modal-title" variant="h6">
-                    Police Verification Certificate Preview
-                  </Typography>
-                  {policeVerificationCertificatePreviewUrl && (
-                    <img
-                      src={policeVerificationCertificatePreviewUrl}
-                      alt="Police Verification Certificate Preview"
-                      style={{ width: "100%", marginTop: 16 }}
-                    />
-                  )}
-                </Box>
-              </Modal>
-
-              <Modal
-                open={isLicenseModalOpen}
-                onClose={closeLicenseImagePreview}
-                aria-labelledby="license-modal-title"
-              >
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: "80%",
-                    bgcolor: "background.paper",
-                    boxShadow: 24,
-                    p: 4,
-                  }}
-                >
-                  <IconButton
-                    aria-label="close"
-                    onClick={closeLicenseImagePreview}
-                    sx={{ position: "absolute", top: 8, right: 16 }}
-                  >
-                    <CloseIcon />
-                  </IconButton>
-                  <Typography id="license-modal-title" variant="h6">
-                    License Copy Preview
-                  </Typography>
-                  <img
-                    src={licenseCopyPreviewUrl || ""}
-                    alt="License Copy Preview"
-                    style={{ width: "100%", marginTop: 16 }}
+                  <FormControlLabel
+                    value="Offline"
+                    control={
+                      <Radio
+                        sx={{
+                          color: "#454545",
+                          "&.Mui-checked": {
+                            color: "#66BB6A",
+                          },
+                        }}
+                      />
+                    }
+                    label="Offline"
                   />
-                </Box>
-              </Modal>
-              <Box
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  margin: "10 auto",
-                }}
-              >
-                <TextField
-                  sx={{
-                    margin: "0 auto",
-                    width: { xs: "100%", sm: "100%", md: "100%" },
-                  }}
-                  label={<Typography>Medical Certificate </Typography>}
-                  value={medicalCertificate ? medicalCertificate.name : ""}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    document
-                      .getElementById("fileInputMedicalCertificate")
-                      ?.click();
-                  }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        {!medicalCertificate && (
-                          <UploadFileIcon
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              document
-                                .getElementById("fileInputMedicalCertificate")
-                                ?.click();
-                            }}
-                            style={{ cursor: "pointer" }}
-                          />
-                        )}
-                        {medicalCertificate && medicalCertificatePreviewUrl && (
-                          <VisibilityIcon
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setIsMedicalCertificateModalOpen(true);
-                            }}
-                            style={{ cursor: "pointer", marginLeft: "8px" }}
-                          />
-                        )}
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                <input
-                  type="file"
-                  id="fileInputMedicalCertificate"
-                  accept=".pdf,image/*" // Accepting pdf and all image types
-                  style={{ display: "none" }}
-                  onChange={handleMedicalCertificateFileChange}
-                />
-                {medicalCertificateError && (
-                  <span className="ErrorMsg">{medicalCertificateError}</span>
-                )}
+                </RadioGroup>
               </Box>
-
-              <Modal
-                open={isMedicalCertificateModalOpen}
-                onClose={closeMedicalCertificateImagePreview}
-                aria-labelledby="medical-certificate-modal-title"
-              >
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: "80%",
-                    bgcolor: "background.paper",
-                    boxShadow: 24,
-                    p: 4,
-                  }}
-                >
-                  <IconButton
-                    aria-label="close"
-                    onClick={closeMedicalCertificateImagePreview}
-                    sx={{ position: "absolute", top: 8, right: 16 }}
-                  >
-                    <CloseIcon />
-                  </IconButton>
-                  <Typography id="medical-certificate-modal-title" variant="h6">
-                    Medical Certificate Preview
-                  </Typography>
-                  {medicalCertificatePreviewUrl && (
-                    <img
-                      src={medicalCertificatePreviewUrl}
-                      alt="Medical Certificate Preview"
-                      style={{ width: "100%", marginTop: 16 }}
-                    />
-                  )}
-                </Box>
-              </Modal>
-              {edit && (
-                <>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      padding: "20px",
-                    }}
-                  >
-                    <Button
-                      className="saveBtn"
-                      // disabled={
-                      //   !vehicleName ||
-                      //   !vehicleModel ||
-                      //   !licensePlateNumber ||
-                      //   vehicleModelError ||
-                      //   policyNumberError ||
-                      //   policyTypeError ||
-                      //   policyHolderAddressError ||
-                      //   idvError ||
-                      //   idvAmountError ||
-                      //   deductiblesError
-                      // }
-                      onClick={CreateDriverRequest}
-                    >
-                      {contractorLoading ? "Submitting..." : "Submit"}
-                    </Button>
-                  </Box>
-                </>
-              )}
-              {!edit && (
-                <>
-                  {updatingLoading ? ( // Show loading spinner while updating
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        padding: "20px",
-                      }}
-                    >
-                      <CircularProgress />
-                    </Box>
-                  ) : (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        padding: "20px",
-                      }}
-                    >
-                      <Button
-                        className="saveBtn"
-                        onClick={handleUpdate}
-                        disabled={updatingLoading}
-                      >
-                        Update
-                      </Button>
-                    </Box>
-                  )}
-
-                  {updatingError && (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        padding: "20px",
-                      }}
-                    >
-                      <Alert severity="error">
-                        {updatingError.message || "Failed to update data."}
-                      </Alert>
-                    </Box>
-                  )}
-                </>
-              )}
             </Box>
-          )}
-          {ownership === "Contract" && (
-            <>
+
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Typography
+                sx={{
+                  backgroundColor: "#B3CCB3",
+                  flexGrow: 1,
+
+                  borderRadius: 1,
+                  fontWeight: 600,
+                  color: "#000",
+                  margin: "10px 0px",
+                }}
+              >
+                <IconButton
+                  onClick={() => {
+                    setDriverDetails(false);
+                    setTable(true);
+                  }}
+                >
+                  <ArrowBackIcon />
+                </IconButton>
+                Add Own Driver Details
+              </Typography>
+            </Box>
+
+            {/* Conditional Rendering based on Ownership Type */}
+            {ownership === "Own" && (
               <Box
                 sx={{
                   display: "grid",
+                  backgroundColor: "#fff",
                   gridTemplateColumns: {
                     xs: "1fr",
                     sm: "1fr 1fr",
@@ -1968,37 +1290,207 @@ const Driver: React.FC<DriverProps> = ({
                   padding: "20px",
                 }}
               >
-                <TextField
+                <Autocomplete
                   sx={{
                     width: { xs: "100%", sm: "100%", md: "90%" },
-                    height: "auto",
-                    textAlign: "left",
+                    margin: "10 auto",
                   }}
-                  label={<span>Driver Name</span>}
-                  value={driverName}
-                  onChange={(e) => {
-                    const newValue = e.target.value;
-                    setDriverName(newValue);
-                    validateDriverName(newValue);
-                  }}
-                  error={driverError}
-                  helperText={driverHelperText}
-                />
-                <TextField
-                  sx={{
-                    width: { xs: "100%", sm: "100%", md: "90%" },
-                    height: "auto",
-                    textAlign: "left",
-                  }}
-                  label={
-                    <span>
-                      Contact Number <span style={{ color: "red" }}>*</span>
-                    </span>
+                  options={employeeDetails || []}
+                  getOptionLabel={(option) => option.name}
+                  value={
+                    employeeDetails.find(
+                      (emp) => emp.name === selectedEmployee
+                    ) || null
                   }
+                  onChange={handleEmployeeChange}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Driver ID"
+                      variant="outlined"
+                    />
+                  )}
+                />
+                <Autocomplete
+                  freeSolo
+                  options={
+                    employeeDetails.map((emp) => emp.employee_name) || []
+                  }
+                  value={driverName}
+                  onInputChange={(event, newValue) =>
+                    handleDriverNameChange(event, newValue)
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Driver Name"
+                      variant="outlined"
+                      error={driverError}
+                      helperText={driverHelperText}
+                    />
+                  )}
+                />
+                <Modal
+                  open={isDriverModalOpen}
+                  onClose={closeDriverImagePreview}
+                  aria-labelledby="modal-title"
+                  aria-describedby="modal-description"
+                >
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "80%",
+                      bgcolor: "background.paper",
+                      boxShadow: 24,
+                      p: 4,
+                    }}
+                  >
+                    <IconButton
+                      aria-label="close"
+                      onClick={closeDriverImagePreview}
+                      sx={{ position: "absolute", top: 8, right: 16 }}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                    <Typography id="modal-title" variant="h6" component="h2">
+                      Driver Image Preview
+                    </Typography>
+                    <img
+                      src={driverImagePreviewUrl || ""}
+                      alt="Vehicle Preview"
+                      style={{ width: "100%", marginTop: 16 }}
+                    />
+                  </Box>
+                </Modal>
+
+                <Box
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    margin: "10 auto",
+                  }}
+                >
+                  <TextField
+                    sx={{ margin: "0 auto" }}
+                    label={<Typography>Driver Image </Typography>}
+                    className={`inputsimage ${
+                      fileError ? "input-invalid" : ""
+                    }`}
+                    type="text"
+                    placeholder="Images"
+                    value={driverImage ? driverImage.name : ""}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const fileInput = document.getElementById(
+                        "fileInputVehicle"
+                      ) as HTMLInputElement;
+                      if (fileInput) {
+                        fileInput.click();
+                      }
+                    }}
+                    sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          {!driverImage && (
+                            <>
+                              <UploadFileIcon
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const fileInput = document.getElementById(
+                                    "fileInputVehicle"
+                                  ) as HTMLInputElement;
+                                  if (fileInput) {
+                                    fileInput.click();
+                                  }
+                                }}
+                                className="AttachReporticon"
+                                style={{ cursor: "pointer" }}
+                              />
+                            </>
+                          )}
+                          {driverImage && (
+                            <>
+                              <VisibilityIcon
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openDriverImagePreview();
+                                }}
+                                className="PreviewIcon"
+                                style={{
+                                  cursor: "pointer",
+                                  marginLeft: "8px",
+                                }}
+                              />
+                            </>
+                          )}
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <input
+                    type="file"
+                    id="fileInputVehicle"
+                    name="vehicle_photo"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={handleDriverFileChange}
+                  />
+                  {fileError && <span className="ErrorMsg">{fileError}</span>}
+                </Box>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <Box>
+                    <DatePicker
+                      sx={{
+                        width: {
+                          xs: "100%",
+                          sm: "100%",
+                          md: "90%",
+                        },
+                      }}
+                      label="Date Of Birth"
+                      value={dateOfBirth}
+                      format="DD/MM/YYYY"
+                      onChange={handleDateOfBirthChange}
+                      disableFuture
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          fullWidth
+                          variant="outlined"
+                          required
+                          sx={{
+                            width: {
+                              xs: "100%",
+                              sm: "100%",
+                              md: "90%",
+                            },
+                            "& .MuiInputBase-root": {
+                              height: {
+                                xs: "100%",
+                                sm: "100%",
+                                md: "50px",
+                              },
+                            },
+                          }}
+                        />
+                      )}
+                    />
+                  </Box>
+                </LocalizationProvider>
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                  label={<span>Contact Number</span>}
                   value={contactNumber}
                   onChange={(e) => validateContactNumber(e.target.value)}
-                  error={!!emergencyContactNumberError}
-                  helperText={emergencyContactNumberError}
+                  error={!!contactNumberError}
+                  helperText={contactNumberError}
                   sx={{ width: "100%", marginBottom: 2 }}
                   inputProps={{
                     maxLength: 10,
@@ -2010,7 +1502,12 @@ const Driver: React.FC<DriverProps> = ({
                     height: "auto",
                     textAlign: "left",
                   }}
-                  label={<span>License Plate Number </span>}
+                  label={
+                    <span>
+                      License Plate Number{" "}
+                      <span style={{ color: "red" }}>*</span>
+                    </span>
+                  }
                   value={licensePlateNumber}
                   onChange={(e) => {
                     const newValue = e.target.value;
@@ -2020,6 +1517,63 @@ const Driver: React.FC<DriverProps> = ({
                   error={licensePlateError}
                   helperText={licensePlateHelperText}
                 />
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label="License Expired Date"
+                    value={licenseExpiredDate}
+                    onChange={handleRCExpiredDateChange}
+                    sx={{
+                      width: "90%",
+                      "& .MuiInputBase-root": {
+                        height: "auto",
+                      },
+                      "& .MuiInputLabel-root": {
+                        lineHeight: "40px",
+                      },
+                    }}
+                    renderInput={(params) => <TextField {...params} />}
+                    format="DD/MM/YYYY"
+                  />
+                </LocalizationProvider>
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                  label={<span>Emergency Contact Number </span>}
+                  value={emergencyContactNumber}
+                  onChange={(e) => validateEmergencyNumber(e.target.value)}
+                  error={!!emergencyContactNumberError}
+                  helperText={emergencyContactNumberError}
+                  sx={{ width: "100%", marginBottom: 2 }}
+                  inputProps={{
+                    maxLength: 10,
+                  }}
+                />
+                <TextField
+                  select
+                  label="Type of License"
+                  value={typeofLicense}
+                  onChange={(e) => setTypeofLicense(e.target.value)}
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    "& .MuiSelect-icon": {
+                      color: "#66BB6A",
+                    },
+                    "& .MuiInputLabel-root": {
+                      color: "#000",
+                    },
+                  }}
+                  SelectProps={{ native: true }}
+                  InputLabelProps={{ shrink: true }}
+                >
+                  <option value="">Select License Type</option>
+                  <option value="LMV">LMV</option>
+                  <option value="LMV Badge">LMV Badge</option>
+                  <option value="HMV">HMV</option>
+                  <option value="Hazardous">Hazardous</option>
+                </TextField>
                 <Box
                   sx={{
                     width: { xs: "100%", sm: "100%", md: "90%" },
@@ -2028,11 +1582,95 @@ const Driver: React.FC<DriverProps> = ({
                 >
                   <TextField
                     sx={{ margin: "0 auto" }}
-                    label={
-                      <Typography>
-                        License Copy <span style={{ color: "red" }}>*</span>
-                      </Typography>
-                    }
+                    label={<Typography>Aadhar Card</Typography>}
+                    value={aadharCardImage ? aadharCardImage.name : ""}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      document.getElementById("fileInputAadhar")?.click();
+                    }}
+                    sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          {!aadharCardImage && (
+                            <UploadFileIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                document
+                                  .getElementById("fileInputAadhar")
+                                  ?.click();
+                              }}
+                              style={{ cursor: "pointer" }}
+                            />
+                          )}
+                          {aadharCardImage && (
+                            <VisibilityIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setIsAadharModalOpen(true);
+                              }}
+                              style={{ cursor: "pointer", marginLeft: "8px" }}
+                            />
+                          )}
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <input
+                    type="file"
+                    id="fileInputAadhar"
+                    accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx"
+                    style={{ display: "none" }}
+                    onChange={handleAadharFileChange}
+                  />
+                  {aadharError && (
+                    <span className="ErrorMsg">{aadharError}</span>
+                  )}
+                </Box>
+
+                <Modal
+                  open={isAadharModalOpen}
+                  onClose={closeAadharImagePreview}
+                  aria-labelledby="aadhar-modal-title"
+                >
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "80%",
+                      bgcolor: "background.paper",
+                      boxShadow: 24,
+                      p: 4,
+                    }}
+                  >
+                    <IconButton
+                      aria-label="close"
+                      onClick={closeAadharImagePreview}
+                      sx={{ position: "absolute", top: 8, right: 16 }}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                    <Typography id="aadhar-modal-title" variant="h6">
+                      Aadhar Card Preview
+                    </Typography>
+                    <img
+                      src={aadharCardPreviewUrl || ""}
+                      alt="Aadhar Card Preview"
+                      style={{ width: "100%", marginTop: 16 }}
+                    />
+                  </Box>
+                </Modal>
+                <Box
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "100%" },
+                    margin: "10 auto",
+                  }}
+                >
+                  <TextField
+                    sx={{ margin: "0 auto" }}
+                    label={<Typography>License Copy</Typography>}
                     value={licenseCopy ? licenseCopy.name : ""}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -2069,12 +1707,15 @@ const Driver: React.FC<DriverProps> = ({
                   <input
                     type="file"
                     id="fileInputLicense"
-                    accept="image/*"
+                    accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx"
                     style={{ display: "none" }}
                     onChange={handleLicenseFileChange}
                   />
-                  {fileError && <span className="ErrorMsg">{fileError}</span>}
+                  {licenseError && (
+                    <span className="ErrorMsg">{licenseError}</span>
+                  )}
                 </Box>
+
                 <Modal
                   open={isLicenseModalOpen}
                   onClose={closeLicenseImagePreview}
@@ -2109,68 +1750,245 @@ const Driver: React.FC<DriverProps> = ({
                     />
                   </Box>
                 </Modal>
-                <TextField
+                <Box
                   sx={{
                     width: { xs: "100%", sm: "100%", md: "90%" },
-                    height: "auto",
-                    textAlign: "left",
+                    margin: "10 auto",
                   }}
-                  label={
-                    <span>
-                      Travels Association{" "}
-                      <span style={{ color: "red" }}>*</span>
-                    </span>
-                  }
-                  value={travelsName}
-                  onChange={(e) => validateTravelsName(e.target.value)}
-                  error={!!travelsNameError}
-                  helperText={travelsNameError}
-                  sx={{ width: "100%", marginBottom: 2 }}
-                />
-              </Box>
-              {edit && (
-                <>
+                >
+                  <TextField
+                    sx={{
+                      margin: "0 auto",
+                      width: { xs: "100%", sm: "100%", md: "100%" },
+                    }}
+                    label={
+                      <Typography>Police Verification Certificate</Typography>
+                    }
+                    value={
+                      policeVerificationCertificate
+                        ? policeVerificationCertificate.name
+                        : ""
+                    }
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      document
+                        .getElementById("fileInputPoliceVerification")
+                        ?.click();
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          {!policeVerificationCertificate && (
+                            <UploadFileIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                document
+                                  .getElementById("fileInputPoliceVerification")
+                                  ?.click();
+                              }}
+                              style={{ cursor: "pointer" }}
+                            />
+                          )}
+                          {policeVerificationCertificate &&
+                            policeVerificationCertificatePreviewUrl && (
+                              <VisibilityIcon
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setIsPoliceVerificationModalOpen(true);
+                                }}
+                                style={{ cursor: "pointer", marginLeft: "8px" }}
+                              />
+                            )}
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <input
+                    type="file"
+                    id="fileInputPoliceVerification"
+                    accept=".pdf,image/*,.doc,.docx" // Accepting pdf, all image types, doc, and docx
+                    style={{ display: "none" }}
+                    onChange={handlePoliceVerificationFileChange}
+                  />
+                  {policeVerificationError && (
+                    <span className="ErrorMsg">{policeVerificationError}</span>
+                  )}
+                </Box>
+
+                <Modal
+                  open={isPoliceVerificationModalOpen}
+                  onClose={closePoliceVerificationImagePreview}
+                  aria-labelledby="police-verification-modal-title"
+                >
                   <Box
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      padding: "20px",
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "80%",
+                      bgcolor: "background.paper",
+                      boxShadow: 24,
+                      p: 4,
                     }}
                   >
-                    <Button
-                      className="saveBtn"
-                      // disabled={
-                      //   !vehicleName ||
-                      //   !vehicleModel ||
-                      //   !licensePlateNumber ||
-                      //   vehicleModelError ||
-                      //   policyNumberError ||
-                      //   policyTypeError ||
-                      //   policyHolderAddressError ||
-                      //   idvError ||
-                      //   idvAmountError ||
-                      //   deductiblesError
-                      // }
-                      onClick={CreateDriverRequest}
+                    <IconButton
+                      aria-label="close"
+                      onClick={closePoliceVerificationImagePreview}
+                      sx={{ position: "absolute", top: 8, right: 16 }}
                     >
-                      {contractorLoading ? "Submitting..." : "Submit"}
-                    </Button>
+                      <CloseIcon />
+                    </IconButton>
+                    <Typography
+                      id="police-verification-modal-title"
+                      variant="h6"
+                    >
+                      Police Verification Certificate Preview
+                    </Typography>
+                    {policeVerificationCertificatePreviewUrl && (
+                      <img
+                        src={policeVerificationCertificatePreviewUrl}
+                        alt="Police Verification Certificate Preview"
+                        style={{ width: "100%", marginTop: 16 }}
+                      />
+                    )}
                   </Box>
-                </>
-              )}
-              {!edit && (
-                <>
-                  {updatingLoading ? ( // Show loading spinner while updating
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        padding: "20px",
-                      }}
+                </Modal>
+
+                <Modal
+                  open={isLicenseModalOpen}
+                  onClose={closeLicenseImagePreview}
+                  aria-labelledby="license-modal-title"
+                >
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "80%",
+                      bgcolor: "background.paper",
+                      boxShadow: 24,
+                      p: 4,
+                    }}
+                  >
+                    <IconButton
+                      aria-label="close"
+                      onClick={closeLicenseImagePreview}
+                      sx={{ position: "absolute", top: 8, right: 16 }}
                     >
-                      <CircularProgress />
-                    </Box>
-                  ) : (
+                      <CloseIcon />
+                    </IconButton>
+                    <Typography id="license-modal-title" variant="h6">
+                      License Copy Preview
+                    </Typography>
+                    <img
+                      src={licenseCopyPreviewUrl || ""}
+                      alt="License Copy Preview"
+                      style={{ width: "100%", marginTop: 16 }}
+                    />
+                  </Box>
+                </Modal>
+                <Box
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    margin: "10 auto",
+                  }}
+                >
+                  <TextField
+                    sx={{
+                      margin: "0 auto",
+                      width: { xs: "100%", sm: "100%", md: "100%" },
+                    }}
+                    label={<Typography>Medical Certificate </Typography>}
+                    value={medicalCertificate ? medicalCertificate.name : ""}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      document
+                        .getElementById("fileInputMedicalCertificate")
+                        ?.click();
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          {!medicalCertificate && (
+                            <UploadFileIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                document
+                                  .getElementById("fileInputMedicalCertificate")
+                                  ?.click();
+                              }}
+                              style={{ cursor: "pointer" }}
+                            />
+                          )}
+                          {medicalCertificate &&
+                            medicalCertificatePreviewUrl && (
+                              <VisibilityIcon
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setIsMedicalCertificateModalOpen(true);
+                                }}
+                                style={{ cursor: "pointer", marginLeft: "8px" }}
+                              />
+                            )}
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <input
+                    type="file"
+                    id="fileInputMedicalCertificate"
+                    accept=".pdf,image/*" // Accepting pdf and all image types
+                    style={{ display: "none" }}
+                    onChange={handleMedicalCertificateFileChange}
+                  />
+                  {medicalCertificateError && (
+                    <span className="ErrorMsg">{medicalCertificateError}</span>
+                  )}
+                </Box>
+
+                <Modal
+                  open={isMedicalCertificateModalOpen}
+                  onClose={closeMedicalCertificateImagePreview}
+                  aria-labelledby="medical-certificate-modal-title"
+                >
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "80%",
+                      bgcolor: "background.paper",
+                      boxShadow: 24,
+                      p: 4,
+                    }}
+                  >
+                    <IconButton
+                      aria-label="close"
+                      onClick={closeMedicalCertificateImagePreview}
+                      sx={{ position: "absolute", top: 8, right: 16 }}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                    <Typography
+                      id="medical-certificate-modal-title"
+                      variant="h6"
+                    >
+                      Medical Certificate Preview
+                    </Typography>
+                    {medicalCertificatePreviewUrl && (
+                      <img
+                        src={medicalCertificatePreviewUrl}
+                        alt="Medical Certificate Preview"
+                        style={{ width: "100%", marginTop: 16 }}
+                      />
+                    )}
+                  </Box>
+                </Modal>
+                {edit && (
+                  <>
                     <Box
                       sx={{
                         display: "flex",
@@ -2180,15 +1998,249 @@ const Driver: React.FC<DriverProps> = ({
                     >
                       <Button
                         className="saveBtn"
-                        onClick={handleUpdate}
-                        disabled={updatingLoading}
+                        // disabled={
+                        //   !vehicleName ||
+                        //   !vehicleModel ||
+                        //   !licensePlateNumber ||
+                        //   vehicleModelError ||
+                        //   policyNumberError ||
+                        //   policyTypeError ||
+                        //   policyHolderAddressError ||
+                        //   idvError ||
+                        //   idvAmountError ||
+                        //   deductiblesError
+                        // }
+                        onClick={CreateDriverRequest}
                       >
-                        Update
+                        {contractorLoading ? "Submitting..." : "Submit"}
                       </Button>
                     </Box>
-                  )}
+                  </>
+                )}
+                {!edit && (
+                  <>
+                    {updatingLoading ? ( // Show loading spinner while updating
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          padding: "20px",
+                        }}
+                      >
+                        <CircularProgress />
+                      </Box>
+                    ) : (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          padding: "20px",
+                        }}
+                      >
+                        <Button
+                          className="saveBtn"
+                          onClick={handleUpdate}
+                          disabled={updatingLoading}
+                        >
+                          Update
+                        </Button>
+                      </Box>
+                    )}
 
-                  {updatingError && (
+                    {updatingError && (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          padding: "20px",
+                        }}
+                      >
+                        <Alert severity="error">
+                          {updatingError.message || "Failed to update data."}
+                        </Alert>
+                      </Box>
+                    )}
+                  </>
+                )}
+              </Box>
+            )}
+            {ownership === "Contract" && (
+              <>
+                <Box
+                  sx={{
+                    backgroundColor: "#fff",
+                    display: "grid",
+                    gridTemplateColumns: {
+                      xs: "1fr",
+                      sm: "1fr 1fr",
+                      md: "1fr 1fr 1fr",
+                    },
+                    gap: "10px",
+                    padding: "20px",
+                  }}
+                >
+                  <TextField
+                    sx={{
+                      width: { xs: "100%", sm: "100%", md: "90%" },
+                      height: "auto",
+                      textAlign: "left",
+                    }}
+                    label={<span>Driver Name</span>}
+                    value={driverName}
+                    onChange={(e) => {
+                      const newValue = e.target.value;
+                      setDriverName(newValue);
+                      validateDriverName(newValue);
+                    }}
+                    error={driverError}
+                    helperText={driverHelperText}
+                  />
+                  <TextField
+                    sx={{
+                      width: { xs: "100%", sm: "100%", md: "90%" },
+                      height: "auto",
+                      textAlign: "left",
+                    }}
+                    label={
+                      <span>
+                        Contact Number <span style={{ color: "red" }}>*</span>
+                      </span>
+                    }
+                    value={contactNumber}
+                    onChange={(e) => validateContactNumber(e.target.value)}
+                    error={!!emergencyContactNumberError}
+                    helperText={emergencyContactNumberError}
+                    sx={{ width: "100%", marginBottom: 2 }}
+                    inputProps={{
+                      maxLength: 10,
+                    }}
+                  />
+                  <TextField
+                    sx={{
+                      width: { xs: "100%", sm: "100%", md: "90%" },
+                      height: "auto",
+                      textAlign: "left",
+                    }}
+                    label={<span>License Plate Number </span>}
+                    value={licensePlateNumber}
+                    onChange={(e) => {
+                      const newValue = e.target.value;
+                      setLicensePlateNumber(newValue);
+                      validateLicensePlateNumber(newValue);
+                    }}
+                    error={licensePlateError}
+                    helperText={licensePlateHelperText}
+                  />
+                  <Box
+                    sx={{
+                      width: { xs: "100%", sm: "100%", md: "90%" },
+                      margin: "10 auto",
+                    }}
+                  >
+                    <TextField
+                      sx={{ margin: "0 auto" }}
+                      label={
+                        <Typography>
+                          License Copy <span style={{ color: "red" }}>*</span>
+                        </Typography>
+                      }
+                      value={licenseCopy ? licenseCopy.name : ""}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        document.getElementById("fileInputLicense")?.click();
+                      }}
+                      sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            {!licenseCopy && (
+                              <UploadFileIcon
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  document
+                                    .getElementById("fileInputLicense")
+                                    ?.click();
+                                }}
+                                style={{ cursor: "pointer" }}
+                              />
+                            )}
+                            {licenseCopy && (
+                              <VisibilityIcon
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setIsLicenseModalOpen(true);
+                                }}
+                                style={{ cursor: "pointer", marginLeft: "8px" }}
+                              />
+                            )}
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                    <input
+                      type="file"
+                      id="fileInputLicense"
+                      accept="image/*"
+                      style={{ display: "none" }}
+                      onChange={handleLicenseFileChange}
+                    />
+                    {fileError && <span className="ErrorMsg">{fileError}</span>}
+                  </Box>
+                  <Modal
+                    open={isLicenseModalOpen}
+                    onClose={closeLicenseImagePreview}
+                    aria-labelledby="license-modal-title"
+                  >
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        width: "80%",
+                        bgcolor: "background.paper",
+                        boxShadow: 24,
+                        p: 4,
+                      }}
+                    >
+                      <IconButton
+                        aria-label="close"
+                        onClick={closeLicenseImagePreview}
+                        sx={{ position: "absolute", top: 8, right: 16 }}
+                      >
+                        <CloseIcon />
+                      </IconButton>
+                      <Typography id="license-modal-title" variant="h6">
+                        License Copy Preview
+                      </Typography>
+                      <img
+                        src={licenseCopyPreviewUrl || ""}
+                        alt="License Copy Preview"
+                        style={{ width: "100%", marginTop: 16 }}
+                      />
+                    </Box>
+                  </Modal>
+                  <TextField
+                    sx={{
+                      width: { xs: "100%", sm: "100%", md: "90%" },
+                      height: "auto",
+                      textAlign: "left",
+                    }}
+                    label={
+                      <span>
+                        Travels Association{" "}
+                        <span style={{ color: "red" }}>*</span>
+                      </span>
+                    }
+                    value={travelsName}
+                    onChange={(e) => validateTravelsName(e.target.value)}
+                    error={!!travelsNameError}
+                    helperText={travelsNameError}
+                    sx={{ width: "100%", marginBottom: 2 }}
+                  />
+                </Box>
+                {edit && (
+                  <>
                     <Box
                       sx={{
                         display: "flex",
@@ -2196,15 +2248,75 @@ const Driver: React.FC<DriverProps> = ({
                         padding: "20px",
                       }}
                     >
-                      <Alert severity="error">
-                        {updatingError.message || "Failed to update data."}
-                      </Alert>
+                      <Button
+                        className="saveBtn"
+                        // disabled={
+                        //   !vehicleName ||
+                        //   !vehicleModel ||
+                        //   !licensePlateNumber ||
+                        //   vehicleModelError ||
+                        //   policyNumberError ||
+                        //   policyTypeError ||
+                        //   policyHolderAddressError ||
+                        //   idvError ||
+                        //   idvAmountError ||
+                        //   deductiblesError
+                        // }
+                        onClick={CreateDriverRequest}
+                      >
+                        {contractorLoading ? "Submitting..." : "Submit"}
+                      </Button>
                     </Box>
-                  )}
-                </>
-              )}
-            </>
-          )}
+                  </>
+                )}
+                {!edit && (
+                  <>
+                    {updatingLoading ? ( // Show loading spinner while updating
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          padding: "20px",
+                        }}
+                      >
+                        <CircularProgress />
+                      </Box>
+                    ) : (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          padding: "20px",
+                        }}
+                      >
+                        <Button
+                          className="saveBtn"
+                          onClick={handleUpdate}
+                          disabled={updatingLoading}
+                        >
+                          Update
+                        </Button>
+                      </Box>
+                    )}
+
+                    {updatingError && (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          padding: "20px",
+                        }}
+                      >
+                        <Alert severity="error">
+                          {updatingError.message || "Failed to update data."}
+                        </Alert>
+                      </Box>
+                    )}
+                  </>
+                )}
+              </>
+            )}
+          </ThemeProvider>
         </>
       )}
 
