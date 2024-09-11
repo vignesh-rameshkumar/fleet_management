@@ -1058,8 +1058,9 @@ const Logs: React.FC<LogsProps> = ({
     useFrappeGetDocList("Employee", {
       fields: ["*"],
       filters: [
-        ["department", "=", "Transportation - ACPL"],
+        ["department", "Like", "Transportation - ACPL"],
         ["designation", "=", "Driver"],
+        ["status", "=", "Active"],
       ],
 
       orderBy: {

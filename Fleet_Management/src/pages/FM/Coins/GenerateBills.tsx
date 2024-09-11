@@ -151,7 +151,7 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
       setTravelData(Travel_route);
     }
   }, [Travel_route]);
- 
+
   // console.log("api", travelData);
   // Handle drawer toggle
   const toggleDrawer = (open: boolean) => {

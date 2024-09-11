@@ -248,8 +248,9 @@ const Driver: React.FC<DriverProps> = ({
     useFrappeGetDocList("Employee", {
       fields: ["*"],
       filters: [
-        ["department", "=", "Transportation - ACPL"],
+        ["department", "Like", "Transportation - ACPL"],
         ["designation", "=", "Driver"],
+        ["status", "=", "Active"],
       ],
 
       orderBy: {
