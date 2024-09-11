@@ -204,11 +204,11 @@ const SideBar: React.FC<SideBarProps> = ({
       name: "Track Request",
       icon: <RiFocus3Line />,
     },
-    {
-      path: "/Fleet_Management/bills",
-      name: "Bills",
-      icon: <GoNote />,
-    },
+    // {
+    //   path: "/Fleet_Management/bills",
+    //   name: "Bills",
+    //   icon: <GoNote />,
+    // },
     {
       path: "/Fleet_Management/coins",
       name: "Coins",
@@ -272,11 +272,11 @@ const SideBar: React.FC<SideBarProps> = ({
       name: "Request Approval",
       icon: <BsBookmarkCheck />,
     },
-    {
-      path: "/Fleet_Management/bills",
-      name: "Bills",
-      icon: <GoNote />,
-    },
+    // {
+    //   path: "/Fleet_Management/bills",
+    //   name: "Bills",
+    //   icon: <GoNote />,
+    // },
     {
       name: "Coins",
       icon: <PiCoinsLight />,
@@ -353,11 +353,11 @@ const SideBar: React.FC<SideBarProps> = ({
       name: "Request Approval",
       icon: <BsBookmarkCheck />,
     },
-    {
-      path: "/Fleet_Management/bills",
-      name: "Bills",
-      icon: <GoNote />,
-    },
+    // {
+    //   path: "/Fleet_Management/bills",
+    //   name: "Bills",
+    //   icon: <GoNote />,
+    // },
     {
       name: "Coins",
       icon: <PiCoinsLight />,

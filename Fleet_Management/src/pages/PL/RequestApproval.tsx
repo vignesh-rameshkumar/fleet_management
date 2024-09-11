@@ -95,7 +95,7 @@ const RequestApproval: React.FC<RequestApprovalProps> = ({
       filters: [
         ["owner", "!=", userEmailId],
         ["reports_to", "=", userEmailId],
-        ["status", "!=", "Cancelled"],
+        ["status", "!=", "Delete"],
       ],
       orderBy: {
         field: "modified",

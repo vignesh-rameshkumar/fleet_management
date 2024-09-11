@@ -24,7 +24,7 @@ const ExternalServices: React.FC<ExternalServicesProps> = ({
   userEmailId,
 }) => {
   const handleCardClick = (url: string) => {
-    window.location.href = url;
+    window.open(url, "_blank");
   };
   const buttonStyle = {
     backgroundColor: "#5e8d57", // Common green color for both buttons

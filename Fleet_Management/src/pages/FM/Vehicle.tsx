@@ -20,6 +20,7 @@ import {
   Dialog,
   DialogContent,
   IconButton,
+  Alert,
 } from "@mui/material";
 import { useParams, Link } from "react-router-dom";
 import {
@@ -113,6 +114,7 @@ const Vehicle: React.FC<VehicleProps> = ({
   const [contactNumberError, setContactNumberError] = useState<string | null>(
     null
   );
+  const [edit, setEdit] = useState(true);
 
   const [vehicleImagePreviewUrl, setVehicleImagePreviewUrl] = useState<
     string | null
@@ -137,7 +139,7 @@ const Vehicle: React.FC<VehicleProps> = ({
   const [vinError, setVINError] = useState(false);
   const [vinHelperText, setVINHelperText] = useState("");
 
-  const [rcDate, setRCDate] = useState(null);
+  const [rcDate, setRCDate] = useState<Date | null>(null);
   const [rcExpiredDate, setRCExpiredDate] = useState(null);
   const [rcDateError, setRCDateError] = useState(false);
   const [rcDateHelperText, setRCDateHelperText] = useState("");
@@ -523,14 +525,17 @@ const Vehicle: React.FC<VehicleProps> = ({
     }
   };
   const validateVehicleModel = (model) => {
-    if (model && !/^[a-zA-Z\s]*$/.test(model)) {
+    if (model && !/^[a-zA-Z0-9\s]*$/.test(model)) {
       setVehicleModelError(true);
-      setVehicleModelHelperText("Model can only contain letters and spaces.");
+      setVehicleModelHelperText(
+        "Model can only contain letters, numbers, and spaces."
+      );
     } else {
       setVehicleModelError(false);
       setVehicleModelHelperText("");
     }
   };
+
   const validateLicensePlateNumber = (value: string) => {
     // Remove spaces from the input value
     const trimmedValue = value.replace(/\s+/g, "");
@@ -557,15 +562,21 @@ const Vehicle: React.FC<VehicleProps> = ({
 
   const validateDates = (rcDate, rcExpiredDate) => {
     let valid = true;
-    let errorMsg = "";
 
-    if (rcExpiredDate && rcDate && rcExpiredDate.isBefore(rcDate)) {
+    // Check if RC Expired Date is before RC Date
+    if (rcDate && rcExpiredDate && rcExpiredDate.isBefore(rcDate)) {
       valid = false;
-      errorMsg = "RC Expired Date cannot be before RC Date.";
-      setRCDateError(!valid);
-      setRCExpiredDateError(!valid);
+      const errorMsg = "RC Expired Date cannot be before RC Date.";
+      setRCDateError(true);
+      setRCExpiredDateError(true);
       setRCDateHelperText(errorMsg);
       setRCExpiredDateHelperText(errorMsg);
+    } else {
+      // Clear the errors if the validation passes
+      setRCDateError(false);
+      setRCExpiredDateError(false);
+      setRCDateHelperText("");
+      setRCExpiredDateHelperText("");
     }
   };
 
@@ -598,6 +609,8 @@ const Vehicle: React.FC<VehicleProps> = ({
     }
     setTravelsName(name);
   };
+  console.log("rcExpiredDateHelperText", rcExpiredDateHelperText);
+  console.log("rcDateHelperText", rcDateHelperText);
 
   const validateTravelsContractorsName = (name: string) => {
     if (name && !/^[a-zA-Z\s]+$/.test(name)) {
@@ -910,29 +923,29 @@ const Vehicle: React.FC<VehicleProps> = ({
     setVehicleName("");
     setContactNumber("");
 
-    setVehicleYear(null);
+    // setVehicleYear(null);
     setVehicleType("");
     setFuelType("");
     setVIN("");
-    setRCDate(null);
-    setRCExpiredDate(null);
+    // setRCDate(null);
+    // setRCExpiredDate(null);
     setRcDetails(null);
     setPollutionCertificate(null);
-    setNextServiceDate(null);
-    setRoadTaxDate(null);
-    setPermitYearlyOnceDate(null);
+    // setNextServiceDate(null);
+    // setRoadTaxDate(null);
+    // setPermitYearlyOnceDate(null);
     setPolicyHolderName("");
     setPolicyNumber("");
     setPolicyType("");
     setPolicyHolderAddress("");
     setInsuranceCompanyAddress("");
     setInsuranceCompanyName("");
-    setPolicyEffectiveDate(null);
-    setPolicyEffectiveEndDate(null);
+    // setPolicyEffectiveDate(null);
+    // setPolicyEffectiveEndDate(null);
     setIdv("");
     setIdvAmount("");
     setDeductibles("");
-    setPurchaseInvoice(null);
+    // setPurchaseInvoice(null);
     setBillsOfSales(null);
     setVehicleDetails(false);
     setTable(true);
@@ -944,14 +957,20 @@ const Vehicle: React.FC<VehicleProps> = ({
     error,
     reset,
   } = useFrappeCreateDoc();
-
+  const {
+    updateDoc,
+    loading: updatingLoading,
+    error: updatingError,
+  } = useFrappeUpdateDoc();
   // Reusable function for file upload
   const uploadFile = async (file, options) => {
-    if (file) {
+    if (file instanceof File || file instanceof Blob) {
       const response = await upload(file, options);
       return response.file_url;
+    } else {
+      console.error("Invalid file type:", file);
+      return null;
     }
-    return null;
   };
   const formatDate = (date) => {
     return new Date(date).toISOString().slice(0, 19).replace("T", " ");
@@ -1046,7 +1065,92 @@ const Vehicle: React.FC<VehicleProps> = ({
       handleRequestError(error);
     }
   };
+  const handleUpdate = async (status) => {
+    try {
+      // File uploads
+      const vehicleImageUrl = await uploadFile(vehicleImage, {
+        isPrivate: true,
+        doctype: "FM_Vehicle_Details",
+        fieldname: "vehicle_image",
+      });
+      const rcImageUrl = await uploadFile(rcDetails, {
+        isPrivate: true,
+        doctype: "FM_Vehicle_Details",
+        fieldname: "rc_copy",
+      });
+      const pollutionCertificateUrl = await uploadFile(pollutionCertificate, {
+        isPrivate: true,
+        doctype: "FM_Vehicle_Details",
+        fieldname: "pollution_certificate",
+      });
+      const insuranceCopyUrl = await uploadFile(insuranceFile, {
+        isPrivate: true,
+        doctype: "FM_Vehicle_Details",
+        fieldname: "insurance_copy",
+      });
+      const purchaseinvoice = await uploadFile(purchaseInvoice, {
+        isPrivate: true,
+        doctype: "FM_Vehicle_Details",
+        fieldname: "purchase_invoice",
+      });
+      const billsofsales = await uploadFile(billsOfSales, {
+        isPrivate: true,
+        doctype: "FM_Vehicle_Details",
+        filedname: "bills_of_sales",
+      });
+      // Base request body
+      // Base request body
+      const requestBody = {
+        contractor_name: travelsContractorsName,
+        travels_name: travelsName,
+        plate_number: licensePlateNumber,
+        model: vehicleModel,
+        vehicle_image: vehicleImageUrl,
+        contact_number: contactNumber,
+        status: vehicleAvailability,
+        ownership: ownership,
+        manufacturer_name: vehicleName,
+      };
 
+      // Additional fields for "Own" ownership
+      if (ownership === "Own") {
+        Object.assign(requestBody, {
+          model_year: vehicleYear,
+          vehicle_type: vehicleType,
+          fuel_type: fuelType,
+          identification_number: vin,
+          rc_date: formatDate(rcDate),
+          rc_expiring_date: formatDate(rcExpiredDate),
+          rc_copy: rcImageUrl,
+          pollution_certificate: pollutionCertificateUrl,
+          next_service_date: formatDate(nextServiceDate),
+          road_tax: formatDate(roadTaxDate),
+          permit: formatDate(permitYearlyOnceDate),
+          policyholder_name: policyHolderName,
+          policy_no: policyNumber,
+          policy_type: policyType,
+          policyholder_address: policyHolderAddress,
+          insurance_company_address: insuranceCompanyAddress,
+          insurance_company_name: insuranceCompanyName,
+          policy_effective_start: formatDate(policyEffectiveDate),
+          policy_effective_end: formatDate(policyEffectiveEndDate),
+          idv: idv,
+          idv_amount: idvAmount,
+          deductibles: deductibles,
+          insurance_copy: insuranceCopyUrl,
+          purchase_invoice: purchaseinvoice,
+          bills_of_sales: billsofsales,
+        });
+      }
+
+      // Update the document
+      await updateDoc("FM_Vehicle_Details", drawerDetails.name, requestBody);
+      toast.success("Updated successfully");
+    } catch (error) {
+      toast.error("Failed to update data.");
+      console.error("Error:", error);
+    }
+  };
   // Helper function to handle errors
   const handleRequestError = (error) => {
     if (error.response) {
@@ -1411,7 +1515,7 @@ const Vehicle: React.FC<VehicleProps> = ({
                 >
                   <ArrowBackIcon />
                 </IconButton>
-                Add Own Vehicle Details
+                Add {ownership} Vehicle Details
               </Typography>
             </Box>
             {/* Conditional Rendering based on Ownership Type */}
@@ -1685,78 +1789,92 @@ const Vehicle: React.FC<VehicleProps> = ({
                     helperText={vinHelperText}
                     sx={{ width: { xs: "100%", sm: "100%", md: "90%" } }}
                   />
-                  {/* RC Date Picker */}
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                      label="RC Date"
-                      value={rcDate}
-                      onChange={handleRCDateChange}
+                    {/* RC Date Picker */}
+                    <Box
                       sx={{
+                        position: "relative",
                         width: "90%",
-                        "& .MuiInputBase-root": {
-                          height: "auto",
-                        },
-                        "& .MuiInputLabel-root": {
-                          lineHeight: "40px",
-                        },
+                        marginBottom: "20px",
                       }}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          error={rcDateError}
-                          helperText={rcDateHelperText}
-                        />
-                      )}
-                      format="DD/MM/YYYY"
-                    />
-                    {rcDateError && (
-                      <span
-                        style={{
-                          color: "red",
-                          position: "absolute",
-                          top: "100%",
-                          left: 0,
+                    >
+                      <DatePicker
+                        label="RC Date"
+                        value={rcDate}
+                        onChange={handleRCDateChange}
+                        sx={{
+                          width: "100%",
+                          "& .MuiInputBase-root": {
+                            height: "auto",
+                          },
+                          "& .MuiInputLabel-root": {
+                            lineHeight: "40px",
+                          },
                         }}
-                      >
-                        {rcDateHelperText}
-                      </span>
-                    )}
+                        renderInput={(params) => (
+                          <TextField {...params} error={rcDateError} />
+                        )}
+                        format="DD/MM/YYYY"
+                      />
+                      {rcDateError && (
+                        <span
+                          style={{
+                            color: "red",
+                            position: "absolute",
+                            top: "100%",
+                            left: 0,
+                            marginTop: "5px", // Add margin for spacing
+                            fontSize: "12px", // Responsive font size
+                          }}
+                        >
+                          {rcDateHelperText}
+                        </span>
+                      )}
+                    </Box>
 
-                    <DatePicker
-                      label="RC Expired Date"
-                      value={rcExpiredDate}
-                      onChange={handleRCExpiredDateChange}
+                    {/* RC Expired Date Picker */}
+                    <Box
                       sx={{
+                        position: "relative",
                         width: "90%",
-                        "& .MuiInputBase-root": {
-                          height: "auto",
-                        },
-                        "& .MuiInputLabel-root": {
-                          lineHeight: "40px",
-                        },
+                        marginBottom: "20px",
                       }}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          error={rcExpiredDateError}
-                          helperText={rcExpiredDateHelperText}
-                        />
-                      )}
-                      format="DD/MM/YYYY"
-                    />
-                    {rcExpiredDateError && (
-                      <span
-                        style={{
-                          color: "red",
-                          position: "absolute",
-                          top: "100%",
-                          left: 0,
+                    >
+                      <DatePicker
+                        label="RC Expired Date"
+                        value={rcExpiredDate}
+                        onChange={handleRCExpiredDateChange}
+                        sx={{
+                          width: "100%",
+                          "& .MuiInputBase-root": {
+                            height: "auto",
+                          },
+                          "& .MuiInputLabel-root": {
+                            lineHeight: "40px",
+                          },
                         }}
-                      >
-                        {rcExpiredDateHelperText}
-                      </span>
-                    )}
+                        renderInput={(params) => (
+                          <TextField {...params} error={rcExpiredDateError} />
+                        )}
+                        format="DD/MM/YYYY"
+                      />
+                      {rcExpiredDateError && (
+                        <span
+                          style={{
+                            color: "red",
+                            position: "absolute",
+                            top: "100%",
+                            left: 0,
+                            marginTop: "5px", // Add margin for spacing
+                            fontSize: "12px", // Responsive font size
+                          }}
+                        >
+                          {rcExpiredDateHelperText}
+                        </span>
+                      )}
+                    </Box>
                   </LocalizationProvider>
+
                   <Modal
                     open={rcDetailsModalOpen}
                     onClose={closeRCImagePreview}
@@ -2439,7 +2557,7 @@ const Vehicle: React.FC<VehicleProps> = ({
                   <Box
                     sx={{
                       width: { xs: "100%", sm: "100%", md: "90%" },
-                      margin: "10 auto",
+                      margin: "5 auto",
                     }}
                   >
                     <TextField
@@ -2455,7 +2573,7 @@ const Vehicle: React.FC<VehicleProps> = ({
                           fileInput.click();
                         }
                       }}
-                      // sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
+                      sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
@@ -2496,7 +2614,7 @@ const Vehicle: React.FC<VehicleProps> = ({
                     />
                   </Box>
                 </Box>
-                <Box
+                {/* <Box
                   sx={{
                     display: "flex",
                     justifyContent: "center",
@@ -2521,7 +2639,83 @@ const Vehicle: React.FC<VehicleProps> = ({
                   >
                     {contractorLoading ? "Submitting..." : "Submit"}
                   </Button>
-                </Box>
+                </Box> */}
+                {edit && (
+                  <>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        padding: "20px",
+                      }}
+                    >
+                      <Button
+                        className="saveBtn"
+                        disabled={
+                          !vehicleName ||
+                          !vehicleModel ||
+                          !vehicleImage ||
+                          !licensePlateNumber ||
+                          vehicleModelError ||
+                          vehicleModelError ||
+                          licensePlateError
+                        }
+                        onClick={CreateContractorRequest}
+                      >
+                        {contractorLoading ? "Submitting..." : "Submit"}
+                      </Button>
+                    </Box>
+                  </>
+                )}
+                {!edit && (
+                  <>
+                    {updatingLoading ? ( // Show loading spinner while updating
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          padding: "20px",
+                        }}
+                      >
+                        <CircularProgress />
+                      </Box>
+                    ) : (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          padding: "20px",
+                        }}
+                      >
+                        <Button
+                          className="saveBtn"
+                          onClick={() => {
+                            handleUpdate; // Call your update function
+                            setVehicleDetails(true); // Set vehicle details to true
+                            setTable(false); // Set table to false
+                          }}
+                          disabled={updatingLoading} // Button is disabled if `updatingLoading` is true
+                        >
+                          {updatingLoading ? "updating..." : "Update"}
+                        </Button>
+                      </Box>
+                    )}
+
+                    {updatingError && (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          padding: "20px",
+                        }}
+                      >
+                        <Alert severity="error">
+                          {updatingError.message || "Failed to update data."}
+                        </Alert>
+                      </Box>
+                    )}
+                  </>
+                )}
               </>
             )}
             {ownership === "Contract" && (
@@ -2777,36 +2971,88 @@ const Vehicle: React.FC<VehicleProps> = ({
                     />
                     {fileError && <span className="ErrorMsg">{fileError}</span>}
                   </Box>
-                </Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    padding: "20px",
-                  }}
-                >
-                  <Button
-                    className="saveBtn"
-                    disabled={
-                      !travelsContractorsName ||
-                      !travelsName ||
-                      !licensePlateNumber ||
-                      !vehicleModel ||
-                      !vehicleImage ||
-                      !contactNumber ||
-                      travelsNameError ||
-                      travelsContractorsNameError ||
-                      licensePlateError ||
-                      vehicleModelError ||
-                      contactNumberError ||
-                      contractorLoading ||
-                      !vehicleName ||
-                      vehicleError
-                    }
-                    onClick={CreateContractorRequest}
-                  >
-                    {contractorLoading ? "Submitting..." : "Submit"}
-                  </Button>
+                  {edit && (
+                    <>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          padding: "20px",
+                        }}
+                      >
+                        <Button
+                          className="saveBtn"
+                          disabled={
+                            !vehicleName ||
+                            !vehicleModel ||
+                            !vehicleImage ||
+                            !licensePlateNumber ||
+                            !travelsName ||
+                            !contactNumber ||
+                            !travelsContractorsName ||
+                            travelsNameError ||
+                            vehicleModelError ||
+                            licensePlateError ||
+                            contactNumberError ||
+                            vehicleError ||
+                            travelsContractorsNameError
+                          }
+                          onClick={CreateContractorRequest}
+                        >
+                          {contractorLoading ? "Submitting..." : "Submitcon"}
+                        </Button>
+                      </Box>
+                    </>
+                  )}
+                  {!edit && (
+                    <>
+                      {updatingLoading ? ( // Show loading spinner while updating
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            padding: "20px",
+                          }}
+                        >
+                          <CircularProgress />
+                        </Box>
+                      ) : (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            padding: "20px",
+                          }}
+                        >
+                          <Button
+                            className="saveBtn"
+                            onClick={() => {
+                              handleUpdate; // Call your update function
+                              setVehicleDetails(true); // Set vehicle details to true
+                              setTable(false); // Set table to false
+                            }}
+                            disabled={updatingLoading}
+                          >
+                            Update
+                          </Button>
+                        </Box>
+                      )}
+
+                      {updatingError && (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            padding: "20px",
+                          }}
+                        >
+                          <Alert severity="error">
+                            {updatingError.message || "Failed to update data."}
+                          </Alert>
+                        </Box>
+                      )}
+                    </>
+                  )}
                 </Box>
               </>
             )}
@@ -3446,17 +3692,24 @@ const Vehicle: React.FC<VehicleProps> = ({
                     </Typography>
                   </Grid>
                 </Grid>
-                <Box>
-                  <Typography
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    padding: "20px",
+                  }}
+                >
+                  <Button
+                    className="saveBtn"
                     onClick={() => {
-                      setVehicleDetails(true);
+                      setEdit(false);
+                      setVehicleDetails(true); // Correct way to call functions
                       setTable(false);
                       handleCloseDrawer();
                     }}
-                    sx={{ cursor: "pointer" }}
                   >
                     Edit
-                  </Typography>
+                  </Button>
                 </Box>
               </>
               {/* )} */}

@@ -248,7 +248,10 @@ const Driver: React.FC<DriverProps> = ({
   const { data: Employee, isLoading: employeeDetailsLoading } =
     useFrappeGetDocList("Employee", {
       fields: ["*"],
-      // filters: [["owner", "=", userEmailId]],
+      filters: [
+        ["department", "=", "Transportation - ACPL"],
+        ["designation", "=", "Driver"],
+      ],
 
       orderBy: {
         field: "modified",
@@ -1031,7 +1034,7 @@ const Driver: React.FC<DriverProps> = ({
       setLicensePlateNumber(drawerDetails.license_number || "");
       setSelectedEmployee(drawerDetails.employee_id || "");
       setContactNumber(drawerDetails.contact_number || "");
-      // setOwnership(drawerDetails.employee_type || "");
+      setOwnership(drawerDetails.employee_type || "Own");
       // setLicenseExpiredDate(drawerDetails.license_expiration_date || "");
       setDriverImage(drawerDetails.driver_photo || "");
       // setDateOfBirth(drawerDetails.dob || "");
@@ -1044,7 +1047,7 @@ const Driver: React.FC<DriverProps> = ({
         drawerDetails.insurance_company_address || ""
       );
       setMedicalCertificate(drawerDetails.medical_fitness_certificate || "");
-      setDriverAvailability(drawerDetails.status || " ");
+      setDriverAvailability(drawerDetails.status || "Online");
     }
   }, [drawerDetails]);
   return (
@@ -1216,7 +1219,7 @@ const Driver: React.FC<DriverProps> = ({
                 <Typography>Driver Available:</Typography>
                 <RadioGroup
                   row
-                  value={driverAvailability}
+                  value={driverAvailability} // This ensures the selected value is controlled
                   onChange={handleDriverAvailabilityChange}
                 >
                   <FormControlLabel

@@ -1057,7 +1057,10 @@ const Logs: React.FC<LogsProps> = ({
   const { data: Employee, isLoading: employeeDetailsLoading } =
     useFrappeGetDocList("Employee", {
       fields: ["*"],
-      // filters: [["owner", "=", userEmailId]],
+      filters: [
+        ["department", "=", "Transportation - ACPL"],
+        ["designation", "=", "Driver"],
+      ],
 
       orderBy: {
         field: "modified",
@@ -4316,7 +4319,11 @@ const Logs: React.FC<LogsProps> = ({
                   textAlign: "left",
                   marginBottom: 2,
                 }}
-                label="Damage Description"
+                label={
+                  <span>
+                    Damage Description <span style={{ color: "red" }}>*</span>
+                  </span>
+                }
                 value={damageDescription}
                 onChange={handleDamageDescriptionChange}
                 error={!!damageDescriptionError}
@@ -4433,7 +4440,11 @@ const Logs: React.FC<LogsProps> = ({
                   height: "auto",
                   textAlign: "left",
                 }}
-                label={<span>Vehicle Number</span>}
+                label={
+                  <span>
+                    Vehicle Number <span style={{ color: "red" }}>*</span>
+                  </span>
+                }
                 value={licensePlateNumber}
                 onChange={(e) => {
                   const newValue = e.target.value;
@@ -4461,7 +4472,9 @@ const Logs: React.FC<LogsProps> = ({
                       policeStationNumberError ||
                       firCopyError ||
                       accidentReasonError ||
+                      !damageDescription ||
                       damageDescriptionError ||
+                      licensePlateNumber ||
                       accidentDescriptionError ||
                       licensePlateError ||
                       !accidentImage
@@ -4620,7 +4633,7 @@ const Logs: React.FC<LogsProps> = ({
                 SelectProps={{ native: true }}
                 InputLabelProps={{ shrink: true }}
               >
-                <option value="">Select Vehicle Type</option>
+                <option value="">Service Type</option>
                 <option value="Routine">Routine</option>
                 <option value="Repair">Repair</option>
                 <option value="Inspection">Inspection</option>
