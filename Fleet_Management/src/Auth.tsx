@@ -17,25 +17,18 @@ export const Auth = () => {
   return (
     <div>
       {currentUser}
-
       <button
         onClick={
           // () => login({ username: "Administrator", password: "rajesh123" })
-          // () => login({ username: "testhra@agnikul.in", password: "Agnikul_1" })
-          // () => login({ username: "testhr@agnikul.in", password: "Agnikul_1" })
-          // () => login({ username: "testhr1@agnikul.in", password: "Agnikul_1" })
-          // Team 2
-          // () => login({ username: "testdl2@agnikul.in", password: "Agnikul_1" })
-          // () => login({ username: "testpl3@agnikul.in", password: "Agnikul_1" })
-          // () => login({ username: "testemp2@agnikul.in", password: "Agnikul_1" })
           // Team 1
           // () => login({ username: "testsa@agnikul.in", password: "Agnikul_1" })
-          // () => login({ username: "driver@agnikul.in", password: "Agnikul_1" })
-          () => login({ username: "lakshmi@agnikul.in", password: "Agnikul_1" })
-
+          // () =>
+          //   login({ username: "tn18av7889@agnikul.in", password: "Agnikul_1" })
+          // () =>
+          // login({ username: "tn18av7099@agnikul.in", password: "Agnikul_1" })
+          // () => login({ username: "testfm@agnikul.in", password: "Agnikul_1" })
           // () => login({ username: "testdl@agnikul.in", password: "Agnikul_1" })
-          // () => login({ username: "testpl@agnikul.in", password: "Agnikul_1" })
-
+          () => login({ username: "testpl@agnikul.in", password: "Agnikul_1" })
           // () => login({ username: "testpl2@agnikul.in", password: "Agnikul_1" })
           // () =>
           // login({ username: "testemp3@agnikul.in", password: "Agnikul_1" })
@@ -49,7 +42,8 @@ export const Auth = () => {
       >
         {" "}
         Login
-      </button> <br />
+      </button>{" "}
+      <br />
       <button onClick={logout}>Logout</button>
       {/* <button onClick={updateCurrentUser}>Fetch current user</button> */}
     </div>

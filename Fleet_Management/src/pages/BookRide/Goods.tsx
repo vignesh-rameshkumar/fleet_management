@@ -242,6 +242,7 @@ const Goods: React.FC<GoodsProps> = ({
   //
   // const [addMore, setAddMore] = useState(false);
   const [sections, setSections] = useState([]);
+
   const [isAddMoreChecked, setIsAddMoreChecked] = useState(false);
 
   const handleAddSection = (event) => {

@@ -1,86 +1,83 @@
 {
- "actions": [],
- "autoname": "format:DR_{MM}{YY}_{####}",
- "creation": "2024-07-30 17:43:54.021186",
- "default_view": "List",
- "doctype": "DocType",
- "editable_grid": 1,
- "engine": "InnoDB",
- "field_order": [
-  "date_time",
-  "route_id",
-  "ride_starting_point",
-  "ride_status",
-  "bill_amount",
-  "onboarded_employees"
- ],
- "fields": [
-  {
-   "default": "now",
-   "fieldname": "date_time",
-   "fieldtype": "Read Only",
-   "in_list_view": 1,
-   "label": "Date & Time",
-   "reqd": 1
-  },
-  {
-   "fieldname": "route_id",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Route ID",
-   "options": "FM_Route_ID",
-   "reqd": 1
-  },
-  {
-   "fieldname": "ride_starting_point",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Ride Starting Point",
-   "reqd": 1
-  },
-  {
-   "fieldname": "onboarded_employees",
-   "fieldtype": "Table",
-   "label": "Onboarded Employees",
-   "options": "FM_Travel_Route_Members",
-   "reqd": 1
-  },
-  {
-   "fieldname": "bill_amount",
-   "fieldtype": "Int",
-   "label": "Bill Amount"
-  },
-  {
-   "fieldname": "ride_status",
-   "fieldtype": "Select",
-   "label": "Ride Status",
-   "options": "In-progress\nCompleted"
-  }
- ],
- "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2024-09-09 15:48:52.416702",
- "modified_by": "Administrator",
- "module": "Fleet Management",
- "name": "FM_Travel_Route_Report",
- "naming_rule": "Expression",
- "owner": "Administrator",
- "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "write": 1
-  }
- ],
- "sort_field": "modified",
- "sort_order": "DESC",
- "states": [],
- "track_changes": 1
+  "actions": [],
+  "autoname": "format:DR_{MM}{YY}_{####}",
+  "creation": "2024-07-30 17:43:54.021186",
+  "default_view": "List",
+  "doctype": "DocType",
+  "editable_grid": 1,
+  "engine": "InnoDB",
+  "field_order": [
+    "date_time",
+    "route_id",
+    "ride_starting_point",
+    "ride_status",
+    "bill_amount",
+    "onboarded_employees"
+  ],
+  "fields": [
+    {
+      "default": "now",
+      "fieldname": "date_time",
+      "fieldtype": "Read Only",
+      "in_list_view": 1,
+      "label": "Date & Time"
+    },
+    {
+      "fieldname": "route_id",
+      "fieldtype": "Link",
+      "in_list_view": 1,
+      "label": "Route ID",
+      "options": "FM_Route_ID"
+    },
+    {
+      "fieldname": "ride_starting_point",
+      "fieldtype": "Data",
+      "in_list_view": 1,
+      "label": "Ride Starting Point",
+      "reqd": 1
+    },
+    {
+      "fieldname": "onboarded_employees",
+      "fieldtype": "Table",
+      "label": "Onboarded Employees",
+      "options": "FM_Travel_Route_Members"
+    },
+    {
+      "fieldname": "bill_amount",
+      "fieldtype": "Int",
+      "label": "Bill Amount"
+    },
+    {
+      "fieldname": "ride_status",
+      "fieldtype": "Select",
+      "label": "Ride Status",
+      "options": "In-progress\nCompleted"
+    }
+  ],
+  "index_web_pages_for_search": 1,
+  "links": [],
+  "modified": "2024-09-04 11:39:05.627553",
+  "modified_by": "Administrator",
+  "module": "Fleet Management",
+  "name": "FM_Travel_Route_Report",
+  "naming_rule": "Expression",
+  "owner": "Administrator",
+  "permissions": [
+    {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "System Manager",
+      "share": 1,
+      "write": 1
+    }
+  ],
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "states": [],
+  "track_changes": 1
 }

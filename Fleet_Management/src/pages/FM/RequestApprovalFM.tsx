@@ -24,6 +24,7 @@ import {
   useFrappeGetDocList,
   useFrappeUpdateDoc,
   useFrappeGetDoc,
+  useFrappeCreateDoc,
 } from "frappe-react-sdk";
 import Autocomplete from "@mui/material/Autocomplete";
 import dayjs from "dayjs";
@@ -362,6 +363,7 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
 
   const handleVehicle = (event) => {
     setSelectedVehicle(event.target.value);
+    setBtnshow(true);
   };
 
   // Driver Details
@@ -467,7 +469,6 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
       vehicle_no: selectedVehicle ? selectedVehicle : externalVehicleNo,
       allotment: selectedOption,
       otp: externalVehicleOTP,
-
       approved_date_time:
         approvalDate && approvalTime ? Approvel_date_time : Req_date_time,
     };
@@ -484,7 +485,7 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
       });
 
       toast.success("Approved Successfully");
-
+      CreateDriverTask();
       handleCloseDrawer();
     } catch (error) {
       toast.error(`Error Approved doc: ${error.message}`);
@@ -583,6 +584,55 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
       setRejectReason("");
     } catch (error) {
       toast.error(`Error Approved doc: ${error.message}`);
+    }
+  };
+
+  const { createDoc } = useFrappeCreateDoc();
+
+  const CreateDriverTask = async () => {
+    try {
+      const body = {
+        request_id: drawerDetails.request_id,
+        employee_name: drawerDetails.employee_name,
+        from_location: drawerData[0]?.from_location || "N/A",
+        to_location: drawerData[0]?.to_location || "N/A",
+        approved_date_time:
+          approvalDate && approvalTime ? Approvel_date_time : Req_date_time,
+        doctypename: drawerDetails.doctypename,
+        vehicle_no: selectedVehicle ? selectedVehicle : externalVehicleNo,
+        task_ride_status: "Pending",
+      };
+      await createDoc("FM_Vehicle_Task", body);
+      toast.success("Vehicle Task Successfully ");
+    } catch (error) {
+      if (error.response) {
+        const statusCode = error.response.status;
+        const serverMessage = error.response.data?._server_messages;
+
+        if (statusCode === 400) {
+          toast.error("Bad request. Please check your input.");
+        } else if (statusCode === 401) {
+          toast.error("Unauthorized. Please log in.");
+        } else if (statusCode === 404) {
+          toast.error("Resource not found.");
+        } else if (statusCode === 500) {
+          toast.error("Internal server error. Please try again later.");
+        } else if (serverMessage) {
+          const parsedMessages = JSON.parse(serverMessage);
+          const errorMessage = parsedMessages
+            .map((msg) => JSON.parse(msg).message)
+            .join(", ");
+          toast.error(errorMessage);
+        } else {
+          toast.error(`Error: ${statusCode}`);
+        }
+      } else if (error.request) {
+        toast.error(
+          "No response received from server. Please try again later."
+        );
+      } else {
+        toast.error(`${error.exception}`);
+      }
     }
   };
 

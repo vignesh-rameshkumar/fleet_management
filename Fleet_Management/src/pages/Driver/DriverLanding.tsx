@@ -52,6 +52,8 @@ import {
   useFrappeGetDocList,
   useFrappeGetDoc,
   useFrappeDeleteDoc,
+  useFrappeUpdateDoc,
+  useFrappeGetCall,
 } from "frappe-react-sdk";
 
 import dayjs from "dayjs";
@@ -78,44 +80,24 @@ const DriverLanding: React.FC<DriverProps> = ({
   const [selectedRouteId, setSelectedRouteId] = useState();
   const [time, setTime] = useState(0); // Keeps track of elapsed time in seconds
   const [isRunning, setIsRunning] = useState(false); // Controls the timer's running state
-  const [totalTime, setTotalTime] = useState(0); // Accumulates total time in seconds
+  const [totalTime, setTotalTime] = useState<string | null>(null);
+
   const timerRef = useRef(null);
   const startTimeRef = useRef(null);
+  const [startTime, setStartTime] = useState<string | null>(null); // To track start time
 
   const [qrData, setQrData] = useState(null);
-  const [scannerShow, setScannerShow] = useState(true);
+  const [scannerShowPage, setScannerShowPage] = useState(true);
   const [hasShownToast, setHasShownToast] = useState(false);
-  const [scannedCodes, setScannedCodes] = useState(new Set());
+  const [webcamStream, setWebcamStream] = useState(null);
+  const [parentNameData, setparentNameData] = useState<any>(null);
 
-  const handleStartscanner = () => {
-    setScannerShow(false);
-  };
-
-  const handleStopscanner = () => {
-    setScannerShow(true);
-  };
-
-  const handleScanResult = () => {
-    if (qrData) {
-      const scannedCode = qrData;
-      setQrData(scannedCode);
-
-      if (scannedCodes.has(scannedCode)) {
-        if (!hasShownToast) {
-          toast.info("QR code has already been scanned.");
-          setHasShownToast(true);
-        }
-      } else {
-        toast.success("QR code scanned successfully!");
-        setScannedCodes((prevCodes) => new Set(prevCodes).add(scannedCode));
-        setHasShownToast(false); // Reset the toast state for new scans
-      }
-    }
-  };
+  // console.log("webcamStream", webcamStream?.map(x)=>XMLDocument.MediaStream);
 
   const handleError = (error) => {
     console.error("QR Scan Error:", error);
   };
+
   const ThemeColor = createTheme({
     palette: {
       primary: {
@@ -234,10 +216,9 @@ const DriverLanding: React.FC<DriverProps> = ({
     setDailyShow(true);
     setPassengerShow(false);
     setDriverShow(false);
-    setSelectedDropPoint(null);
+
     setSelectedPickUp(null);
   };
-
   const { data: pickup } = useFrappeGetDoc("FM_Route_ID", selectedRouteId);
   const [pickUp, setPickup] = useState([]);
 
@@ -266,37 +247,46 @@ const DriverLanding: React.FC<DriverProps> = ({
     }
   }, [drop, selectedPickup]);
 
-  const [selectedDropPoint, setSelectedDropPoint] = useState("");
-
-  const handleDropId = (event) => {
-    const dropPoint = event.target.value;
-
-    if (dropPoint === selectedPickup) {
-      toast.warning("The Pickup and Drop locations cannot be the same.");
-      setSelectedDropPoint("");
-    } else {
-      setSelectedDropPoint(dropPoint);
-    }
-  };
-
   // END
 
   // Start Passenger time count
   const handleStart = () => {
     setIsRunning(true);
-    startTimeRef.current = Date.now(); // Record the start time
+    startTimeRef.current = Date.now();
     timerRef.current = setInterval(() => {
       setTime((prevTime) => prevTime + 1);
-    }, 1000); // Increment time every second
+    }, 1000);
+    const currentTime = new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    setStartTime(currentTime);
+    updateRideTime("start");
   };
 
   const handleStop = () => {
     clearInterval(timerRef.current);
     setIsRunning(false);
-    const endTime = Date.now(); // Record the end time
-    const sessionTime = Math.floor((endTime - startTimeRef.current) / 1000); // Calculate the session time in seconds
-    setTotalTime((prevTotal) => prevTotal + sessionTime); // Update total time
-    setTime(0); // Reset the current timer
+
+    const endTime = Date.now();
+    const sessionTimeInSeconds = Math.floor(
+      (endTime - startTimeRef.current) / 1000
+    ); // Calculate the session time in seconds
+
+    // Convert total time to HH:mm:ss format
+    const totalHours = Math.floor(sessionTimeInSeconds / 3600); // Total hours
+    const totalMinutes = Math.floor((sessionTimeInSeconds % 3600) / 60); // Total minutes
+    const totalSeconds = sessionTimeInSeconds % 60; // Remaining seconds
+
+    // Format hours, minutes, and seconds as HH:mm:ss
+    const formattedHours = String(totalHours).padStart(2, "0");
+    const formattedMinutes = String(totalMinutes).padStart(2, "0");
+    const formattedSeconds = String(totalSeconds).padStart(2, "0");
+    const formattedTotalTime = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+
+    setTotalTime(formattedTotalTime);
+    // setTime(0);
+    updateRideTime("end");
   };
 
   const formatTime = (seconds) => {
@@ -310,6 +300,327 @@ const DriverLanding: React.FC<DriverProps> = ({
     return `${h}:${m}:${s}`;
   };
   // END -------------
+
+  // Parent and child API
+
+  const { updateDoc } = useFrappeUpdateDoc();
+
+  const handleStopScanner = async () => {
+    try {
+      if (webcamStream && webcamStream.getTracks) {
+        webcamStream.getTracks().forEach((track) => {
+          if (track.readyState === "live") {
+            track.stop();
+            console.log(`Track with kind ${track.kind} stopped.`);
+          } else {
+            console.log(`Track with kind ${track.kind} is already stopped.`);
+          }
+        });
+      } else {
+        console.warn("No webcam stream available to stop.");
+      }
+
+      if (parentNameData && parentNameData.name) {
+        const body = {
+          ride_status: "Completed",
+        };
+        await updateDoc("FM_Travel_Route_Report", parentNameData.name, body);
+        toast.success("Ride Completed Successfully");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        throw new Error("Invalid parent document data");
+      }
+
+      // Update component state
+      setWebcamStream(null);
+      setScannerShowPage(true);
+      setHasShownToast(false);
+
+      console.log("Webcam stopped and scanner hidden.");
+    } catch (error) {
+      console.error("Error in handleStopScanner:", error);
+      toast.error(
+        error.message || "Failed to stop scanner and update document"
+      );
+    }
+  };
+
+  const { createDoc } = useFrappeCreateDoc();
+  const handleStartScanner = () => {
+    // setScannerShowPage(false);
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .then((stream) => {
+        setWebcamStream(stream);
+        console.log("Webcam started:", stream);
+      })
+      .catch((err) => {
+        console.error("Error accessing webcam: ", err);
+      });
+    createParentDocument();
+  };
+
+  const { data: FM_Travel_Route_Report }: any = useFrappeGetDocList(
+    "FM_Travel_Route_Report",
+    {
+      filters: [["route_id", "=", selectedRouteId]],
+      fields: ["name", "ride_status"],
+
+      limit: 100000,
+      orderBy: {
+        field: "modified",
+        order: "desc",
+      },
+    }
+  );
+
+  const [oldDataId, setOldDataId] = useState(FM_Travel_Route_Report);
+
+  useEffect(() => {
+    setOldDataId(FM_Travel_Route_Report);
+  }, [FM_Travel_Route_Report]);
+
+  const createParentDocument = async () => {
+    try {
+      // First, check if any documents exist with the same route_id
+      const existingDocs = oldDataId;
+
+      let parentName;
+      let parentResponse;
+
+      if (existingDocs && existingDocs.length > 0) {
+        // Find the first document with a ride_status that is not "Completed"
+        const ongoingDoc = existingDocs.find(
+          (doc) => doc.ride_status !== "Completed"
+        );
+
+        if (ongoingDoc) {
+          // Continue the existing ride
+          parentName = ongoingDoc.name;
+          parentResponse = ongoingDoc;
+          toast.info("Continuing existing ride.");
+        } else {
+          const parentBody = {
+            ride_starting_point: selectedPickup,
+            route_id: selectedRouteId,
+          };
+          parentResponse = await createDoc(
+            "FM_Travel_Route_Report",
+            parentBody
+          );
+          parentName = parentResponse?.name;
+          toast.success("New ride started successfully!");
+          setScannerShowPage(false);
+          setOldDataId((prevData) => [parentResponse, ...prevData]);
+        }
+      } else {
+        const parentBody = {
+          ride_starting_point: selectedPickup,
+          route_id: selectedRouteId,
+        };
+        parentResponse = await createDoc("FM_Travel_Route_Report", parentBody);
+        parentName = parentResponse?.name;
+        toast.success("New ride started successfully!");
+        setScannerShowPage(false);
+        setOldDataId((prevData) => [parentResponse, ...prevData]);
+      }
+
+      if (!parentName) {
+        throw new Error("Failed to create or retrieve parent document");
+      }
+
+      setparentNameData(parentResponse);
+      return parentName;
+    } catch (error) {
+      console.error("Error in createParentDocument:", error);
+      toast.error(error.message || "Failed to start or continue ride");
+    }
+  };
+
+  const handleScanResult = async (result) => {
+    if (result) {
+      const scannedCode = result.text;
+      setQrData(scannedCode);
+    }
+  };
+
+  const { data: Travel_route, error } = useFrappeGetCall(
+    "fleet_management.custom_function.update_attendance",
+    {
+      document_name: parentNameData?.name, // Ensure this is set
+      employee_email: qrData,
+    }
+  );
+  // if(Travel_route.message )
+  // console.log("Travel_route", Travel_route);
+
+  const toastShownRef = useRef(false);
+  const [responseProcessed, setResponseProcessed] = useState(false);
+
+  useEffect(() => {
+    // console.log("Travel_route", Travel_route);
+    if (!responseProcessed && (Travel_route || error)) {
+      if (error) {
+        console.error("Error updating attendance:", error.message);
+        if (!toastShownRef.current) {
+          toast.error("Failed to update attendance. Please try again.");
+          toastShownRef.current = true;
+          // setQrData(null);
+        }
+      } else if (
+        Travel_route &&
+        Travel_route?.message &&
+        Travel_route?.message?.message
+      ) {
+        if (Travel_route.message.message === "Attendance updated to Present") {
+          console.log(
+            "Attendance updated successfully:",
+            Travel_route.message.child_doc_name
+          );
+          // setQrData(null);
+          if (!toastShownRef.current) {
+            toast.success("Successfully scanned and Enjoy your Ride!");
+            toastShownRef.current = true;
+          }
+          setQrData(null);
+        } else {
+          console.log("Unexpected message:", Travel_route.message.message);
+          if (!toastShownRef.current) {
+            toast.info(Travel_route.message.message);
+            toastShownRef.current = true;
+          }
+        }
+      }
+      setResponseProcessed(true);
+    }
+  }, [Travel_route, error, setQrData, responseProcessed]);
+
+  // Reset the toast flag when qrData changes
+  useEffect(() => {
+    toastShownRef.current = false;
+    setResponseProcessed(false);
+  }, [qrData]);
+
+  const vehicle = userEmailId.slice(0, userEmailId.indexOf("@"));
+  // console.log("userEmailId", userEmailId, vehicle);
+
+  const { data: FM_Vehicle_Task }: any = useFrappeGetDocList(
+    "FM_Vehicle_Task",
+    {
+      fields: ["*"],
+      filters: [
+        ["vehicle_no", "LIKE", vehicle],
+        ["task_ride_status", "=", "Pending"], // Fetch Pending and Completed tasks
+      ],
+      limit: 100000,
+      orderBy: {
+        field: "modified",
+        order: "desc", // Sorting by the latest modified task
+      },
+    }
+  );
+
+  const [taskData, setTaskData] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (FM_Vehicle_Task && FM_Vehicle_Task.length > 0) {
+      const filteredTasks = FM_Vehicle_Task.filter(
+        (task: any) =>
+          task.approved_date_time && task.approved_date_time.trim() !== ""
+      );
+
+      filteredTasks.sort((a: any, b: any) => {
+        const dateA = new Date(a.approved_date_time).getTime();
+        const dateB = new Date(b.approved_date_time).getTime();
+        return dateA - dateB;
+      });
+      const nextTask = filteredTasks.find(
+        (task: any) => task.task_ride_status === "Pending"
+      );
+
+      if (nextTask) {
+        setTaskData([nextTask]);
+      } else {
+        const completedTask = filteredTasks.find(
+          (task: any) => task.task_ride_status === "Completed"
+        );
+
+        if (completedTask) {
+          setTaskData([completedTask]);
+        } else {
+          setTaskData([]);
+        }
+      }
+    }
+  }, [FM_Vehicle_Task]);
+
+  const employeeName = taskData?.map((x: any) => x.employee_name);
+  const Pickuppoint = taskData?.map((x: any) => x.from_location);
+  const Droppoint = taskData?.map((x: any) => x.to_location);
+  const Pointime = taskData?.map((x: any) => x.approved_date_time);
+
+  const Vehicletask = async () => {
+    let doctypename = "FM_Vehicle_Task";
+    let id = taskData?.map((x: any) => x.name).join("");
+    let updateData = {
+      task_ride_status: "Completed",
+    };
+
+    try {
+      await updateDoc(doctypename, id, updateData);
+      setTaskData((prevAllData) => {
+        return prevAllData.map((item) => {
+          if (item.doctypename === doctypename && item.name === id) {
+            return { ...item, ...updateData };
+          }
+          return item;
+        });
+      });
+
+      toast.success("Approved Successfully");
+    } catch (error) {
+      toast.error(`Error Approved doc: ${error.message}`);
+    }
+  };
+
+  const updateRideTime = async (updateType: "start" | "end") => {
+    const doctypename = taskData?.map((x: any) => x.doctypename).join("");
+    const id = taskData?.map((x: any) => x.name).join("");
+
+    const currentDateTime = new Date();
+    const day = String(currentDateTime.getDate()).padStart(2, "0");
+    const month = String(currentDateTime.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+    const year = currentDateTime.getFullYear();
+    const hours = String(currentDateTime.getHours()).padStart(2, "0");
+    const minutes = String(currentDateTime.getMinutes()).padStart(2, "0");
+    const formattedDate = `${day}-${month}-${year}`;
+    const formattedTime = `${hours}:${minutes}`;
+    const currentDateTimeString = `${formattedDate} ${formattedTime}`;
+
+    const updateData =
+      updateType === "start"
+        ? { ride_start_time: currentDateTimeString }
+        : { ride_end_time: currentDateTimeString };
+
+    try {
+      await updateDoc(doctypename, id, updateData);
+
+      toast.success(
+        `${updateType === "start" ? "Ride started" : "Ride ended"} successfully`
+      );
+      if (updateType === "end") {
+        Vehicletask();
+        setDriverShow(true);
+        setPassengerShow(false);
+        window.location.reload();
+      }
+    } catch (error) {
+      toast.error(`Error updating ride time: ${error.message}`);
+    }
+  };
+
   return (
     <>
       <div
@@ -318,6 +629,8 @@ const DriverLanding: React.FC<DriverProps> = ({
           padding: "10px",
         }}
       >
+        {/* {JSON.stringify(totalTime)} */}
+
         <Box
           sx={{
             margin: "10px 0px",
@@ -335,7 +648,7 @@ const DriverLanding: React.FC<DriverProps> = ({
                 setDailyShow(false);
                 setPickup([]);
                 setDropPoint([]);
-                setSelectedDropPoint("");
+
                 setSelectedRouteId(null);
               }}
             />
@@ -402,13 +715,19 @@ const DriverLanding: React.FC<DriverProps> = ({
                     textAlign: "center",
                     fontWeight: "600",
                     flex: 1,
+                    fontSize: "22px",
                     maxWidth: { xs: "100%", md: "60%" },
                     cursor: "pointer",
                   }}
                   onClick={() => {
-                    setDriverShow(false);
-                    setDailyShow(false);
-                    setPassengerShow(true);
+                    if (taskData.length > 0) {
+                      setDriverShow(false);
+                      setDailyShow(false);
+                      setPassengerShow(true);
+                      toast.success("Welcome to Agnikul,Start your ride");
+                    } else {
+                      toast.info("No ride assigned. Contact Fleet Manager.");
+                    }
                   }}
                 >
                   <img
@@ -433,6 +752,7 @@ const DriverLanding: React.FC<DriverProps> = ({
                     textAlign: "center",
                     fontWeight: "600",
                     flex: 1,
+                    fontSize: "22px",
                     maxWidth: { xs: "100%", md: "60%" },
                     cursor: "pointer",
                   }}
@@ -440,7 +760,7 @@ const DriverLanding: React.FC<DriverProps> = ({
                     setDriverShow(false);
                     setDailyShow(true);
                     setPassengerShow(false);
-                    setScannerShow(true);
+                    setScannerShowPage(true);
                   }}
                 >
                   <img
@@ -458,6 +778,7 @@ const DriverLanding: React.FC<DriverProps> = ({
           </>
         )}
         {/* Passenger Show Start */}
+
         {passengerShow && (
           <>
             <div
@@ -491,20 +812,15 @@ const DriverLanding: React.FC<DriverProps> = ({
                     color: "#000",
                     textAlign: "center",
                     fontWeight: "600",
+                    fontSize: "18px",
                     flex: 1,
                     maxWidth: { xs: "100%", md: "60%" },
-                    //cursor: "pointer",
                   }}
-                  // onClick={() => {
-                  //   setDriverShow(false);
-                  //   setDailyShow(false);
-                  //   setPassengerShow(true);
-                  // }}
                 >
                   <img
                     src={pic4}
                     alt="Passenger Ride"
-                    style={{ width: "100%", height: "auto" }}
+                    style={{ width: "80%", height: "auto" }}
                   />
                   <span>
                     {" "}
@@ -522,39 +838,44 @@ const DriverLanding: React.FC<DriverProps> = ({
                       justifyContent: "center",
                       textAlign: "center",
                       fontWeight: 500,
+                      fontSize: "16px",
                     }}
                   >
                     <p>
                       {language === "English"
                         ? "Passenger Name :"
                         : "பயணியின் பெயர் :"}{" "}
-                      <b>Rajesh </b>
+                      <b> {employeeName}</b>
                     </p>
                     <p>
                       {language === "English"
                         ? " Pickup Point :"
                         : "ஏறும் இடம் :"}{" "}
-                      <b>Chennai</b>
+                      <b>{Pickuppoint}</b>
                     </p>
                     <p>
                       {language === "English"
                         ? "Drop Point : "
                         : "இறங்கும் இடம் :"}{" "}
-                      <b>Bangalore</b>
+                      <b>{Droppoint}</b>
                     </p>
                     <p>
                       {language === "English"
                         ? "Pickup Point Time : "
                         : "ஏறும் நேரம் :"}{" "}
-                      <b>10:00 Am</b>
+                      <b>{Pointime}</b>
                     </p>
-                    <p>
-                      {language === "English"
-                        ? "Ride start Time : "
-                        : "பயணம் தொடங்கும் நேரம் :"}{" "}
-                      <b>10:00 Am</b>
-                    </p>
+
+                    {startTime && (
+                      <p>
+                        {language === "English"
+                          ? "Ride start Time : "
+                          : "பயணம் தொடங்கும் நேரம் :"}{" "}
+                        <b>{startTime}</b>
+                      </p>
+                    )}
                   </Box>
+                  <br />
                   <Box
                     sx={{
                       padding: "5px 10px",
@@ -575,11 +896,19 @@ const DriverLanding: React.FC<DriverProps> = ({
                   {JSON.stringify(time)} */}
 
                   {isRunning ? (
-                    <Button className="deleteBtn" onClick={handleStop}>
+                    <Button
+                      sx={{ fontSize: "20px ! important" }}
+                      className="deleteBtn"
+                      onClick={handleStop}
+                    >
                       Stop Ride
                     </Button>
                   ) : (
-                    <Button className="saveBtn" onClick={handleStart}>
+                    <Button
+                      sx={{ fontSize: "20px ! important" }}
+                      className="saveBtn"
+                      onClick={handleStart}
+                    >
                       Start Ride
                     </Button>
                   )}
@@ -621,11 +950,12 @@ const DriverLanding: React.FC<DriverProps> = ({
                     textAlign: "center",
                     fontWeight: "600",
                     flex: 1,
+                    fontSize: "22px",
                     maxWidth: { xs: "100%", md: "60%" },
                     cursor: "pointer",
                   }}
                 >
-                  {scannerShow ? (
+                  {scannerShowPage ? (
                     <>
                       <br /> <br />
                       <img
@@ -665,6 +995,7 @@ const DriverLanding: React.FC<DriverProps> = ({
                                 value={selectedRouteId}
                                 onChange={(event) => {
                                   handleRouteId(event);
+                                  setSelectedPickUp(null);
                                 }}
                                 label={
                                   <>
@@ -700,7 +1031,7 @@ const DriverLanding: React.FC<DriverProps> = ({
                               }}
                             >
                               <InputLabel>
-                                Select Pick Up Point {""}
+                                Select Start Point {""}
                                 <Typography className="CodeStar" variant="Code">
                                   *
                                 </Typography>
@@ -711,7 +1042,7 @@ const DriverLanding: React.FC<DriverProps> = ({
                                 onChange={handlePickId}
                                 label={
                                   <>
-                                    Select Pick Up Point {""}
+                                    Select Start Point {""}
                                     <Typography
                                       className="CodeStar"
                                       variant="Code"
@@ -729,67 +1060,45 @@ const DriverLanding: React.FC<DriverProps> = ({
                               </Select>
                             </FormControl>
                           </Box>
-
-                          <Box
-                            // className="slideFromRight"
-                            width={{ xs: "100%", sm: "100%", md: "90%" }}
-                            marginBottom="16px"
-                            sx={{ display: "flex", justifyContent: "center" }}
-                          >
-                            <FormControl
-                              variant="outlined"
-                              sx={{
-                                width: { xs: "100%", sm: "100%", md: "90%" },
-                              }}
-                            >
-                              <InputLabel>
-                                Select Drop Point{" "}
-                                <Typography className="CodeStar" variant="Code">
-                                  *
-                                </Typography>
-                              </InputLabel>
-                              <Select
-                                value={selectedDropPoint}
-                                disabled={!selectedRouteId || !selectedPickup}
-                                onChange={handleDropId}
-                                label={
-                                  <>
-                                    Select Drop Point{" "}
-                                    <Typography
-                                      className="CodeStar"
-                                      variant="Code"
-                                    >
-                                      *
-                                    </Typography>
-                                  </>
-                                }
-                              >
-                                {dropPoint?.map((x) => (
-                                  <MenuItem key={x?.name} value={x}>
-                                    {x}
-                                  </MenuItem>
-                                ))}
-                              </Select>
-                            </FormControl>
-                          </Box>
                         </ThemeProvider>
                       </LocalizationProvider>
-                      <Button className="saveBtn" onClick={handleStartscanner}>
+                      <Button
+                        sx={{ fontSize: "20px ! important" }}
+                        className="saveBtn"
+                        disabled={!selectedPickup || !selectedRouteId}
+                        onClick={async () => {
+                          // const parentName = await createParentDocument();
+                          handleStartScanner();
+                        }}
+                      >
                         Start Ride
                       </Button>
                     </>
                   ) : (
                     <>
-                      <p>Route Id :</p>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <span>Route Id : {selectedRouteId}</span>
+                        <span>Start Point : {selectedPickup}</span>
+                      </Box>
+
                       <QrReader
                         onResult={handleScanResult}
-                        onError={handleError} // Add this if your version of react-qr-reader supports it
+                        onError={handleError}
                         style={{ width: "100%", height: "auto" }}
                       />
                       <Box mt={2}>
                         <p>Scanned QR Data: {qrData}</p>
                       </Box>
-                      <Button className="deleteBtn" onClick={handleStopscanner}>
+                      <Button
+                        sx={{ fontSize: "20px ! important" }}
+                        className="deleteBtn"
+                        onClick={handleStopScanner}
+                      >
                         Stop Ride
                       </Button>
                     </>

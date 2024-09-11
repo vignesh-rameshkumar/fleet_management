@@ -93,8 +93,7 @@
   {
    "fieldname": "department",
    "fieldtype": "Data",
-   "label": "Department",
-   "reqd": 1
+   "label": "Department"
   },
   {
    "fieldname": "ride_status",
@@ -106,7 +105,7 @@
  "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-09 15:52:56.912895",
+ "modified": "2024-09-10 18:54:08.045103",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Request_Master",

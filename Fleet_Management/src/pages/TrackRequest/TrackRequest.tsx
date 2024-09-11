@@ -508,7 +508,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
       parent: documentName,
       parentfield: "break_points",
       parenttype: "FM_Goods_Vehicle_Request",
-      ...breakPoint, // Spread the properties from the editedBreakPoint state
+      ...breakPoint,
     };
 
     try {
@@ -606,6 +606,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
   }, [drawerDetails, drawerData]);
   //update
   const { updateDoc, loading, error } = useFrappeUpdateDoc();
+
   // Define the type for your state values
   interface StateValues {
     type: string;

@@ -116,8 +116,6 @@ const SideBar: React.FC<SideBarProps> = ({
 
   useEffect(() => {
     if (data && data.roles && data.roles.length > 0) {
-      // console.log(data, "useridcookie");
-
       const temp = data.roles.map((roleObj: any) => roleObj.role);
 
       setRoles(temp);
@@ -648,11 +646,11 @@ const SideBar: React.FC<SideBarProps> = ({
 
   const navigate = useNavigate(); // Use useNavigate hook
 
-  useEffect(() => {
-    if (employeeRole === "Driver") {
-      navigate("/Fleet_Management/driver"); // Navigate to /driver route
-    }
-  }, [employeeRole, navigate]);
+  // useEffect(() => {
+  //   if (employeeRole === "Driver") {
+  //     navigate("/Fleet_Management/driver"); // Navigate to /driver route
+  //   }
+  // }, [employeeRole, navigate]);
   return (
     <Box
       sx={{

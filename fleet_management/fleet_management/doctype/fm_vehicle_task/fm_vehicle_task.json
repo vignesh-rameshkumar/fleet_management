@@ -12,7 +12,10 @@
   "employee_name",
   "from_location",
   "to_location",
-  "approved_date_time"
+  "approved_date_time",
+  "vehicle_no",
+  "doctypename",
+  "task_ride_status"
  ],
  "fields": [
   {
@@ -40,11 +43,26 @@
    "fieldname": "approved_date_time",
    "fieldtype": "Data",
    "label": "Pickup Time"
+  },
+  {
+   "fieldname": "vehicle_no",
+   "fieldtype": "Data",
+   "label": "Vehicle No"
+  },
+  {
+   "fieldname": "doctypename",
+   "fieldtype": "Data",
+   "label": "Document Type"
+  },
+  {
+   "fieldname": "task_ride_status",
+   "fieldtype": "Data",
+   "label": "Task Ride Status"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-09 16:42:19.509619",
+ "modified": "2024-09-10 20:36:13.858493",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Vehicle_Task",

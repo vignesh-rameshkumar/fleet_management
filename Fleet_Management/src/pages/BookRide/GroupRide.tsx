@@ -30,7 +30,11 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { toast } from "react-toastify";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 
-import { useFrappeCreateDoc, useFrappeGetDocList } from "frappe-react-sdk";
+import {
+  useFrappeCreateDoc,
+  useFrappeGetDocList,
+  useFrappeGetCall,
+} from "frappe-react-sdk";
 import { ThemeProvider } from "@mui/material";
 
 import dayjs from "dayjs";
@@ -259,24 +263,24 @@ const GroupRide: React.FC<GroupRideProps> = ({
     }
   };
 
-  const { data: Employee }: any = useFrappeGetDocList("Employee", {
-    fields: ["*"],
-    filters: [
-      ["status", "=", "Active"],
-      ["company_email", "!=", userEmailId],
-    ],
-    limit: 100000,
-    orderBy: {
-      field: "modified",
-      order: "desc",
-    },
-  });
+  // const { data: Employee }: any = useFrappeGetDocList("Employee", {
+  //   fields: ["*"],
+  //   filters: [
+  //     ["status", "=", "Active"],
+  //     ["company_email", "!=", userEmailId],
+  //   ],
+  //   limit: 100000,
+  //   orderBy: {
+  //     field: "modified",
+  //     order: "desc",
+  //   },
+  // });
 
-  const [employeeName, setEmployeeName] = useState(Employee);
+  // const [employeeName, setEmployeeName] = useState(Employee);
   // console.log("employeeName", employeeName);
-  useEffect(() => {
-    setEmployeeName(Employee);
-  }, [Employee]);
+  // useEffect(() => {
+  //   setEmployeeName(Employee);
+  // }, [Employee]);
 
   const [selectedEmployee, setSelectedEmployee] = useState([]);
 
@@ -301,10 +305,22 @@ const GroupRide: React.FC<GroupRideProps> = ({
     setSelectedEmployee([]);
   };
 
-  const filteredEmployees = employeeName?.filter(
+  //Active Employee
+  const { data: Employee } = useFrappeGetCall(
+    "fleet_management.custom_function.get_active_employees"
+  );
+
+  const [employeeName, setEmployeeName] = useState(Employee);
+  // console.log("employeeName", employeeName);
+  useEffect(() => {
+    setEmployeeName(Employee);
+  }, [Employee]);
+  // console.log("employeeName", employeeName);
+
+  const filteredEmployees = employeeName?.message?.filter(
     (employee) =>
-      employee.name.toLowerCase().includes(filter.toLowerCase()) ||
-      employee.employee_name.toLowerCase().includes(filter.toLowerCase())
+      employee?.name?.toLowerCase()?.includes(filter?.toLowerCase()) ||
+      employee?.employee_name?.toLowerCase()?.includes(filter?.toLowerCase())
   );
 
   // Project API
@@ -407,63 +423,6 @@ const GroupRide: React.FC<GroupRideProps> = ({
       }
     }
   };
-
-  // const CreateGroupRequest = async () => {
-  //   try {
-  //     const body = {
-  //       project_name: selectedProject,
-  //       from_location: fromLocation,
-  //       to_location: toLocation,
-  //       terms: terms,
-  //       doctypename: "FM_Group_Vehicle_Request",
-  //       employee_email: userEmailId,
-  //       employee_name: userName,
-  //       request_date_time: date_time,
-  //       mod: travelMore,
-  //       mod_dates: moreDates,
-  //       purpose: purpose,
-  //       passenger_count: passengerCount,
-  //       // child doctype
-  //       employee_id: Employeeids,
-  //       parent: name,
-  //       parentfield: "passenger_details",
-  //       parenttype: "FM_Group_Ride_Members",
-  //     };
-  //     await createDoc("FM_Group_Vehicle_Request", body);
-  //     toast.success("Request Created Successfully ");
-  //     setSelectedProject();
-  //     handleCancel();
-  //   } catch (error) {
-  //     if (error.response) {
-  //       const statusCode = error.response.status;
-  //       const serverMessage = error.response.data?._server_messages;
-
-  //       if (statusCode === 400) {
-  //         toast.error("Bad request. Please check your input.");
-  //       } else if (statusCode === 401) {
-  //         toast.error("Unauthorized. Please log in.");
-  //       } else if (statusCode === 404) {
-  //         toast.error("Resource not found.");
-  //       } else if (statusCode === 500) {
-  //         toast.error("Internal server error. Please try again later.");
-  //       } else if (serverMessage) {
-  //         const parsedMessages = JSON.parse(serverMessage);
-  //         const errorMessage = parsedMessages
-  //           .map((msg) => JSON.parse(msg).message)
-  //           .join(", ");
-  //         toast.error(errorMessage);
-  //       } else {
-  //         toast.error(`Error: ${statusCode}`);
-  //       }
-  //     } else if (error.request) {
-  //       toast.error(
-  //         "No response received from server. Please try again later."
-  //       );
-  //     } else {
-  //       toast.error(`${error.exception}`);
-  //     }
-  //   }
-  // };
 
   return (
     <>
@@ -1007,7 +966,10 @@ const GroupRide: React.FC<GroupRideProps> = ({
                         </ListSubheader>
                         {filteredEmployees?.length > 0 ? (
                           filteredEmployees?.map((employee) => (
-                            <MenuItem key={employee.name} value={employee.name}>
+                            <MenuItem
+                              key={employee?.name}
+                              value={employee?.name}
+                            >
                               <Checkbox
                                 checked={
                                   selectedEmployee?.indexOf(employee.name) > -1

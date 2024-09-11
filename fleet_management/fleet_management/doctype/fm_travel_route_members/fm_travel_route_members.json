@@ -27,7 +27,7 @@
   },
   {
    "fieldname": "checkin_time",
-   "fieldtype": "Time",
+   "fieldtype": "Data",
    "label": "Checkin TIme"
   },
   {
@@ -46,7 +46,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-09-04 11:42:29.109859",
+ "modified": "2024-09-10 12:54:04.637290",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Travel_Route_Members",

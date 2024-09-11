@@ -57,6 +57,34 @@ const QuickAccess: React.FC<QuickAccessProps> = ({
   };
   const greeting = getGreeting();
 
+  const quotes = [
+    "Life is 10% what happens to us and 90% how we react to it - DENNIS P. KIMBRO",
+    "Hard work beats talent if talent doesn't work hard - Tim Notke",
+    "If you’re not failing every now and again, it's a sign you're not doing anything very innovative - Woody Allen",
+    "The secret of success is to do the common things uncommonly well - John D Rockefeller",
+    "Either you run the day or the day runs you - Jim Rohn",
+    "Tough times don't last. Tough teams do.",
+    "Act as if what you do makes a difference. It does. - William James",
+    "There are no shortcuts to any place worth going - Beverly Sills",
+    "Life begins at the end of your comfort zone - Neale Donald Walsh",
+  ];
+
+  const [currentQuote, setCurrentQuote] = useState("");
+
+  useEffect(() => {
+    const updateQuote = () => {
+      const randomIndex = Math.floor(Math.random() * quotes.length);
+      setCurrentQuote(quotes[randomIndex]);
+    };
+
+    updateQuote();
+
+    const intervalId = setInterval(updateQuote, 3600000);
+
+    // Clean up interval on component unmount
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
     <>
       <Box
@@ -85,13 +113,16 @@ const QuickAccess: React.FC<QuickAccessProps> = ({
           <Box
             className="Subtitle"
             sx={{
-              color: darkMode ? "#FFF" : "", // Conditionally apply color based on dark mode
-              textAlign: { xs: "center", md: "left" }, // Center text on small screens, align left on medium screens
+              color: darkMode ? "#FFF" : "",
+              textAlign: { xs: "center", md: "left" },
             }}
           >
-            Life is 10% what happens to us and 90% how we react to it{" "}
-            <span className="titleAut">- DENNIS P. KIMBRO</span>
+            {/* Life is 10% what happens to us and 90% how we react to it{" "}
+            <span className="titleAut">- DENNIS P. KIMBRO</span> */}
+            {currentQuote}
           </Box>
+          <br />
+
           <Box>
             <p className="QA">Quick Links</p>
             <Box
@@ -113,6 +144,7 @@ const QuickAccess: React.FC<QuickAccessProps> = ({
                         "0px 3.2px 7.2px 0px #00000021, 0px 0.6px 1.8px 0px #0000001C",
                       padding: "5px",
                       cursor: "pointer",
+                      fontSize: "16px",
                     }}
                     onClick={() => toggleDrawer(true, "TravelRoute")}
                   >
@@ -141,6 +173,7 @@ const QuickAccess: React.FC<QuickAccessProps> = ({
                         "0px 3.2px 7.2px 0px #00000021, 0px 0.6px 1.8px 0px #0000001C",
                       padding: "5px",
                       cursor: "pointer",
+                      fontSize: "16px",
                     }}
                     onClick={() => toggleDrawer(true, "GroupRide")}
                   >
@@ -169,6 +202,7 @@ const QuickAccess: React.FC<QuickAccessProps> = ({
                         "0px 3.2px 7.2px 0px #00000021, 0px 0.6px 1.8px 0px #0000001C",
                       padding: "5px",
                       cursor: "pointer",
+                      fontSize: "16px",
                     }}
                     onClick={() => toggleDrawer(true, "Passenger")}
                   >
@@ -197,6 +231,7 @@ const QuickAccess: React.FC<QuickAccessProps> = ({
                         "0px 3.2px 7.2px 0px #00000021, 0px 0.6px 1.8px 0px #0000001C",
                       padding: "5px",
                       cursor: "pointer",
+                      fontSize: "16px",
                     }}
                     onClick={() => toggleDrawer(true, "Equipment")}
                   >
@@ -225,6 +260,7 @@ const QuickAccess: React.FC<QuickAccessProps> = ({
                         "0px 3.2px 7.2px 0px #00000021, 0px 0.6px 1.8px 0px #0000001C",
                       padding: "5px",
                       cursor: "pointer",
+                      fontSize: "16px",
                     }}
                     onClick={() => handleCome()}
                   >
@@ -251,6 +287,7 @@ const QuickAccess: React.FC<QuickAccessProps> = ({
             </Box>
           </Box>
         </div>
+        <br /> <br />
       </Box>
 
       {/* Drawer */}

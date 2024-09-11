@@ -8,6 +8,7 @@ import { IoMoonOutline } from "react-icons/io5";
 import Logo from "../assets/LogoAgnikul.png";
 import LogoSmall from "../assets/agnikul 8.png";
 import { useFrappeAuth } from "frappe-react-sdk";
+import { useFrappeGetDoc } from "frappe-react-sdk";
 
 interface HeaderProps {
   darkMode: boolean;
@@ -34,6 +35,66 @@ const Header: React.FC<HeaderProps> = ({
 
   const [isOpen, setIsOpen] = useState(false);
   const { currentUser, logout } = useFrappeAuth();
+
+  //--------------------------------------------------------------------------Role Fetching----------------------------------------------------------------
+  const cookiesArray = document.cookie.split("; ");
+  const cookieData: { [key: string]: string } = {};
+
+  cookiesArray.forEach((cookie) => {
+    const [key, value] = cookie.split("=");
+    cookieData[key] = decodeURIComponent(value);
+  });
+
+  const userIdCookie = cookieData.user_id;
+  const [roles, setRoles] = useState<string[]>([]);
+  const [employeeRole, setEmployeeRole] = useState("");
+
+  const userDocType = "User";
+  const parent = userIdCookie;
+  const { data } = useFrappeGetDoc(userDocType, parent);
+
+  useEffect(() => {
+    if (data && data.roles && data.roles.length > 0) {
+      const temp = data.roles.map((roleObj: any) => roleObj.role);
+
+      setRoles(temp);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (roles && roles.length > 0) {
+      let role = "User"; // Default role
+
+      switch (true) {
+        case roles.includes("Employee") &&
+          roles.includes("Project Lead") &&
+          roles.includes("Department Head"):
+          role = "Department Manager";
+          break;
+        case roles.includes("Employee") && roles.includes("Project Lead"):
+          role = "Project Manager";
+          break;
+        case roles.includes("Employee") && roles.includes("Department Head"):
+          role = "Department Manager";
+          break;
+        case roles.includes("Employee") && roles.includes("Fleet Manager"):
+          role = "Fleet Manager";
+          break;
+        case roles.includes("Vehicle"):
+          role = "Driver";
+          break;
+        case roles.includes("Employee"):
+          role = "User";
+          break;
+        default:
+          role = "User";
+          break;
+      }
+
+      setEmployeeRole(role);
+    }
+  }, [roles]);
+
   const handleLogout = () => {
     logout();
     setTimeout(() => {
@@ -95,9 +156,16 @@ const Header: React.FC<HeaderProps> = ({
         bgcolor: darkMode ? "#222222" : "#fff",
         color: darkMode ? "#eeeeed" : "",
         animation: "fadeIn 1s ease forwards",
-        boxShadow: isOpenMenu
-          ? "rgba(0, 0, 0, 0.24) 262px 3px 8px"
-          : "rgba(0, 0, 0, 0.24) 50px 3px 8px",
+        boxShadow: (theme) => {
+          if (employeeRole === "Driver") {
+            return isOpenMenu
+              ? "rgba(0, 0, 0, 0.24) 5px 3px 8px"
+              : "rgba(0, 0, 0, 0.24) 0px 3px 8px";
+          }
+          return isOpenMenu
+            ? "rgba(0, 0, 0, 0.24) 262px 3px 8px"
+            : "rgba(0, 0, 0, 0.24) 50px 3px 8px";
+        },
       }}
     >
       <Box
@@ -155,14 +223,14 @@ const Header: React.FC<HeaderProps> = ({
             animation: "fadeIn 3s ease forwards",
           }}
         >
-          <IconButton
+          {/* <IconButton
             onClick={toggleDarkMode}
             sx={{
               color: darkMode ? "#eeeeed" : "",
             }}
           >
             {darkMode ? <CiLight size={25} /> : <IoMoonOutline size={20} />}
-          </IconButton>
+          </IconButton> */}
           <IconButton sx={{ color: darkMode ? "#eeeeed" : "" }}></IconButton>
         </Box>
 

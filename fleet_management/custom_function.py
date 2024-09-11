@@ -194,3 +194,56 @@ def get_user_roles():
     except Exception as e:
         frappe.log_error(message=str(e), title="Error in get_user_roles")
         return {'error': str(e), 'roles_enabled': []}
+@frappe.whitelist()
+def update_attendance(document_name=None, employee_email=None):
+    try:
+        if not document_name:
+            return {"success": False}
+        if not employee_email:
+            return {"success": False}
+
+        parent_doc = frappe.get_doc("FM_Travel_Route_Report", document_name)
+        
+        if not parent_doc:
+            return {"success": False, "message": f"No document found with the provided document name: {document_name}"}
+
+        child_doc = None
+        for member in parent_doc.get("onboarded_employees"):
+            if member.employee_email == employee_email:
+                child_doc = member
+                break
+
+        if not child_doc:
+            return {"success": False, "message": f"No member found with the provided employee_email: {employee_email}"}
+
+        frappe.logger().info(f"Current attendance for {employee_email}: {child_doc.attendance}")
+
+        if child_doc.attendance == "Present":
+            return {"success": True, "message": "Already scanned", "child_doc_name": child_doc.name}
+
+        child_doc.attendance = "Present"
+        parent_doc.save()
+        frappe.db.commit()
+        
+        parent_doc.reload()
+        updated_member = next((member for member in parent_doc.get("onboarded_employees") if member.employee_email == employee_email), None)
+        updated_attendance = updated_member.attendance if updated_member else "Not Found"
+        
+        frappe.logger().info(f"Updated attendance for {employee_email}: {updated_attendance}")
+
+        return {"success": True, "message": "Attendance updated to Present", "child_doc_name": child_doc.name}
+
+    except Exception as e:
+        frappe.log_error(message=str(e), title="Error in update_attendance")
+        return {"success": False, "message": str(e)}
+@frappe.whitelist(allow_guest=True)
+def get_active_employees():
+    # Query to fetch employee_name and name fields for active employees
+    employees = frappe.get_all(
+        "Employee",
+        filters={"status": "Active"},
+        fields=["employee_name", "name"]
+    )
+    
+    # Return the list of employees
+    return employees
