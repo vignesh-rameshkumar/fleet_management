@@ -24,6 +24,9 @@ import {
   useFrappeUpdateDoc,
   useFrappeGetCall,
 } from "frappe-react-sdk";
+import { IoCarSportOutline } from "react-icons/io5";
+import { PiCoinsLight } from "react-icons/pi";
+
 import { IoCarSportSharp } from "react-icons/io5";
 import { PiCoinsBold } from "react-icons/pi";
 interface ProjectSpendsProps {
@@ -401,7 +404,7 @@ const ProjectSpends: React.FC<ProjectSpendsProps> = ({
           marginBottom: "10px",
         }}
       >
-        Department Spends
+        Project Spends
       </Box>
 
       <div
@@ -453,21 +456,14 @@ const ProjectSpends: React.FC<ProjectSpendsProps> = ({
           <Box sx={{ flex: "2 1 20%" }}>
             <Card
               sx={{
-                borderLeft: "solid 5px blue",
-                backgroundColor: "white",
+                borderLeft: "solid 5px #5a6868",
+                backgroundColor: "#daeaea",
                 width: "100%", // Ensure the card takes up available width within the flexbox
-                height: "100px", // Adjusted height for a smaller card
-                padding: "4px", // Adjusted padding inside the card
+                // Adjusted padding inside the card
               }}
             >
-              <CardContent sx={{ padding: "8px" }}>
-                <Typography
-                  variant="h6"
-                  align="center"
-                  sx={{ mb: 1, fontSize: "0.875rem" }}
-                >
-                  Total Project Spends
-                </Typography>
+              <CardContent>
+                Total Project Spends
                 <Grid
                   container
                   alignItems="center"
@@ -475,7 +471,7 @@ const ProjectSpends: React.FC<ProjectSpendsProps> = ({
                 >
                   <Grid item>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <IoCarSportSharp />
+                      <IoCarSportOutline size={25} />
                       <Typography
                         variant="body1"
                         sx={{ ml: 1, fontSize: "0.875rem" }}
@@ -486,7 +482,7 @@ const ProjectSpends: React.FC<ProjectSpendsProps> = ({
                   </Grid>
                   <Grid item>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <PiCoinsBold />
+                      <PiCoinsLight size={25} />
                       <Typography
                         variant="body1"
                         sx={{ ml: 1, fontSize: "0.875rem" }}
@@ -593,7 +589,6 @@ const ProjectSpends: React.FC<ProjectSpendsProps> = ({
 
         {/* {JSON.stringify(FM_Bills_Projectlead)} */}
         <CSmartTable
-          cleaner
           clickableRows
           columns={columns}
           columnFilter
@@ -602,7 +597,6 @@ const ProjectSpends: React.FC<ProjectSpendsProps> = ({
           itemsPerPageSelect
           itemsPerPage={10}
           pagination
-          tableFilter
           tableProps={{
             className: "add-this-class red-border",
             responsive: true,

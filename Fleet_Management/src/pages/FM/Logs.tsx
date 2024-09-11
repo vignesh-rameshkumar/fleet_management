@@ -1085,7 +1085,12 @@ const Logs: React.FC<LogsProps> = ({
   const handleBillCopyDialogClose = () => {
     setBillCopyDialogOpen(false);
   };
-
+  useEffect(() => {
+    const filterInput = document.querySelector(".form-control");
+    if (filterInput) {
+      filterInput.placeholder = "Vehicle Number";
+    }
+  }, []);
   const handleDownloadBillCopyMaintenance = () => {
     if (drawerDetails.bill_copy) {
       const doc = new jsPDF();
@@ -1674,2493 +1679,1738 @@ const Logs: React.FC<LogsProps> = ({
   //   console.log("finelog", fineLog);
   return (
     <>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          color: "#FFF",
-          backgroundColor: "#4D8C52",
-          padding: "10px",
-          borderRadius: "5px",
-          fontSize: "18px",
-          fontWeight: 600,
-          marginBottom: "10px",
-        }}
-      >
-        Logs Details
-      </Box>
-      {subHeadingLog && (
-        <>
-          <div>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-evenly",
-                gap: "5px",
-                margin: "10px",
+      <ThemeProvider theme={ThemeColor}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            color: "#FFF",
+            backgroundColor: "#4D8C52",
+            padding: "10px",
+            borderRadius: "5px",
+            fontSize: "18px",
+            fontWeight: 600,
+            marginBottom: "10px",
+          }}
+        >
+          Logs Details
+        </Box>
+        {subHeadingLog && (
+          <>
+            <div>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-evenly",
+                  gap: "5px",
+                  margin: "10px",
+                }}
+              >
+                <Typography
+                  onClick={() => handleLogClick("fineLog")}
+                  sx={{
+                    backgroundColor:
+                      activeLog === "fineLog" ? "#E5F3E6" : "#f5f5f5",
+                    cursor: "pointer",
+                    padding: "10px",
+                    borderRadius: "4px 4px 0 0",
+                    width: "20vw",
+                    display: "flex",
+                    justifyContent: "center",
+                    fontSize: "16px",
+                    fontWeight: 600,
+                    color: activeLog === "fineLog" ? "#375d33" : "#A1A1A1",
+                    borderBottom:
+                      activeLog === "fineLog"
+                        ? "3px solid #487644"
+                        : "3px solid transparent",
+                  }}
+                >
+                  Fine Log
+                </Typography>
+                <Typography
+                  onClick={() => handleLogClick("fuelLog")}
+                  sx={{
+                    backgroundColor:
+                      activeLog === "fuelLog" ? "#E5F3E6" : "#f5f5f5",
+                    cursor: "pointer",
+                    padding: "10px",
+                    borderRadius: "4px 4px 0 0",
+                    width: "20vw",
+                    display: "flex",
+                    justifyContent: "center",
+                    fontSize: "16px",
+                    fontWeight: 600,
+                    color: activeLog === "fuelLog" ? "#375d33" : "#A1A1A1",
+                    borderBottom:
+                      activeLog === "fuelLog"
+                        ? "3px solid #487644"
+                        : "3px solid transparent",
+                  }}
+                >
+                  Fuel Log
+                </Typography>
+                <Typography
+                  onClick={() => handleLogClick("accidentLog")}
+                  sx={{
+                    backgroundColor:
+                      activeLog === "accidentLog" ? "#E5F3E6" : "#f5f5f5",
+                    cursor: "pointer",
+                    padding: "10px",
+                    borderRadius: "4px 4px 0 0",
+                    width: "20vw",
+                    display: "flex",
+                    justifyContent: "center",
+                    fontSize: "16px",
+                    fontWeight: 600,
+                    color: activeLog === "accidentLog" ? "#375d33" : "#A1A1A1",
+                    borderBottom:
+                      activeLog === "accidentLog"
+                        ? "3px solid #487644"
+                        : "3px solid transparent",
+                  }}
+                >
+                  Accident Log
+                </Typography>
+                <Typography
+                  onClick={() => handleLogClick("maintenanceLog")}
+                  sx={{
+                    backgroundColor:
+                      activeLog === "maintenanceLog" ? "#E5F3E6" : "#f5f5f5",
+                    cursor: "pointer",
+                    padding: "10px",
+                    borderRadius: "4px 4px 0 0",
+                    width: "20vw",
+                    display: "flex",
+                    justifyContent: "center",
+                    fontSize: "16px",
+                    fontWeight: 600,
+                    color:
+                      activeLog === "maintenanceLog" ? "#375d33" : "#A1A1A1",
+                    borderBottom:
+                      activeLog === "maintenanceLog"
+                        ? "3px solid #487644"
+                        : "3px solid transparent",
+                  }}
+                >
+                  Maintenance Log
+                </Typography>
+              </Box>
+            </div>
+          </>
+        )}
+
+        {table && (
+          <>
+            {/* {JSON.stringify(drawerDetails)} */}
+            <div
+              style={{
+                backgroundColor: darkMode ? "#222222" : "#fff",
+                padding: "15px",
               }}
             >
-              <Typography
-                onClick={() => handleLogClick("fineLog")}
+              <Box
                 sx={{
-                  backgroundColor:
-                    activeLog === "fineLog" ? "#E5F3E6" : "#f5f5f5",
-                  cursor: "pointer",
-                  padding: "10px",
-                  borderRadius: "4px 4px 0 0",
-                  width: "20vw",
-                  display: "flex",
-                  justifyContent: "center",
-                  fontSize: "16px",
+                  color: "#000",
+                  backgroundColor: "#a5d0a9",
+                  padding: "10px 20px",
+                  borderRadius: "5px",
+                  float: "right",
+                  marginBottom: "5px",
+                  fontSize: "15px",
                   fontWeight: 600,
-                  color: activeLog === "fineLog" ? "#375d33" : "#A1A1A1",
-                  borderBottom:
-                    activeLog === "fineLog"
-                      ? "3px solid #487644"
-                      : "3px solid transparent",
+                  display: "flex",
+                  alignItems: "center",
+                  cursor: "pointer",
+                }}
+                onClick={() => {
+                  handleCancel();
+                  setTable(false);
+                  setSubHeadingLog(false);
+                  switch (activeLog) {
+                    case "fineLog":
+                      setFineLog(true);
+                      setFuelLog(false);
+                      setAccidentLog(false);
+                      setMaintenanceLog(false);
+                      break;
+                    case "fuelLog":
+                      setFuelLog(true);
+                      setFineLog(false);
+                      setAccidentLog(false);
+                      setMaintenanceLog(false);
+                      break;
+                    case "accidentLog":
+                      setAccidentLog(true);
+                      setFineLog(false);
+                      setFuelLog(false);
+                      setMaintenanceLog(false);
+                      break;
+                    case "maintenanceLog":
+                      setMaintenanceLog(true);
+                      setFineLog(false);
+                      setFuelLog(false);
+                      setAccidentLog(false);
+                      break;
+                    default:
+                      setFineLog(false);
+                      setFuelLog(false);
+                      setAccidentLog(false);
+                      setMaintenanceLog(false);
+                      break;
+                  }
                 }}
               >
-                Fine Log
-              </Typography>
-              <Typography
-                onClick={() => handleLogClick("fuelLog")}
-                sx={{
-                  backgroundColor:
-                    activeLog === "fuelLog" ? "#E5F3E6" : "#f5f5f5",
-                  cursor: "pointer",
-                  padding: "10px",
-                  borderRadius: "4px 4px 0 0",
-                  width: "20vw",
-                  display: "flex",
-                  justifyContent: "center",
-                  fontSize: "16px",
-                  fontWeight: 600,
-                  color: activeLog === "fuelLog" ? "#375d33" : "#A1A1A1",
-                  borderBottom:
-                    activeLog === "fuelLog"
-                      ? "3px solid #487644"
-                      : "3px solid transparent",
-                }}
-              >
-                Fuel Log
-              </Typography>
-              <Typography
-                onClick={() => handleLogClick("accidentLog")}
-                sx={{
-                  backgroundColor:
-                    activeLog === "accidentLog" ? "#E5F3E6" : "#f5f5f5",
-                  cursor: "pointer",
-                  padding: "10px",
-                  borderRadius: "4px 4px 0 0",
-                  width: "20vw",
-                  display: "flex",
-                  justifyContent: "center",
-                  fontSize: "16px",
-                  fontWeight: 600,
-                  color: activeLog === "accidentLog" ? "#375d33" : "#A1A1A1",
-                  borderBottom:
-                    activeLog === "accidentLog"
-                      ? "3px solid #487644"
-                      : "3px solid transparent",
-                }}
-              >
-                Accident Log
-              </Typography>
-              <Typography
-                onClick={() => handleLogClick("maintenanceLog")}
-                sx={{
-                  backgroundColor:
-                    activeLog === "maintenanceLog" ? "#E5F3E6" : "#f5f5f5",
-                  cursor: "pointer",
-                  padding: "10px",
-                  borderRadius: "4px 4px 0 0",
-                  width: "20vw",
-                  display: "flex",
-                  justifyContent: "center",
-                  fontSize: "16px",
-                  fontWeight: 600,
-                  color: activeLog === "maintenanceLog" ? "#375d33" : "#A1A1A1",
-                  borderBottom:
-                    activeLog === "maintenanceLog"
-                      ? "3px solid #487644"
-                      : "3px solid transparent",
-                }}
-              >
-                Maintenance Log
-              </Typography>
-            </Box>
-          </div>
-        </>
-      )}
+                <AddIcon sx={{ marginRight: "8px" }} />
+                {activeLog === "fineLog"
+                  ? "Add Fine Details"
+                  : activeLog === "fuelLog"
+                  ? "Add Fuel Log"
+                  : activeLog === "accidentLog"
+                  ? "Add Accident Log"
+                  : activeLog === "maintenanceLog"
+                  ? "Add Maintenance Log"
+                  : ""}
+              </Box>
 
-      {table && (
-        <>
-          {/* {JSON.stringify(drawerDetails)} */}
-          <div
-            style={{
-              backgroundColor: darkMode ? "#222222" : "#fff",
-              padding: "15px",
-            }}
-          >
-            <Box
+              <CSmartTable
+                cleaner
+                clickableRows
+                columns={columns}
+                columnFilter
+                columnSorter
+                items={tableData}
+                itemsPerPageSelect
+                itemsPerPage={10}
+                pagination
+                tableFilter
+                tableProps={{
+                  className: "add-this-class red-border",
+                  responsive: true,
+                  striped: true,
+                  hover: true,
+                }}
+                onRowClick={(item) => handleRowClick(item)}
+                tableBodyProps={{
+                  className: "align-middle tableData",
+                }}
+                scopedColumns={{
+                  S_no: (_item, index) => <td>{index + 1}</td>,
+                  incident_date: (item: any) => {
+                    const date = new Date(item.creation);
+                    const formattedDate = `${date
+                      .getDate()
+                      .toString()
+                      .padStart(2, "0")}-${(date.getMonth() + 1)
+                      .toString()
+                      .padStart(2, "0")}-${date.getFullYear()}`;
+                    return <td>{formattedDate}</td>;
+                  },
+                  date: (item: any) => {
+                    const date = new Date(item.creation);
+                    const formattedDate = `${date
+                      .getDate()
+                      .toString()
+                      .padStart(2, "0")}-${(date.getMonth() + 1)
+                      .toString()
+                      .padStart(2, "0")}-${date.getFullYear()}`;
+                    return <td>{formattedDate}</td>;
+                  },
+                  accident_date: (item: any) => {
+                    const date = new Date(item.creation);
+                    const formattedDate = `${date
+                      .getDate()
+                      .toString()
+                      .padStart(2, "0")}-${(date.getMonth() + 1)
+                      .toString()
+                      .padStart(2, "0")}-${date.getFullYear()}`;
+                    return <td>{formattedDate}</td>;
+                  },
+
+                  action: (item) => (
+                    <td className="ActionData">
+                      <div className="viewicon">
+                        <MdOutlineVisibility
+                          size={20}
+                          onClick={() => {
+                            toggleDrawer(true);
+                            setView(true);
+                            setDrawerDetails(item);
+                          }}
+                        />
+                      </div>
+                    </td>
+                  ),
+                }}
+              />
+            </div>
+
+            <Drawer
               sx={{
-                color: "#000",
-                backgroundColor: "#a5d0a9",
-                padding: "10px 20px",
-                borderRadius: "5px",
-                float: "right",
-                marginBottom: "5px",
-                fontSize: "15px",
-                fontWeight: 600,
-                display: "flex",
-                alignItems: "center",
-                cursor: "pointer",
+                "& .MuiPaper-root": {
+                  backgroundColor: darkMode ? "#222222" : "#FFF",
+                  color: darkMode ? "#fff" : "#000",
+                  width: "50%",
+                  "@media (max-width: 1024px)": {
+                    width: "85%",
+                  },
+                  "@media (max-width: 600px)": {
+                    width: "80%",
+                  },
+                },
               }}
-              onClick={() => {
-                handleCancel();
-                setTable(false);
-                setSubHeadingLog(false);
-                switch (activeLog) {
-                  case "fineLog":
-                    setFineLog(true);
-                    setFuelLog(false);
-                    setAccidentLog(false);
-                    setMaintenanceLog(false);
-                    break;
-                  case "fuelLog":
-                    setFuelLog(true);
-                    setFineLog(false);
-                    setAccidentLog(false);
-                    setMaintenanceLog(false);
-                    break;
-                  case "accidentLog":
-                    setAccidentLog(true);
-                    setFineLog(false);
-                    setFuelLog(false);
-                    setMaintenanceLog(false);
-                    break;
-                  case "maintenanceLog":
-                    setMaintenanceLog(true);
-                    setFineLog(false);
-                    setFuelLog(false);
-                    setAccidentLog(false);
-                    break;
-                  default:
-                    setFineLog(false);
-                    setFuelLog(false);
-                    setAccidentLog(false);
-                    setMaintenanceLog(false);
-                    break;
-                }
-              }}
+              anchor="right"
+              open={isOpen}
+              onClose={handleCloseDrawer}
             >
-              <AddIcon sx={{ marginRight: "8px" }} />
-              {activeLog === "fineLog"
-                ? "Add Fine Details"
-                : activeLog === "fuelLog"
-                ? "Add Fuel Log"
-                : activeLog === "accidentLog"
-                ? "Add Accident Log"
-                : activeLog === "maintenanceLog"
-                ? "Add Maintenance Log"
-                : ""}
-            </Box>
-
-            <CSmartTable
-              cleaner
-              clickableRows
-              columns={columns}
-              columnFilter
-              columnSorter
-              items={tableData}
-              itemsPerPageSelect
-              itemsPerPage={10}
-              pagination
-              tableFilter
-              tableProps={{
-                className: "add-this-class red-border",
-                responsive: true,
-                striped: true,
-                hover: true,
-              }}
-              onRowClick={(item) => handleRowClick(item)}
-              tableBodyProps={{
-                className: "align-middle tableData",
-              }}
-              scopedColumns={{
-                S_no: (_item, index) => <td>{index + 1}</td>,
-                incident_date: (item: any) => {
-                  const date = new Date(item.creation);
-                  const formattedDate = `${date
-                    .getDate()
-                    .toString()
-                    .padStart(2, "0")}-${(date.getMonth() + 1)
-                    .toString()
-                    .padStart(2, "0")}-${date.getFullYear()}`;
-                  return <td>{formattedDate}</td>;
-                },
-                date: (item: any) => {
-                  const date = new Date(item.creation);
-                  const formattedDate = `${date
-                    .getDate()
-                    .toString()
-                    .padStart(2, "0")}-${(date.getMonth() + 1)
-                    .toString()
-                    .padStart(2, "0")}-${date.getFullYear()}`;
-                  return <td>{formattedDate}</td>;
-                },
-                accident_date: (item: any) => {
-                  const date = new Date(item.creation);
-                  const formattedDate = `${date
-                    .getDate()
-                    .toString()
-                    .padStart(2, "0")}-${(date.getMonth() + 1)
-                    .toString()
-                    .padStart(2, "0")}-${date.getFullYear()}`;
-                  return <td>{formattedDate}</td>;
-                },
-
-                action: (item) => (
-                  <td className="ActionData">
-                    <div className="viewicon">
-                      <MdOutlineVisibility
-                        size={20}
-                        onClick={() => {
-                          toggleDrawer(true);
-                          setView(true);
-                          setDrawerDetails(item);
-                        }}
-                      />
+              {view && (
+                <Box sx={{ padding: "20px" }}>
+                  <Box>
+                    <div className="m-4">
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Box
+                          flexGrow={1}
+                          className="drawerTitle"
+                          sx={{ color: darkMode ? "#d1d1d1" : "#5b5b5b" }}
+                        >
+                          Request Type - {activeLog}
+                        </Box>
+                        <Button
+                          className="closeX"
+                          sx={{ color: darkMode ? "#d1d1d1" : "#5b5b5b" }}
+                          onClick={handleCloseDrawer}
+                        >
+                          X
+                        </Button>
+                      </Box>
                     </div>
-                  </td>
-                ),
-              }}
-            />
-          </div>
+                    {activeLog === "fineLog" && (
+                      <>
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <Typography
+                            sx={{
+                              backgroundColor: "#B3CCB3",
+                              padding: 1,
+                              flexGrow: 1,
+                              colour: "#454545",
+                              borderRadius: 1,
+                              // margin: 2,
+                            }}
+                          >
+                            Driver Details:
+                          </Typography>
+                        </Box>
 
-          <Drawer
-            sx={{
-              "& .MuiPaper-root": {
-                backgroundColor: darkMode ? "#222222" : "#FFF",
-                color: darkMode ? "#fff" : "#000",
-                width: "50%",
-                "@media (max-width: 1024px)": {
-                  width: "85%",
-                },
-                "@media (max-width: 600px)": {
-                  width: "80%",
-                },
-              },
-            }}
-            anchor="right"
-            open={isOpen}
-            onClose={handleCloseDrawer}
-          >
-            {view && (
-              <Box sx={{ padding: "20px" }}>
-                <Box>
-                  <div className="m-4">
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <Box
-                        flexGrow={1}
-                        className="drawerTitle"
-                        sx={{ color: darkMode ? "#d1d1d1" : "#5b5b5b" }}
-                      >
-                        Request Type - {activeLog}
-                      </Box>
-                      <Button
-                        className="closeX"
-                        sx={{ color: darkMode ? "#d1d1d1" : "#5b5b5b" }}
-                        onClick={handleCloseDrawer}
-                      >
-                        X
-                      </Button>
-                    </Box>
-                  </div>
-                  {activeLog === "fineLog" && (
-                    <>
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <Typography
-                          sx={{
-                            backgroundColor: "#B3CCB3",
-                            padding: 1,
-                            flexGrow: 1,
-                            colour: "#454545",
-                            borderRadius: 1,
-                            // margin: 2,
-                          }}
-                        >
-                          Driver Details:
-                        </Typography>
-                      </Box>
-
-                      <Grid container spacing={2} sx={{ marginTop: 2 }}>
-                        {/* {JSON.stringify(drawerDetails)} */}
-                        {/* Add your Grid content here */}
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Driver Name
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.driver_name || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Employee Id
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.driver_employee_id || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                      </Grid>
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <Typography
-                          sx={{
-                            backgroundColor: "#B3CCB3",
-                            padding: 1,
-                            flexGrow: 1,
-                            colour: "#454545",
-                            borderRadius: 1,
-                            // margin: 2,
-                          }}
-                        >
-                          Fine Details:
-                        </Typography>
-                      </Box>
-                      <Grid container spacing={2} sx={{ marginTop: 2 }}>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            incident date
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.incident_date || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              width: { xs: "100%", sm: "100%", md: "90%" },
-                              padding: 1,
-                              color: "#848484",
-                              height: "auto",
-                              textAlign: "left",
-                              // marginBottom: 2,
-                            }}
-                          >
-                            Location
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.location || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              width: { xs: "100%", sm: "100%", md: "90%" },
-                              padding: 1,
-                              color: "#848484",
-                              height: "auto",
-                              textAlign: "left",
-                              // marginBottom: 2,
-                            }}
-                          >
-                            Fine Amount
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.fine_amount || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              width: { xs: "100%", sm: "100%", md: "90%" },
-                              padding: 1,
-                              color: "#848484",
-                              height: "auto",
-                              textAlign: "left",
-                              // marginBottom: 2,
-                            }}
-                          >
-                            Reason
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.reason || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Fine Bill Copy
-                          </Typography>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                            }}
-                          >
+                        <Grid container spacing={2} sx={{ marginTop: 2 }}>
+                          {/* {JSON.stringify(drawerDetails)} */}
+                          {/* Add your Grid content here */}
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Driver Name
+                            </Typography>
                             <Typography
                               sx={{
                                 padding: 1,
                                 color: "#000",
                               }}
                             >
-                              {drawerDetails.fine_bill_copy || "N/A"}
+                              {drawerDetails.driver_name || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
                             </Typography>
-                            {drawerDetails.fine_bill_copy && (
-                              <>
-                                <IconButton
-                                  sx={{ marginLeft: 1 }}
-                                  onClick={handleFineDialogOpen}
-                                >
-                                  <VisibilityIcon />
-                                </IconButton>
-                                <IconButton
-                                  sx={{ marginLeft: 1 }}
-                                  onClick={handleDownloadFineCopy}
-                                >
-                                  <DownloadIcon />
-                                </IconButton>
-                              </>
-                            )}
-                          </Box>
-
-                          {/* Preview Dialog */}
-                          <Dialog
-                            open={fineBillDialogOpen}
-                            onClose={handleFineDialogClose}
-                            maxWidth="md"
-                            fullWidth
-                          >
-                            <DialogContent>
-                              <IconButton
-                                edge="end"
-                                color="inherit"
-                                onClick={handleFineDialogClose}
-                                aria-label="close"
-                                sx={{ position: "absolute", top: 8, right: 8 }}
-                              >
-                                <CloseIcon />
-                              </IconButton>
-                              {drawerDetails.fine_bill_copy ? (
-                                <Box
-                                  component="img"
-                                  src={drawerDetails.fine_bill_copy.replace(
-                                    "/private",
-                                    ""
-                                  )}
-                                  alt="Fine Bill Copy Image"
-                                  sx={{
-                                    maxWidth: "100%",
-                                    height: "auto",
-                                    objectFit: "contain",
-                                  }}
-                                />
-                              ) : (
-                                <Typography>No image available</Typography>
-                              )}
-                            </DialogContent>
-                          </Dialog>
-                        </Grid>
-                      </Grid>
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <Typography
-                          sx={{
-                            backgroundColor: "#B3CCB3",
-                            padding: 1,
-                            flexGrow: 1,
-                            colour: "#454545",
-                            borderRadius: 1,
-                            // margin: 2,
-                          }}
-                        >
-                          Vehicle Details:
-                        </Typography>
-                      </Box>
-                      <Grid container spacing={2} sx={{ marginTop: 2 }}>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Vehicle Number
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.vehicle_number || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                      </Grid>
-
-                      <Box sx={{ display: "flex", justifyContent: "center" }}>
-                        <Typography
-                          //   className="saveBtn"
-                          onClick={() => {
-                            setTable(false);
-                            handleCloseDrawer();
-                            setFineLog(true);
-                            setEdit(false);
-                          }}
-                          sx={{
-                            cursor: "pointer",
-                            backgroundColor: "#71a375",
-                            color: "#ffffff",
-                            fontSize: "14px",
-                            fontWeight: 600,
-                            padding: "9px 29px",
-                            margin: "10px",
-                            borderRadius: "5px",
-                          }}
-                        >
-                          Edit
-                        </Typography>
-                      </Box>
-                    </>
-                  )}
-                  {activeLog === "fuelLog" && (
-                    <>
-                      <Grid container spacing={2} sx={{ marginTop: 2 }}>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Date
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.date || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Vehicle No
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.vehicle_number || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Bill Amount
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.bill_amount || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Current Odometer Reading
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.current_odometer_reading || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Fuel in Litres
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.fuel_in_litres || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Supplier Name
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.supplier_name || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Price per Litre
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.price_per_litre || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Fuel Bill Copy
-                          </Typography>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                            }}
-                          >
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Employee Id
+                            </Typography>
                             <Typography
                               sx={{
                                 padding: 1,
                                 color: "#000",
                               }}
                             >
-                              {drawerDetails.bill_copy || "N/A"}
+                              {drawerDetails.driver_employee_id || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
                             </Typography>
-                            {drawerDetails.bill_copy && (
-                              <>
-                                <IconButton
-                                  sx={{ marginLeft: 1 }}
-                                  onClick={handleBillDialogOpen}
-                                >
-                                  <VisibilityIcon />
-                                </IconButton>
-                                <IconButton
-                                  sx={{ marginLeft: 1 }}
-                                  onClick={handleDownloadBillCopy}
-                                >
-                                  <DownloadIcon />
-                                </IconButton>
-                              </>
-                            )}
-                          </Box>
-
-                          {/* Preview Dialog */}
-                          <Dialog
-                            open={billDialogOpen}
-                            onClose={handleBillDialogClose}
-                            maxWidth="md"
-                            fullWidth
-                          >
-                            <DialogContent>
-                              <IconButton
-                                edge="end"
-                                color="inherit"
-                                onClick={handleBillDialogClose}
-                                aria-label="close"
-                                sx={{ position: "absolute", top: 8, right: 8 }}
-                              >
-                                <CloseIcon />
-                              </IconButton>
-                              {drawerDetails.bill_copy ? (
-                                <Box
-                                  component="img"
-                                  src={drawerDetails.bill_copy.replace(
-                                    "/private",
-                                    ""
-                                  )}
-                                  alt="Fuel Bill Copy Image"
-                                  sx={{
-                                    maxWidth: "100%",
-                                    height: "auto",
-                                    objectFit: "contain",
-                                  }}
-                                />
-                              ) : (
-                                <Typography>No image available</Typography>
-                              )}
-                            </DialogContent>
-                          </Dialog>
+                          </Grid>
                         </Grid>
-                      </Grid>
-
-                      <Box sx={{ display: "flex", justifyContent: "center" }}>
-                        <Typography
-                          onClick={() => {
-                            setTable(false);
-                            handleCloseDrawer();
-                            setFuelLog(true);
-                            setEditFuel(false);
-                            setSubHeadingLog(false);
-                          }}
-                          sx={{
-                            cursor: "pointer",
-                            backgroundColor: "#71a375",
-                            color: "#ffffff",
-                            fontSize: "14px",
-                            fontWeight: 600,
-                            padding: "9px 29px",
-                            margin: "10px",
-                            borderRadius: "5px",
-                          }}
-                        >
-                          Edit
-                        </Typography>
-                      </Box>
-                    </>
-                  )}
-                  {activeLog === "accidentLog" && (
-                    <>
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <Typography
-                          sx={{
-                            backgroundColor: "#B3CCB3",
-                            padding: 1,
-                            flexGrow: 1,
-                            colour: "#454545",
-                            borderRadius: 1,
-                            // margin: 2,
-                          }}
-                        >
-                          Vehicle Details:
-                        </Typography>
-                      </Box>
-                      <Grid container spacing={2} sx={{ marginTop: 2 }}>
-                        <Grid item xs={6}>
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
                           <Typography
                             sx={{
+                              backgroundColor: "#B3CCB3",
                               padding: 1,
-                              color: "#848484",
+                              flexGrow: 1,
+                              colour: "#454545",
+                              borderRadius: 1,
+                              // margin: 2,
                             }}
                           >
-                            Driver Name
+                            Fine Details:
                           </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.driver_name || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Employee Id
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.driver_employee_id || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                      </Grid>
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <Typography
-                          sx={{
-                            backgroundColor: "#B3CCB3",
-                            padding: 1,
-                            flexGrow: 1,
-                            colour: "#454545",
-                            borderRadius: 1,
-                            // margin: 2,
-                          }}
-                        >
-                          Accident Details:
-                        </Typography>
-                      </Box>
-                      <Grid container spacing={2} sx={{ marginTop: 2 }}>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Accident Date
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.accident_date || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              width: { xs: "100%", sm: "100%", md: "90%" },
-                              padding: 1,
-                              color: "#848484",
-                              height: "auto",
-                              textAlign: "left",
-                              // marginBottom: 2,
-                            }}
-                          >
-                            Police Station No./Name
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.police_station_noname || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              width: { xs: "100%", sm: "100%", md: "90%" },
-                              padding: 1,
-                              color: "#848484",
-                              height: "auto",
-                              textAlign: "left",
-                              // marginBottom: 2,
-                            }}
-                          >
-                            Accident Description
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.accident_description || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              width: { xs: "100%", sm: "100%", md: "90%" },
-                              padding: 1,
-                              color: "#848484",
-                              height: "auto",
-                              textAlign: "left",
-                              // marginBottom: 2,
-                            }}
-                          >
-                            Damage Description
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.damage_description || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              width: { xs: "100%", sm: "100%", md: "90%" },
-                              padding: 1,
-                              color: "#848484",
-                              height: "auto",
-                              textAlign: "left",
-                              // marginBottom: 2,
-                            }}
-                          >
-                            Reason
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.reason || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              width: { xs: "100%", sm: "100%", md: "90%" },
-                              padding: 1,
-                              color: "#848484",
-                              height: "auto",
-                              textAlign: "left",
-                              // marginBottom: 2,
-                            }}
-                          >
-                            Vehicle No
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.vehicle_number || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            FIR Copy
-                          </Typography>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                            }}
-                          >
+                        </Box>
+                        <Grid container spacing={2} sx={{ marginTop: 2 }}>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              incident date
+                            </Typography>
                             <Typography
                               sx={{
                                 padding: 1,
                                 color: "#000",
                               }}
                             >
-                              {drawerDetails.fir_copy || "N/A"}
+                              {drawerDetails.incident_date || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
                             </Typography>
-                            {drawerDetails.fir_copy && (
-                              <>
-                                <IconButton
-                                  sx={{ marginLeft: 1 }}
-                                  onClick={handleFirDialogOpen}
-                                >
-                                  <VisibilityIcon />
-                                </IconButton>
-                                <IconButton
-                                  sx={{ marginLeft: 1 }}
-                                  onClick={handleDownloadFirCopy}
-                                >
-                                  <DownloadIcon />
-                                </IconButton>
-                              </>
-                            )}
-                          </Box>
-
-                          {/* FIR Copy Preview Dialog */}
-                          <Dialog
-                            open={firDialogOpen}
-                            onClose={handleFirDialogClose}
-                            maxWidth="md"
-                            fullWidth
-                          >
-                            <DialogContent>
-                              <IconButton
-                                edge="end"
-                                color="inherit"
-                                onClick={handleFirDialogClose}
-                                aria-label="close"
-                                sx={{ position: "absolute", top: 8, right: 8 }}
-                              >
-                                <CloseIcon />
-                              </IconButton>
-                              {drawerDetails.fir_copy ? (
-                                <Box
-                                  component="img"
-                                  src={drawerDetails.fir_copy.replace(
-                                    "/private",
-                                    ""
-                                  )}
-                                  alt="FIR Copy Image"
-                                  sx={{
-                                    maxWidth: "100%",
-                                    height: "auto",
-                                    objectFit: "contain",
-                                  }}
-                                />
-                              ) : (
-                                <Typography>No image available</Typography>
-                              )}
-                            </DialogContent>
-                          </Dialog>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Accident Images
-                          </Typography>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                            }}
-                          >
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                width: { xs: "100%", sm: "100%", md: "90%" },
+                                padding: 1,
+                                color: "#848484",
+                                height: "auto",
+                                textAlign: "left",
+                                // marginBottom: 2,
+                              }}
+                            >
+                              Location
+                            </Typography>
                             <Typography
                               sx={{
                                 padding: 1,
                                 color: "#000",
                               }}
                             >
-                              {drawerDetails.images || "N/A"}
+                              {drawerDetails.location || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
                             </Typography>
-                            {drawerDetails.images && (
-                              <>
-                                <IconButton
-                                  sx={{ marginLeft: 1 }}
-                                  onClick={handleAccidentImagesDialogOpen}
-                                >
-                                  <VisibilityIcon />
-                                </IconButton>
-                                <IconButton
-                                  sx={{ marginLeft: 1 }}
-                                  onClick={handleDownloadAccidentImages}
-                                >
-                                  <DownloadIcon />
-                                </IconButton>
-                              </>
-                            )}
-                          </Box>
-
-                          {/* Accident Images Preview Dialog */}
-                          <Dialog
-                            open={accidentImagesDialogOpen}
-                            onClose={handleAccidentImagesDialogClose}
-                            maxWidth="md"
-                            fullWidth
-                          >
-                            <DialogContent>
-                              <IconButton
-                                edge="end"
-                                color="inherit"
-                                onClick={handleAccidentImagesDialogClose}
-                                aria-label="close"
-                                sx={{ position: "absolute", top: 8, right: 8 }}
-                              >
-                                <CloseIcon />
-                              </IconButton>
-                              {drawerDetails.images ? (
-                                <Box
-                                  component="img"
-                                  src={drawerDetails.images.replace(
-                                    "/private",
-                                    ""
-                                  )}
-                                  alt="Accident Images"
-                                  sx={{
-                                    maxWidth: "100%",
-                                    height: "auto",
-                                    objectFit: "contain",
-                                  }}
-                                />
-                              ) : (
-                                <Typography>No image available</Typography>
-                              )}
-                            </DialogContent>
-                          </Dialog>
-                        </Grid>
-                      </Grid>
-                      <Box sx={{ display: "flex", justifyContent: "center" }}>
-                        <Typography
-                          //   className="saveBtn"
-                          onClick={() => {
-                            setTable(false);
-                            handleCloseDrawer();
-                            setAccidentLog(true);
-                            setEdit(false);
-                            setSubHeadingLog(false);
-                          }}
-                          sx={{
-                            cursor: "pointer",
-                            backgroundColor: "#71a375",
-                            color: "#ffffff",
-                            fontSize: "14px",
-                            fontWeight: 600,
-                            padding: "9px 29px",
-                            margin: "10px",
-                            borderRadius: "5px",
-                          }}
-                        >
-                          Edit
-                        </Typography>
-                      </Box>
-                    </>
-                  )}
-                  {activeLog === "maintenanceLog" && (
-                    <>
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <Typography
-                          sx={{
-                            backgroundColor: "#B3CCB3",
-                            padding: 1,
-                            flexGrow: 1,
-                            colour: "#454545",
-                            borderRadius: 1,
-                            // margin: 2,
-                          }}
-                        >
-                          Maintenance Details:
-                        </Typography>
-                      </Box>
-                      <Grid container spacing={2} sx={{ marginTop: 2 }}>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Date of Service
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.date_of_service || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Vehicle Number
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.vehicle_number || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Service Type
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.service_type || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Description
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.description || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Parts Replaced
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.parts_replaced || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Total Cost
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.total_cost || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Warranty Information
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.warranty_information || "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Next Scheduled Maintenance Date
-                          </Typography>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#000",
-                            }}
-                          >
-                            {drawerDetails.next_scheduled_maintenance_date ||
-                              "N/A"}{" "}
-                            {/* Display the type or "N/A" if not available */}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Warranty Copy
-                          </Typography>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                            }}
-                          >
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                width: { xs: "100%", sm: "100%", md: "90%" },
+                                padding: 1,
+                                color: "#848484",
+                                height: "auto",
+                                textAlign: "left",
+                                // marginBottom: 2,
+                              }}
+                            >
+                              Fine Amount
+                            </Typography>
                             <Typography
                               sx={{
                                 padding: 1,
                                 color: "#000",
                               }}
                             >
-                              {drawerDetails.warranty_copy || "N/A"}
+                              {drawerDetails.fine_amount || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
                             </Typography>
-                            {drawerDetails.warranty_copy && (
-                              <>
-                                <IconButton
-                                  sx={{ marginLeft: 1 }}
-                                  onClick={handleWarrantyCopyDialogOpen}
-                                >
-                                  <VisibilityIcon />
-                                </IconButton>
-                                <IconButton
-                                  sx={{ marginLeft: 1 }}
-                                  onClick={handleDownloadWarrantyCopy}
-                                >
-                                  <DownloadIcon />
-                                </IconButton>
-                              </>
-                            )}
-                          </Box>
-
-                          {/* Warranty Copy Preview Dialog */}
-                          <Dialog
-                            open={warrantyCopyDialogOpen}
-                            onClose={handleWarrantyCopyDialogClose}
-                            maxWidth="md"
-                            fullWidth
-                          >
-                            <DialogContent>
-                              <IconButton
-                                edge="end"
-                                color="inherit"
-                                onClick={handleWarrantyCopyDialogClose}
-                                aria-label="close"
-                                sx={{ position: "absolute", top: 8, right: 8 }}
-                              >
-                                <CloseIcon />
-                              </IconButton>
-                              {drawerDetails.warranty_copy ? (
-                                <Box
-                                  component="img"
-                                  src={drawerDetails.warranty_copy.replace(
-                                    "/private",
-                                    ""
-                                  )}
-                                  alt="Warranty Copy Image"
-                                  sx={{
-                                    maxWidth: "100%",
-                                    height: "auto",
-                                    objectFit: "contain",
-                                  }}
-                                />
-                              ) : (
-                                <Typography>No image available</Typography>
-                              )}
-                            </DialogContent>
-                          </Dialog>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            sx={{
-                              padding: 1,
-                              color: "#848484",
-                            }}
-                          >
-                            Maintenance Bill Copy
-                          </Typography>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                            }}
-                          >
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                width: { xs: "100%", sm: "100%", md: "90%" },
+                                padding: 1,
+                                color: "#848484",
+                                height: "auto",
+                                textAlign: "left",
+                                // marginBottom: 2,
+                              }}
+                            >
+                              Reason
+                            </Typography>
                             <Typography
                               sx={{
                                 padding: 1,
                                 color: "#000",
                               }}
                             >
-                              {drawerDetails.bill_copy || "N/A"}
+                              {drawerDetails.reason || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
                             </Typography>
-                            {drawerDetails.bill_copy && (
-                              <>
-                                <IconButton
-                                  sx={{ marginLeft: 1 }}
-                                  onClick={handleBillCopyDialogOpen}
-                                >
-                                  <VisibilityIcon />
-                                </IconButton>
-                                <IconButton
-                                  sx={{ marginLeft: 1 }}
-                                  onClick={handleDownloadBillCopyMaintenance}
-                                >
-                                  <DownloadIcon />
-                                </IconButton>
-                              </>
-                            )}
-                          </Box>
-
-                          {/* Maintenance Bill Copy Preview Dialog */}
-                          <Dialog
-                            open={billCopyDialogOpen}
-                            onClose={handleBillCopyDialogClose}
-                            maxWidth="md"
-                            fullWidth
-                          >
-                            <DialogContent>
-                              <IconButton
-                                edge="end"
-                                color="inherit"
-                                onClick={handleBillCopyDialogClose}
-                                aria-label="close"
-                                sx={{ position: "absolute", top: 8, right: 8 }}
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Fine Bill Copy
+                            </Typography>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                              }}
+                            >
+                              <Typography
+                                sx={{
+                                  padding: 1,
+                                  color: "#000",
+                                }}
                               >
-                                <CloseIcon />
-                              </IconButton>
-                              {drawerDetails.bill_copy ? (
-                                <Box
-                                  component="img"
-                                  src={drawerDetails.bill_copy.replace(
-                                    "/private",
-                                    ""
-                                  )}
-                                  alt="Maintenance Bill Copy Image"
-                                  sx={{
-                                    maxWidth: "100%",
-                                    height: "auto",
-                                    objectFit: "contain",
-                                  }}
-                                />
-                              ) : (
-                                <Typography>No image available</Typography>
+                                {drawerDetails.fine_bill_copy || "N/A"}
+                              </Typography>
+                              {drawerDetails.fine_bill_copy && (
+                                <>
+                                  <IconButton
+                                    sx={{ marginLeft: 1 }}
+                                    onClick={handleFineDialogOpen}
+                                  >
+                                    <VisibilityIcon />
+                                  </IconButton>
+                                  <IconButton
+                                    sx={{ marginLeft: 1 }}
+                                    onClick={handleDownloadFineCopy}
+                                  >
+                                    <DownloadIcon />
+                                  </IconButton>
+                                </>
                               )}
-                            </DialogContent>
-                          </Dialog>
+                            </Box>
+
+                            {/* Preview Dialog */}
+                            <Dialog
+                              open={fineBillDialogOpen}
+                              onClose={handleFineDialogClose}
+                              maxWidth="md"
+                              fullWidth
+                            >
+                              <DialogContent>
+                                <IconButton
+                                  edge="end"
+                                  color="inherit"
+                                  onClick={handleFineDialogClose}
+                                  aria-label="close"
+                                  sx={{
+                                    position: "absolute",
+                                    top: 8,
+                                    right: 8,
+                                  }}
+                                >
+                                  <CloseIcon />
+                                </IconButton>
+                                {drawerDetails.fine_bill_copy ? (
+                                  <Box
+                                    component="img"
+                                    src={drawerDetails.fine_bill_copy.replace(
+                                      "/private",
+                                      ""
+                                    )}
+                                    alt="Fine Bill Copy Image"
+                                    sx={{
+                                      maxWidth: "100%",
+                                      height: "auto",
+                                      objectFit: "contain",
+                                    }}
+                                  />
+                                ) : (
+                                  <Typography>No image available</Typography>
+                                )}
+                              </DialogContent>
+                            </Dialog>
+                          </Grid>
                         </Grid>
-                      </Grid>
-                    </>
-                  )}
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <Typography
+                            sx={{
+                              backgroundColor: "#B3CCB3",
+                              padding: 1,
+                              flexGrow: 1,
+                              colour: "#454545",
+                              borderRadius: 1,
+                              // margin: 2,
+                            }}
+                          >
+                            Vehicle Details:
+                          </Typography>
+                        </Box>
+                        <Grid container spacing={2} sx={{ marginTop: 2 }}>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Vehicle Number
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.vehicle_number || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          <Typography
+                            //   className="saveBtn"
+                            onClick={() => {
+                              setTable(false);
+                              handleCloseDrawer();
+                              setFineLog(true);
+                              setEdit(false);
+                            }}
+                            sx={{
+                              cursor: "pointer",
+                              backgroundColor: "#71a375",
+                              color: "#ffffff",
+                              fontSize: "14px",
+                              fontWeight: 600,
+                              padding: "9px 29px",
+                              margin: "10px",
+                              borderRadius: "5px",
+                            }}
+                          >
+                            Edit
+                          </Typography>
+                        </Box>
+                      </>
+                    )}
+                    {activeLog === "fuelLog" && (
+                      <>
+                        <Grid container spacing={2} sx={{ marginTop: 2 }}>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Date
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.date || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Vehicle No
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.vehicle_number || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Bill Amount
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.bill_amount || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Current Odometer Reading
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.current_odometer_reading || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Fuel in Litres
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.fuel_in_litres || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Supplier Name
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.supplier_name || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Price per Litre
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.price_per_litre || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Fuel Bill Copy
+                            </Typography>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                              }}
+                            >
+                              <Typography
+                                sx={{
+                                  padding: 1,
+                                  color: "#000",
+                                }}
+                              >
+                                {drawerDetails.bill_copy || "N/A"}
+                              </Typography>
+                              {drawerDetails.bill_copy && (
+                                <>
+                                  <IconButton
+                                    sx={{ marginLeft: 1 }}
+                                    onClick={handleBillDialogOpen}
+                                  >
+                                    <VisibilityIcon />
+                                  </IconButton>
+                                  <IconButton
+                                    sx={{ marginLeft: 1 }}
+                                    onClick={handleDownloadBillCopy}
+                                  >
+                                    <DownloadIcon />
+                                  </IconButton>
+                                </>
+                              )}
+                            </Box>
+
+                            {/* Preview Dialog */}
+                            <Dialog
+                              open={billDialogOpen}
+                              onClose={handleBillDialogClose}
+                              maxWidth="md"
+                              fullWidth
+                            >
+                              <DialogContent>
+                                <IconButton
+                                  edge="end"
+                                  color="inherit"
+                                  onClick={handleBillDialogClose}
+                                  aria-label="close"
+                                  sx={{
+                                    position: "absolute",
+                                    top: 8,
+                                    right: 8,
+                                  }}
+                                >
+                                  <CloseIcon />
+                                </IconButton>
+                                {drawerDetails.bill_copy ? (
+                                  <Box
+                                    component="img"
+                                    src={drawerDetails.bill_copy.replace(
+                                      "/private",
+                                      ""
+                                    )}
+                                    alt="Fuel Bill Copy Image"
+                                    sx={{
+                                      maxWidth: "100%",
+                                      height: "auto",
+                                      objectFit: "contain",
+                                    }}
+                                  />
+                                ) : (
+                                  <Typography>No image available</Typography>
+                                )}
+                              </DialogContent>
+                            </Dialog>
+                          </Grid>
+                        </Grid>
+
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          <Typography
+                            onClick={() => {
+                              setTable(false);
+                              handleCloseDrawer();
+                              setFuelLog(true);
+                              setEditFuel(false);
+                              setSubHeadingLog(false);
+                            }}
+                            sx={{
+                              cursor: "pointer",
+                              backgroundColor: "#71a375",
+                              color: "#ffffff",
+                              fontSize: "14px",
+                              fontWeight: 600,
+                              padding: "9px 29px",
+                              margin: "10px",
+                              borderRadius: "5px",
+                            }}
+                          >
+                            Edit
+                          </Typography>
+                        </Box>
+                      </>
+                    )}
+                    {activeLog === "accidentLog" && (
+                      <>
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <Typography
+                            sx={{
+                              backgroundColor: "#B3CCB3",
+                              padding: 1,
+                              flexGrow: 1,
+                              colour: "#454545",
+                              borderRadius: 1,
+                              // margin: 2,
+                            }}
+                          >
+                            Vehicle Details:
+                          </Typography>
+                        </Box>
+                        <Grid container spacing={2} sx={{ marginTop: 2 }}>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Driver Name
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.driver_name || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Employee Id
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.driver_employee_id || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <Typography
+                            sx={{
+                              backgroundColor: "#B3CCB3",
+                              padding: 1,
+                              flexGrow: 1,
+                              colour: "#454545",
+                              borderRadius: 1,
+                              // margin: 2,
+                            }}
+                          >
+                            Accident Details:
+                          </Typography>
+                        </Box>
+                        <Grid container spacing={2} sx={{ marginTop: 2 }}>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Accident Date
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.accident_date || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                width: { xs: "100%", sm: "100%", md: "90%" },
+                                padding: 1,
+                                color: "#848484",
+                                height: "auto",
+                                textAlign: "left",
+                                // marginBottom: 2,
+                              }}
+                            >
+                              Police Station No./Name
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.police_station_noname || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                width: { xs: "100%", sm: "100%", md: "90%" },
+                                padding: 1,
+                                color: "#848484",
+                                height: "auto",
+                                textAlign: "left",
+                                // marginBottom: 2,
+                              }}
+                            >
+                              Accident Description
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.accident_description || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                width: { xs: "100%", sm: "100%", md: "90%" },
+                                padding: 1,
+                                color: "#848484",
+                                height: "auto",
+                                textAlign: "left",
+                                // marginBottom: 2,
+                              }}
+                            >
+                              Damage Description
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.damage_description || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                width: { xs: "100%", sm: "100%", md: "90%" },
+                                padding: 1,
+                                color: "#848484",
+                                height: "auto",
+                                textAlign: "left",
+                                // marginBottom: 2,
+                              }}
+                            >
+                              Reason
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.reason || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                width: { xs: "100%", sm: "100%", md: "90%" },
+                                padding: 1,
+                                color: "#848484",
+                                height: "auto",
+                                textAlign: "left",
+                                // marginBottom: 2,
+                              }}
+                            >
+                              Vehicle No
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.vehicle_number || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              FIR Copy
+                            </Typography>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                              }}
+                            >
+                              <Typography
+                                sx={{
+                                  padding: 1,
+                                  color: "#000",
+                                }}
+                              >
+                                {drawerDetails.fir_copy || "N/A"}
+                              </Typography>
+                              {drawerDetails.fir_copy && (
+                                <>
+                                  <IconButton
+                                    sx={{ marginLeft: 1 }}
+                                    onClick={handleFirDialogOpen}
+                                  >
+                                    <VisibilityIcon />
+                                  </IconButton>
+                                  <IconButton
+                                    sx={{ marginLeft: 1 }}
+                                    onClick={handleDownloadFirCopy}
+                                  >
+                                    <DownloadIcon />
+                                  </IconButton>
+                                </>
+                              )}
+                            </Box>
+
+                            {/* FIR Copy Preview Dialog */}
+                            <Dialog
+                              open={firDialogOpen}
+                              onClose={handleFirDialogClose}
+                              maxWidth="md"
+                              fullWidth
+                            >
+                              <DialogContent>
+                                <IconButton
+                                  edge="end"
+                                  color="inherit"
+                                  onClick={handleFirDialogClose}
+                                  aria-label="close"
+                                  sx={{
+                                    position: "absolute",
+                                    top: 8,
+                                    right: 8,
+                                  }}
+                                >
+                                  <CloseIcon />
+                                </IconButton>
+                                {drawerDetails.fir_copy ? (
+                                  <Box
+                                    component="img"
+                                    src={drawerDetails.fir_copy.replace(
+                                      "/private",
+                                      ""
+                                    )}
+                                    alt="FIR Copy Image"
+                                    sx={{
+                                      maxWidth: "100%",
+                                      height: "auto",
+                                      objectFit: "contain",
+                                    }}
+                                  />
+                                ) : (
+                                  <Typography>No image available</Typography>
+                                )}
+                              </DialogContent>
+                            </Dialog>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Accident Images
+                            </Typography>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                              }}
+                            >
+                              <Typography
+                                sx={{
+                                  padding: 1,
+                                  color: "#000",
+                                }}
+                              >
+                                {drawerDetails.images || "N/A"}
+                              </Typography>
+                              {drawerDetails.images && (
+                                <>
+                                  <IconButton
+                                    sx={{ marginLeft: 1 }}
+                                    onClick={handleAccidentImagesDialogOpen}
+                                  >
+                                    <VisibilityIcon />
+                                  </IconButton>
+                                  <IconButton
+                                    sx={{ marginLeft: 1 }}
+                                    onClick={handleDownloadAccidentImages}
+                                  >
+                                    <DownloadIcon />
+                                  </IconButton>
+                                </>
+                              )}
+                            </Box>
+
+                            {/* Accident Images Preview Dialog */}
+                            <Dialog
+                              open={accidentImagesDialogOpen}
+                              onClose={handleAccidentImagesDialogClose}
+                              maxWidth="md"
+                              fullWidth
+                            >
+                              <DialogContent>
+                                <IconButton
+                                  edge="end"
+                                  color="inherit"
+                                  onClick={handleAccidentImagesDialogClose}
+                                  aria-label="close"
+                                  sx={{
+                                    position: "absolute",
+                                    top: 8,
+                                    right: 8,
+                                  }}
+                                >
+                                  <CloseIcon />
+                                </IconButton>
+                                {drawerDetails.images ? (
+                                  <Box
+                                    component="img"
+                                    src={drawerDetails.images.replace(
+                                      "/private",
+                                      ""
+                                    )}
+                                    alt="Accident Images"
+                                    sx={{
+                                      maxWidth: "100%",
+                                      height: "auto",
+                                      objectFit: "contain",
+                                    }}
+                                  />
+                                ) : (
+                                  <Typography>No image available</Typography>
+                                )}
+                              </DialogContent>
+                            </Dialog>
+                          </Grid>
+                        </Grid>
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          <Typography
+                            //   className="saveBtn"
+                            onClick={() => {
+                              setTable(false);
+                              handleCloseDrawer();
+                              setAccidentLog(true);
+                              setEdit(false);
+                              setSubHeadingLog(false);
+                            }}
+                            sx={{
+                              cursor: "pointer",
+                              backgroundColor: "#71a375",
+                              color: "#ffffff",
+                              fontSize: "14px",
+                              fontWeight: 600,
+                              padding: "9px 29px",
+                              margin: "10px",
+                              borderRadius: "5px",
+                            }}
+                          >
+                            Edit
+                          </Typography>
+                        </Box>
+                      </>
+                    )}
+                    {activeLog === "maintenanceLog" && (
+                      <>
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <Typography
+                            sx={{
+                              backgroundColor: "#B3CCB3",
+                              padding: 1,
+                              flexGrow: 1,
+                              colour: "#454545",
+                              borderRadius: 1,
+                              // margin: 2,
+                            }}
+                          >
+                            Maintenance Details:
+                          </Typography>
+                        </Box>
+                        <Grid container spacing={2} sx={{ marginTop: 2 }}>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Date of Service
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.date_of_service || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Vehicle Number
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.vehicle_number || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Service Type
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.service_type || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Description
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.description || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Parts Replaced
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.parts_replaced || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Total Cost
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.total_cost || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Warranty Information
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.warranty_information || "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Next Scheduled Maintenance Date
+                            </Typography>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#000",
+                              }}
+                            >
+                              {drawerDetails.next_scheduled_maintenance_date ||
+                                "N/A"}{" "}
+                              {/* Display the type or "N/A" if not available */}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Warranty Copy
+                            </Typography>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                              }}
+                            >
+                              <Typography
+                                sx={{
+                                  padding: 1,
+                                  color: "#000",
+                                }}
+                              >
+                                {drawerDetails.warranty_copy || "N/A"}
+                              </Typography>
+                              {drawerDetails.warranty_copy && (
+                                <>
+                                  <IconButton
+                                    sx={{ marginLeft: 1 }}
+                                    onClick={handleWarrantyCopyDialogOpen}
+                                  >
+                                    <VisibilityIcon />
+                                  </IconButton>
+                                  <IconButton
+                                    sx={{ marginLeft: 1 }}
+                                    onClick={handleDownloadWarrantyCopy}
+                                  >
+                                    <DownloadIcon />
+                                  </IconButton>
+                                </>
+                              )}
+                            </Box>
+
+                            {/* Warranty Copy Preview Dialog */}
+                            <Dialog
+                              open={warrantyCopyDialogOpen}
+                              onClose={handleWarrantyCopyDialogClose}
+                              maxWidth="md"
+                              fullWidth
+                            >
+                              <DialogContent>
+                                <IconButton
+                                  edge="end"
+                                  color="inherit"
+                                  onClick={handleWarrantyCopyDialogClose}
+                                  aria-label="close"
+                                  sx={{
+                                    position: "absolute",
+                                    top: 8,
+                                    right: 8,
+                                  }}
+                                >
+                                  <CloseIcon />
+                                </IconButton>
+                                {drawerDetails.warranty_copy ? (
+                                  <Box
+                                    component="img"
+                                    src={drawerDetails.warranty_copy.replace(
+                                      "/private",
+                                      ""
+                                    )}
+                                    alt="Warranty Copy Image"
+                                    sx={{
+                                      maxWidth: "100%",
+                                      height: "auto",
+                                      objectFit: "contain",
+                                    }}
+                                  />
+                                ) : (
+                                  <Typography>No image available</Typography>
+                                )}
+                              </DialogContent>
+                            </Dialog>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              sx={{
+                                padding: 1,
+                                color: "#848484",
+                              }}
+                            >
+                              Maintenance Bill Copy
+                            </Typography>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                              }}
+                            >
+                              <Typography
+                                sx={{
+                                  padding: 1,
+                                  color: "#000",
+                                }}
+                              >
+                                {drawerDetails.bill_copy || "N/A"}
+                              </Typography>
+                              {drawerDetails.bill_copy && (
+                                <>
+                                  <IconButton
+                                    sx={{ marginLeft: 1 }}
+                                    onClick={handleBillCopyDialogOpen}
+                                  >
+                                    <VisibilityIcon />
+                                  </IconButton>
+                                  <IconButton
+                                    sx={{ marginLeft: 1 }}
+                                    onClick={handleDownloadBillCopyMaintenance}
+                                  >
+                                    <DownloadIcon />
+                                  </IconButton>
+                                </>
+                              )}
+                            </Box>
+
+                            {/* Maintenance Bill Copy Preview Dialog */}
+                            <Dialog
+                              open={billCopyDialogOpen}
+                              onClose={handleBillCopyDialogClose}
+                              maxWidth="md"
+                              fullWidth
+                            >
+                              <DialogContent>
+                                <IconButton
+                                  edge="end"
+                                  color="inherit"
+                                  onClick={handleBillCopyDialogClose}
+                                  aria-label="close"
+                                  sx={{
+                                    position: "absolute",
+                                    top: 8,
+                                    right: 8,
+                                  }}
+                                >
+                                  <CloseIcon />
+                                </IconButton>
+                                {drawerDetails.bill_copy ? (
+                                  <Box
+                                    component="img"
+                                    src={drawerDetails.bill_copy.replace(
+                                      "/private",
+                                      ""
+                                    )}
+                                    alt="Maintenance Bill Copy Image"
+                                    sx={{
+                                      maxWidth: "100%",
+                                      height: "auto",
+                                      objectFit: "contain",
+                                    }}
+                                  />
+                                ) : (
+                                  <Typography>No image available</Typography>
+                                )}
+                              </DialogContent>
+                            </Dialog>
+                          </Grid>
+                        </Grid>
+                      </>
+                    )}
+                  </Box>
                 </Box>
-              </Box>
-            )}
-          </Drawer>
-        </>
-      )}
-      <Box
-        sx={{
-          backgroundColor: "#fff",
-        }}
-      >
-        {fineLog && (
-          <>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Typography
-                sx={{
-                  backgroundColor: "#B3CCB3",
-                  // padding: 1,
-                  flexGrow: 1,
-                  colour: "#454545",
-                  borderRadius: 1,
-                  margin: 2,
-                }}
-              >
-                <IconButton
-                  onClick={() => {
-                    setFineLog(false);
-                    setTable(true);
-                    setSubHeadingLog(true);
-                  }}
-                >
-                  <ArrowBackIcon />
-                </IconButton>
-                Add Fine Details:
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: {
-                  xs: "1fr",
-                  sm: "1fr 1fr",
-                  md: "1fr 1fr 1fr",
-                },
-                gap: "10px",
-                padding: "20px",
-              }}
-            >
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label={
-                    <span>
-                      Incident Date <span style={{ color: "red" }}>*</span>
-                    </span>
-                  }
-                  value={incidentDate}
-                  onChange={handleIncidentDateChange}
+              )}
+            </Drawer>
+          </>
+        )}
+        <Box
+          sx={{
+            backgroundColor: "#fff",
+          }}
+        >
+          {fineLog && (
+            <>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Typography
                   sx={{
-                    width: "90%",
-                    "& .MuiInputBase-root": {
-                      height: "auto",
-                    },
-                    "& .MuiInputLabel-root": {
-                      lineHeight: "40px",
-                    },
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      error={incidentDateError}
-                      helperText={incidentDateHelperText}
-                    />
-                  )}
-                  format="DD/MM/YYYY"
-                />
-                {incidentDateError && (
-                  <span
-                    style={{
-                      color: "red",
-                      position: "absolute",
-                      top: "100%",
-                      left: 0,
-                    }}
-                  >
-                    {incidentDateHelperText}
-                  </span>
-                )}
-              </LocalizationProvider>
-              <TextField
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  height: "auto",
-                  textAlign: "left",
-                  marginBottom: 2,
-                }}
-                label={
-                  <span>
-                    Location <span style={{ color: "red" }}>*</span>
-                  </span>
-                }
-                value={location}
-                onChange={(e) => validateLocation(e.target.value)}
-                error={!!locationError}
-                helperText={locationError}
-              />
-              <TextField
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  height: "auto",
-                  textAlign: "left",
-                  marginBottom: 2,
-                }}
-                label="Fine Amount"
-                value={fineAmount}
-                onChange={handleFineAmountChange}
-                error={!!fineAmountError}
-                helperText={fineAmountError}
-                type="number"
-                inputProps={{ step: "0.01" }}
-              />
-              <TextField
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  height: "auto",
-                  textAlign: "left",
-                  marginBottom: 2,
-                }}
-                label="Reason"
-                value={reason}
-                onChange={handleReasonChange}
-                error={!!reasonError}
-                helperText={reasonError}
-                multiline
-                rows={4}
-              />
-              {/* Modal for Fine Bill Preview */}
-              <Modal
-                open={isFineBillModalOpen}
-                onClose={closeFineBillPreview}
-                aria-labelledby="fine-bill-modal-title"
-                aria-describedby="fine-bill-modal-description"
-              >
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: "80%",
-                    bgcolor: "background.paper",
-                    boxShadow: 24,
-                    p: 4,
+                    backgroundColor: "#B3CCB3",
+                    // padding: 1,
+                    flexGrow: 1,
+                    colour: "#454545",
+                    borderRadius: 1,
+                    margin: 2,
                   }}
                 >
                   <IconButton
-                    aria-label="close"
-                    onClick={closeFineBillPreview}
-                    sx={{ position: "absolute", top: 8, right: 16 }}
+                    onClick={() => {
+                      setFineLog(false);
+                      setTable(true);
+                      setSubHeadingLog(true);
+                    }}
                   >
-                    <CloseIcon />
+                    <ArrowBackIcon />
                   </IconButton>
-                  <Typography
-                    id="fine-bill-modal-title"
-                    variant="h6"
-                    component="h2"
-                  >
-                    Fine Bill Copy Preview
-                  </Typography>
-                  {fineBillPreviewUrl ? (
-                    <img
-                      src={fineBillPreviewUrl}
-                      alt="Fine Bill Copy Preview"
-                      style={{ width: "100%", marginTop: 16 }}
-                    />
-                  ) : (
-                    <Typography
-                      variant="body2"
-                      color="textSecondary"
-                      sx={{ mt: 2 }}
-                    >
-                      No preview available for this file type.
-                    </Typography>
-                  )}
-                </Box>
-              </Modal>
-
-              {/* Fine Bill File Upload Field */}
+                  Add Fine Details:
+                </Typography>
+              </Box>
               <Box
                 sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  margin: "10 auto",
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "1fr",
+                    sm: "1fr 1fr",
+                    md: "1fr 1fr 1fr",
+                  },
+                  gap: "10px",
+                  padding: "20px",
                 }}
               >
-                <TextField
-                  sx={{ margin: "0 auto" }}
-                  label="Fine Bill Copy"
-                  value={fineBillFile ? fineBillFile.name : ""}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const fileInput = document.getElementById(
-                      "fileInputFineBill"
-                    ) as HTMLInputElement;
-                    if (fileInput) {
-                      fileInput.click();
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label={
+                      <span>
+                        Incident Date <span style={{ color: "red" }}>*</span>
+                      </span>
                     }
-                  }}
-                  sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        {!fineBillFile && (
-                          <UploadFileIcon
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const fileInput = document.getElementById(
-                                "fileInputFineBill"
-                              ) as HTMLInputElement;
-                              if (fileInput) {
-                                fileInput.click();
-                              }
-                            }}
-                            style={{ cursor: "pointer" }}
-                          />
-                        )}
-                        {fineBillFile && (
-                          <VisibilityIcon
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openFineBillPreview();
-                            }}
-                            style={{ cursor: "pointer", marginLeft: "8px" }}
-                          />
-                        )}
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                <input
-                  type="file"
-                  id="fileInputFineBill"
-                  name="fineBill"
-                  accept=".png,.jpg,.jpeg,.pdf,.doc"
-                  style={{ display: "none" }}
-                  onChange={handleFileChangeFineBill}
-                />
-              </Box>
-            </Box>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Typography
-                sx={{
-                  backgroundColor: "#B3CCB3",
-                  padding: 1,
-                  flexGrow: 1,
-                  colour: "#454545",
-                  borderRadius: 1,
-                  margin: 2,
-                }}
-              >
-                Add Driver Details:
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: {
-                  xs: "1fr",
-                  sm: "1fr 1fr",
-                  md: "1fr 1fr 1fr",
-                },
-                gap: "10px",
-                padding: "20px",
-              }}
-            >
-              <Autocomplete
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  margin: "10 auto",
-                }}
-                options={employeeDetails || []}
-                getOptionLabel={(option) => option.name}
-                value={
-                  employeeDetails.find(
-                    (emp) => emp.name === selectedEmployee
-                  ) || null
-                }
-                onChange={handleEmployeeChange}
-                renderInput={(params) => (
-                  <TextField {...params} label="Driver ID" variant="outlined" />
-                )}
-              />
-              <Autocomplete
-                freeSolo
-                options={employeeDetails.map((emp) => emp.employee_name) || []}
-                value={driverName}
-                onInputChange={(event, newValue) =>
-                  handleDriverNameChange(event, newValue)
-                }
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Driver Name"
-                    variant="outlined"
-                    error={driverError}
-                    helperText={driverHelperText}
+                    value={incidentDate}
+                    onChange={handleIncidentDateChange}
+                    sx={{
+                      width: "90%",
+                      "& .MuiInputBase-root": {
+                        height: "auto",
+                      },
+                      "& .MuiInputLabel-root": {
+                        lineHeight: "40px",
+                      },
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        error={incidentDateError}
+                        helperText={incidentDateHelperText}
+                      />
+                    )}
+                    format="DD/MM/YYYY"
                   />
-                )}
-              />
-            </Box>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Typography
-                sx={{
-                  backgroundColor: "#B3CCB3",
-                  padding: 1,
-                  flexGrow: 1,
-                  colour: "#454545",
-                  borderRadius: 1,
-                  margin: 2,
-                }}
-              >
-                Add Vehicle Details:
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: {
-                  xs: "1fr",
-                  sm: "1fr 1fr",
-                  md: "1fr 1fr 1fr",
-                },
-                gap: "10px",
-                padding: "20px",
-              }}
-            >
-              <TextField
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  height: "auto",
-                  textAlign: "left",
-                }}
-                label={<span>Vehicle Number</span>}
-                value={licensePlateNumber}
-                onChange={(e) => {
-                  const newValue = e.target.value;
-                  setLicensePlateNumber(newValue);
-                  validateLicensePlateNumber(newValue);
-                }}
-                error={licensePlateError}
-                helperText={licensePlateHelperText}
-              />
-            </Box>
-            {edit && (
-              <>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    padding: "20px",
-                  }}
-                >
-                  <Button
-                    className="saveBtn"
-                    disabled={
-                      !location ||
-                      !incidentDate ||
-                      //   !incidentDateError
-                      //    ||
-                      locationError ||
-                      fineAmountError ||
-                      reasonError
-                    }
-                    onClick={CreateFineLogDetails}
-                  >
-                    {fineLoading ? "Submitting..." : "Submit"}
-                  </Button>
-                </Box>
-              </>
-            )}
-
-            {!edit && (
-              <>
-                {updatingLoading ? ( // Show loading spinner while updating
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      padding: "20px",
-                    }}
-                  >
-                    <CircularProgress />
-                  </Box>
-                ) : (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      padding: "20px",
-                    }}
-                  >
-                    <Button
-                      className="saveBtn"
-                      onClick={handleUpdate}
-                      disabled={updatingLoading}
+                  {incidentDateError && (
+                    <span
+                      style={{
+                        color: "red",
+                        position: "absolute",
+                        top: "100%",
+                        left: 0,
+                      }}
                     >
-                      Update
-                    </Button>
-                  </Box>
-                )}
-
-                {updatingError && (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      padding: "20px",
-                    }}
-                  >
-                    <Alert severity="error">
-                      {updatingError.message || "Failed to update data."}
-                    </Alert>
-                  </Box>
-                )}
-              </>
-            )}
-          </>
-        )}
-
-        {fuelLog && (
-          <>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Typography
-                sx={{
-                  backgroundColor: "#B3CCB3",
-                  // padding: 1,
-                  flexGrow: 1,
-                  colour: "#454545",
-                  borderRadius: 1,
-                  margin: 2,
-                }}
-              >
-                <IconButton
-                  onClick={() => {
-                    setFuelLog(false);
-                    setTable(true);
-                    setSubHeadingLog(true);
-                  }}
-                >
-                  <ArrowBackIcon />
-                </IconButton>
-                Add Fuel Details:
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: {
-                  xs: "1fr",
-                  sm: "1fr 1fr",
-                  md: "1fr 1fr 1fr",
-                },
-                gap: "10px",
-                padding: "20px",
-              }}
-            >
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label={<span>Fuel Date</span>}
-                  value={fuelDate}
-                  onChange={handleFuelDateChange}
-                  sx={{
-                    width: "90%",
-                    "& .MuiInputBase-root": {
-                      height: "auto",
-                    },
-                    "& .MuiInputLabel-root": {
-                      lineHeight: "40px",
-                    },
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      error={fuelDateError}
-                      helperText={fuelDateHelperText}
-                    />
+                      {incidentDateHelperText}
+                    </span>
                   )}
-                  format="DD/MM/YYYY"
-                />
-                {fuelDateError && (
-                  <span
-                    style={{
-                      color: "red",
-                      position: "absolute",
-                      top: "100%",
-                      left: 0,
-                    }}
-                  >
-                    {fuelDateHelperText}
-                  </span>
-                )}
-              </LocalizationProvider>
-              <TextField
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  height: "auto",
-                  textAlign: "left",
-                }}
-                label={<span>Vehicle Number</span>}
-                value={licensePlateNumber}
-                onChange={(e) => {
-                  const newValue = e.target.value;
-                  setLicensePlateNumber(newValue);
-                  validateLicensePlateNumber(newValue);
-                }}
-                error={licensePlateError}
-                helperText={licensePlateHelperText}
-              />
-              <TextField
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  height: "auto",
-                  textAlign: "left",
-                  marginBottom: 2,
-                }}
-                label="Fuel Amount"
-                value={fuelAmount}
-                onChange={handleFuelAmountChange}
-                error={!!fuelAmountError}
-                helperText={fuelAmountError}
-                type="number"
-                inputProps={{ step: "0.01" }}
-              />
-              <TextField
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  height: "auto",
-                  textAlign: "left",
-                  marginBottom: 2,
-                }}
-                label="Current Odometer Reading"
-                value={currentOdometer}
-                onChange={handleCurrentOdometerChange}
-                error={!!currentOdometerError}
-                helperText={currentOdometerError}
-                type="number"
-                inputProps={{ min: "0", step: "1" }} // Ensure only non-negative integers
-              />
-              <TextField
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  height: "auto",
-                  textAlign: "left",
-                  marginBottom: 2,
-                }}
-                label="Fuel Liters"
-                value={fuelLiters}
-                onChange={handleFuelLitersChange}
-                error={!!fuelLitersError}
-                helperText={fuelLitersError}
-                type="number"
-                inputProps={{ step: "0.01" }} // Ensure only numbers with up to two decimal places
-              />
-              <TextField
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  height: "auto",
-                  textAlign: "left",
-                  marginBottom: 2,
-                }}
-                label="Supplier Name"
-                value={supplierName}
-                onChange={handleSupplierNameChange}
-                error={!!supplierNameError}
-                helperText={supplierNameError}
-              />
-              <TextField
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  height: "auto",
-                  textAlign: "left",
-                  marginBottom: 2,
-                }}
-                label="Price per Liters"
-                value={pricePerLiter}
-                onChange={handlePricePerLiterChange}
-                error={!!pricePerLiterError}
-                helperText={pricePerLiterError}
-                type="number"
-                inputProps={{ step: "0.01" }} // Ensure only numbers with up to two decimal places
-              />
-              <Modal
-                open={isFuelBillModalOpen}
-                onClose={closeFuelBillPreview}
-                aria-labelledby="fuel-bill-modal-title"
-                aria-describedby="fuel-bill-modal-description"
-              >
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: "80%",
-                    bgcolor: "background.paper",
-                    boxShadow: 24,
-                    p: 4,
-                  }}
-                >
-                  <IconButton
-                    aria-label="close"
-                    onClick={closeFuelBillPreview}
-                    sx={{ position: "absolute", top: 8, right: 16 }}
-                  >
-                    <CloseIcon />
-                  </IconButton>
-                  <Typography
-                    id="fuel-bill-modal-title"
-                    variant="h6"
-                    component="h2"
-                  >
-                    Fuel Bill Copy Preview
-                  </Typography>
-                  {fuelBillPreviewUrl ? (
-                    <img
-                      src={fuelBillPreviewUrl}
-                      alt="Fuel Bill Copy Preview"
-                      style={{ width: "100%", marginTop: 16 }}
-                    />
-                  ) : (
-                    <Typography
-                      variant="body2"
-                      color="textSecondary"
-                      sx={{ mt: 2 }}
-                    >
-                      No preview available for this file type.
-                    </Typography>
-                  )}
-                </Box>
-              </Modal>
-              <Box
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  margin: "10 auto",
-                }}
-              >
+                </LocalizationProvider>
                 <TextField
-                  sx={{ margin: "0 auto" }}
-                  label="Fuel Bill Copy"
-                  value={fuelBillFile ? fuelBillFile.name : ""}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const fileInput = document.getElementById(
-                      "fileInputFuelBill"
-                    ) as HTMLInputElement;
-                    if (fileInput) {
-                      fileInput.click();
-                    }
-                  }}
-                  sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        {!fuelBillFile && (
-                          <UploadFileIcon
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const fileInput = document.getElementById(
-                                "fileInputFuelBill"
-                              ) as HTMLInputElement;
-                              if (fileInput) {
-                                fileInput.click();
-                              }
-                            }}
-                            style={{ cursor: "pointer" }}
-                          />
-                        )}
-                        {fuelBillFile && (
-                          <VisibilityIcon
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openFuelBillPreview();
-                            }}
-                            style={{ cursor: "pointer", marginLeft: "8px" }}
-                          />
-                        )}
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                <input
-                  type="file"
-                  id="fileInputFuelBill"
-                  name="fuelBill"
-                  accept=".png,.jpg,.jpeg,.pdf,.doc"
-                  style={{ display: "none" }}
-                  onChange={handleFileChangeFuelBill}
-                />
-              </Box>
-            </Box>
-            {editFuel && (
-              <>
-                <Box
                   sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    padding: "20px",
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                    marginBottom: 2,
                   }}
-                >
-                  <Button
-                    className="saveBtn"
-                    disabled={
-                      fuelDateError ||
-                      fuelAmountError ||
-                      currentOdometerError ||
-                      fuelLitersError ||
-                      supplierNameError ||
-                      pricePerLiterError ||
-                      licensePlateError
-                    }
-                    onClick={CreateFuelLogDetails}
-                  >
-                    {fineLoading ? "Submitting..." : "Submit"}
-                  </Button>
-                </Box>
-              </>
-            )}
-            {!editFuel && (
-              <>
-                {updatingLoading ? ( // Show loading spinner while updating
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      padding: "20px",
-                    }}
-                  >
-                    <CircularProgress />
-                  </Box>
-                ) : (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      padding: "20px",
-                    }}
-                  >
-                    <Button
-                      className="saveBtn"
-                      onClick={handleUpdateFuel}
-                      disabled={updatingLoading}
-                    >
-                      Update
-                    </Button>
-                  </Box>
-                )}
-
-                {updatingError && (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      padding: "20px",
-                    }}
-                  >
-                    <Alert severity="error">
-                      {updatingError.message || "Failed to update data."}
-                    </Alert>
-                  </Box>
-                )}
-              </>
-            )}
-          </>
-        )}
-        {accidentLog && (
-          <>
-            {" "}
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Typography
-                sx={{
-                  backgroundColor: "#B3CCB3",
-                  // padding: 1,
-                  flexGrow: 1,
-                  colour: "#454545",
-                  borderRadius: 1,
-                  margin: 2,
-                }}
-              >
-                <IconButton
-                  onClick={() => {
-                    setAccidentLog(false);
-                    setTable(true);
-                    setSubHeadingLog(true);
-                  }}
-                >
-                  <ArrowBackIcon />
-                </IconButton>
-                Add Accident Details:
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: {
-                  xs: "1fr",
-                  sm: "1fr 1fr",
-                  md: "1fr 1fr 1fr",
-                },
-                gap: "10px",
-                padding: "20px",
-              }}
-            >
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
                   label={
                     <span>
-                      Accident Date <span style={{ color: "red" }}>*</span>
+                      Location <span style={{ color: "red" }}>*</span>
                     </span>
                   }
-                  value={accidentDate}
-                  onChange={handleAccidentDateChange}
-                  sx={{
-                    width: "90%",
-                    "& .MuiInputBase-root": {
-                      height: "auto",
-                    },
-                    "& .MuiInputLabel-root": {
-                      lineHeight: "40px",
-                    },
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      error={accidentDateError}
-                      helperText={accidentDateHelperText}
-                    />
-                  )}
-                  format="DD/MM/YYYY"
+                  value={location}
+                  onChange={(e) => validateLocation(e.target.value)}
+                  error={!!locationError}
+                  helperText={locationError}
                 />
-                {accidentDateError && (
-                  <span
-                    style={{
-                      color: "red",
-                      position: "absolute",
-                      top: "100%",
-                      left: 0,
-                    }}
-                  >
-                    {accidentDateHelperText}
-                  </span>
-                )}
-              </LocalizationProvider>
-              <TextField
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  height: "auto",
-                  textAlign: "left",
-                  marginBottom: 2,
-                }}
-                label={<span>Police Station Number</span>}
-                value={policeStationNumber}
-                onChange={(e) => validatePoliceStationNumber(e.target.value)}
-                error={!!policeStationNumberError}
-                helperText={policeStationNumberError}
-              />
-              <Box
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  margin: "10 auto",
-                }}
-              >
                 <TextField
                   sx={{
-                    margin: "0 auto",
-                    width: { xs: "100%", sm: "100%", md: "100%" },
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                    marginBottom: 2,
                   }}
-                  label={<Typography>Fir Copy</Typography>}
-                  value={firCopyImage ? firCopyImage.name : ""}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    document.getElementById("fileInputFirCopy")?.click();
-                  }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        {!firCopyImage && (
-                          <UploadFileIcon
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              document
-                                .getElementById("fileInputFirCopy")
-                                ?.click();
-                            }}
-                            style={{ cursor: "pointer" }}
-                          />
-                        )}
-                        {firCopyImage && (
-                          <VisibilityIcon
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setIsFirCopyModalOpen(true);
-                            }}
-                            style={{ cursor: "pointer", marginLeft: "8px" }}
-                          />
-                        )}
-                      </InputAdornment>
-                    ),
-                  }}
+                  label="Fine Amount"
+                  value={fineAmount}
+                  onChange={handleFineAmountChange}
+                  error={!!fineAmountError}
+                  helperText={fineAmountError}
+                  type="number"
+                  inputProps={{ step: "0.01" }}
                 />
-                <input
-                  type="file"
-                  id="fileInputFirCopy"
-                  accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
-                  style={{ display: "none" }}
-                  onChange={handleFirCopyFileChange}
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                    marginBottom: 2,
+                  }}
+                  label="Reason"
+                  value={reason}
+                  onChange={handleReasonChange}
+                  error={!!reasonError}
+                  helperText={reasonError}
+                  multiline
+                  rows={2}
                 />
-                {firCopyError && (
-                  <span className="ErrorMsg">{firCopyError}</span>
-                )}
-
+                {/* Modal for Fine Bill Preview */}
                 <Modal
-                  open={isFirCopyModalOpen}
-                  onClose={closeFirCopyImagePreview}
-                  aria-labelledby="fir-copy-modal-title"
+                  open={isFineBillModalOpen}
+                  onClose={closeFineBillPreview}
+                  aria-labelledby="fine-bill-modal-title"
+                  aria-describedby="fine-bill-modal-description"
                 >
                   <Box
                     sx={{
@@ -4176,329 +3426,209 @@ const Logs: React.FC<LogsProps> = ({
                   >
                     <IconButton
                       aria-label="close"
-                      onClick={closeFirCopyImagePreview}
+                      onClick={closeFineBillPreview}
                       sx={{ position: "absolute", top: 8, right: 16 }}
                     >
                       <CloseIcon />
                     </IconButton>
-                    <Typography id="fir-copy-modal-title" variant="h6">
-                      Fir Copy Preview
-                    </Typography>
-                    <img
-                      src={firCopyPreviewUrl || ""}
-                      alt="Fir Copy Preview"
-                      style={{ width: "100%", marginTop: 16 }}
-                    />
-                  </Box>
-                </Modal>
-              </Box>
-              <Box
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  margin: "10 auto",
-                }}
-              >
-                <TextField
-                  sx={{
-                    margin: "0 auto",
-                    width: { xs: "100%", sm: "100%", md: "100%" },
-                  }}
-                  label={
-                    <Typography>
-                      Accident Image <span style={{ color: "red" }}>*</span>
-                    </Typography>
-                  }
-                  value={accidentImage ? accidentImage.name : ""}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    document.getElementById("fileInputAccidentImage")?.click();
-                  }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        {!accidentImage && (
-                          <UploadFileIcon
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              document
-                                .getElementById("fileInputAccidentImage")
-                                ?.click();
-                            }}
-                            style={{ cursor: "pointer" }}
-                          />
-                        )}
-                        {accidentImage && (
-                          <VisibilityIcon
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setIsAccidentModalOpen(true);
-                            }}
-                            style={{ cursor: "pointer", marginLeft: "8px" }}
-                          />
-                        )}
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                <input
-                  type="file"
-                  id="fileInputAccidentImage"
-                  accept=".jpg,.jpeg,.png,.pdf"
-                  style={{ display: "none" }}
-                  onChange={handleAccidentImageFileChange}
-                />
-                {accidentError && (
-                  <span className="ErrorMsg">{accidentError}</span>
-                )}
-
-                <Modal
-                  open={isAccidentModalOpen}
-                  onClose={closeAccidentImagePreview}
-                  aria-labelledby="accident-image-modal-title"
-                >
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      top: "50%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
-                      width: "80%",
-                      bgcolor: "background.paper",
-                      boxShadow: 24,
-                      p: 4,
-                    }}
-                  >
-                    <IconButton
-                      aria-label="close"
-                      onClick={closeAccidentImagePreview}
-                      sx={{ position: "absolute", top: 8, right: 16 }}
+                    <Typography
+                      id="fine-bill-modal-title"
+                      variant="h6"
+                      component="h2"
                     >
-                      <CloseIcon />
-                    </IconButton>
-                    <Typography id="accident-image-modal-title" variant="h6">
-                      Accident Image Preview
+                      Fine Bill Copy Preview
                     </Typography>
-                    {accidentImage &&
-                    accidentImage.type === "application/pdf" ? (
-                      <Document file={accidentImagePreviewUrl}>
-                        <Page pageNumber={1} />
-                      </Document>
-                    ) : (
+                    {fineBillPreviewUrl ? (
                       <img
-                        src={accidentImagePreviewUrl || ""}
-                        alt="Accident Image Preview"
+                        src={fineBillPreviewUrl}
+                        alt="Fine Bill Copy Preview"
                         style={{ width: "100%", marginTop: 16 }}
                       />
+                    ) : (
+                      <Typography
+                        variant="body2"
+                        color="textSecondary"
+                        sx={{ mt: 2 }}
+                      >
+                        No preview available for this file type.
+                      </Typography>
                     )}
                   </Box>
                 </Modal>
-              </Box>
-              <TextField
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  height: "auto",
-                  textAlign: "left",
-                  marginBottom: 2,
-                }}
-                label={
-                  <span>
-                    Accident Reason <span style={{ color: "red" }}>*</span>
-                  </span>
-                }
-                value={accidentReason}
-                onChange={handleAccidentReasonChange}
-                error={!!accidentReasonError}
-                helperText={accidentReasonError}
-                multiline
-                rows={4}
-              />{" "}
-              <TextField
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  height: "auto",
-                  textAlign: "left",
-                  marginBottom: 2,
-                }}
-                label={
-                  <span>
-                    Damage Description <span style={{ color: "red" }}>*</span>
-                  </span>
-                }
-                value={damageDescription}
-                onChange={handleDamageDescriptionChange}
-                error={!!damageDescriptionError}
-                helperText={damageDescriptionError}
-                multiline
-                rows={4}
-              />
-              <TextField
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  height: "auto",
-                  textAlign: "left",
-                  marginBottom: 2,
-                }}
-                label="Accident Description"
-                value={accidentDescription}
-                onChange={handleAccidentDescriptionChange}
-                error={!!accidentDescriptionError}
-                helperText={accidentDescriptionError}
-                multiline
-                rows={4}
-              />
-            </Box>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Typography
-                sx={{
-                  backgroundColor: "#B3CCB3",
-                  padding: 1,
-                  flexGrow: 1,
-                  colour: "#454545",
-                  borderRadius: 1,
-                  margin: 2,
-                }}
-              >
-                Add Driver Details:
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: {
-                  xs: "1fr",
-                  sm: "1fr 1fr",
-                  md: "1fr 1fr 1fr",
-                },
-                gap: "10px",
-                padding: "20px",
-              }}
-            >
-              <Autocomplete
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  margin: "10 auto",
-                }}
-                options={employeeDetails || []}
-                getOptionLabel={(option) => option.name}
-                value={
-                  employeeDetails.find(
-                    (emp) => emp.name === selectedEmployee
-                  ) || null
-                }
-                onChange={handleEmployeeChange}
-                renderInput={(params) => (
-                  <TextField {...params} label="Driver ID" variant="outlined" />
-                )}
-              />
-              <Autocomplete
-                freeSolo
-                options={employeeDetails.map((emp) => emp.employee_name) || []}
-                value={driverName}
-                onInputChange={(event, newValue) =>
-                  handleDriverNameChange(event, newValue)
-                }
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Driver Name"
-                    variant="outlined"
-                    error={driverError}
-                    helperText={driverHelperText}
-                  />
-                )}
-              />
-            </Box>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Typography
-                sx={{
-                  backgroundColor: "#B3CCB3",
-                  padding: 1,
-                  flexGrow: 1,
-                  colour: "#454545",
-                  borderRadius: 1,
-                  margin: 2,
-                }}
-              >
-                Add Vehicle Details:
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: {
-                  xs: "1fr",
-                  sm: "1fr 1fr",
-                  md: "1fr 1fr 1fr",
-                },
-                gap: "10px",
-                padding: "20px",
-              }}
-            >
-              <TextField
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  height: "auto",
-                  textAlign: "left",
-                }}
-                label={
-                  <span>
-                    Vehicle Number <span style={{ color: "red" }}>*</span>
-                  </span>
-                }
-                value={licensePlateNumber}
-                onChange={(e) => {
-                  const newValue = e.target.value;
-                  setLicensePlateNumber(newValue);
-                  validateLicensePlateNumber(newValue);
-                }}
-                error={licensePlateError}
-                helperText={licensePlateHelperText}
-              />
-            </Box>
-            {editAccdient && (
-              <>
+
+                {/* Fine Bill File Upload Field */}
                 <Box
                   sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    padding: "20px",
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    margin: "10 auto",
                   }}
                 >
-                  <Button
-                    className="saveBtn"
-                    disabled={
-                      !accidentDate ||
-                      !accidentReason ||
-                      policeStationNumberError ||
-                      firCopyError ||
-                      accidentReasonError ||
-                      !damageDescription ||
-                      damageDescriptionError ||
-                      licensePlateNumber ||
-                      accidentDescriptionError ||
-                      licensePlateError ||
-                      !accidentImage
-                    }
-                    onClick={CreateAccidentLogDetails}
-                  >
-                    {fineLoading ? "Submitting..." : "Submit"}
-                  </Button>
-                </Box>
-              </>
-            )}
-            {!editAccdient && (
-              <>
-                {updatingLoading ? ( // Show loading spinner while updating
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      padding: "20px",
+                  <TextField
+                    sx={{ margin: "0 auto" }}
+                    label="Fine Bill Copy"
+                    value={fineBillFile ? fineBillFile.name : ""}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const fileInput = document.getElementById(
+                        "fileInputFineBill"
+                      ) as HTMLInputElement;
+                      if (fileInput) {
+                        fileInput.click();
+                      }
                     }}
-                  >
-                    <CircularProgress />
-                  </Box>
-                ) : (
+                    sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          {!fineBillFile && (
+                            <UploadFileIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const fileInput = document.getElementById(
+                                  "fileInputFineBill"
+                                ) as HTMLInputElement;
+                                if (fileInput) {
+                                  fileInput.click();
+                                }
+                              }}
+                              style={{ cursor: "pointer" }}
+                            />
+                          )}
+                          {fineBillFile && (
+                            <VisibilityIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openFineBillPreview();
+                              }}
+                              style={{ cursor: "pointer", marginLeft: "8px" }}
+                            />
+                          )}
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <input
+                    type="file"
+                    id="fileInputFineBill"
+                    name="fineBill"
+                    accept=".png,.jpg,.jpeg,.pdf,.doc"
+                    style={{ display: "none" }}
+                    onChange={handleFileChangeFineBill}
+                  />
+                </Box>
+              </Box>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Typography
+                  sx={{
+                    backgroundColor: "#B3CCB3",
+                    padding: 1,
+                    flexGrow: 1,
+                    colour: "#454545",
+                    borderRadius: 1,
+                    margin: 2,
+                  }}
+                >
+                  Add Driver Details:
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "1fr",
+                    sm: "1fr 1fr",
+                    md: "1fr 1fr 1fr",
+                  },
+                  gap: "10px",
+                  padding: "20px",
+                }}
+              >
+                <Autocomplete
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    margin: "10 auto",
+                  }}
+                  options={employeeDetails || []}
+                  getOptionLabel={(option) => option.name}
+                  value={
+                    employeeDetails.find(
+                      (emp) => emp.name === selectedEmployee
+                    ) || null
+                  }
+                  onChange={handleEmployeeChange}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Driver ID"
+                      variant="outlined"
+                    />
+                  )}
+                />
+                <Autocomplete
+                  freeSolo
+                  options={
+                    employeeDetails.map((emp) => emp.employee_name) || []
+                  }
+                  value={driverName}
+                  onInputChange={(event, newValue) =>
+                    handleDriverNameChange(event, newValue)
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Driver Name"
+                      variant="outlined"
+                      error={driverError}
+                      helperText={driverHelperText}
+                    />
+                  )}
+                />
+              </Box>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Typography
+                  sx={{
+                    backgroundColor: "#B3CCB3",
+                    padding: 1,
+                    flexGrow: 1,
+                    colour: "#454545",
+                    borderRadius: 1,
+                    margin: 2,
+                  }}
+                >
+                  Add Vehicle Details:
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "1fr",
+                    sm: "1fr 1fr",
+                    md: "1fr 1fr 1fr",
+                  },
+                  gap: "10px",
+                  padding: "20px",
+                }}
+              >
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                  label={<span>Vehicle Number</span>}
+                  value={licensePlateNumber}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    setLicensePlateNumber(newValue);
+                    validateLicensePlateNumber(newValue);
+                  }}
+                  error={licensePlateError}
+                  helperText={licensePlateHelperText}
+                />
+              </Box>
+              {edit && (
+                <>
                   <Box
                     sx={{
                       display: "flex",
@@ -4508,15 +3638,344 @@ const Logs: React.FC<LogsProps> = ({
                   >
                     <Button
                       className="saveBtn"
-                      onClick={handleUpdateAccident}
-                      disabled={updatingLoading}
+                      disabled={
+                        !location ||
+                        !incidentDate ||
+                        //   !incidentDateError
+                        //    ||
+                        locationError ||
+                        fineAmountError ||
+                        reasonError
+                      }
+                      onClick={CreateFineLogDetails}
                     >
-                      Update
+                      {fineLoading ? "Submitting..." : "Submit"}
                     </Button>
                   </Box>
-                )}
+                </>
+              )}
 
-                {updatingError && (
+              {!edit && (
+                <>
+                  {updatingLoading ? ( // Show loading spinner while updating
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        padding: "20px",
+                      }}
+                    >
+                      <CircularProgress />
+                    </Box>
+                  ) : (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        padding: "20px",
+                      }}
+                    >
+                      <Button
+                        className="saveBtn"
+                        onClick={handleUpdate}
+                        disabled={updatingLoading}
+                      >
+                        Update
+                      </Button>
+                    </Box>
+                  )}
+
+                  {updatingError && (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        padding: "20px",
+                      }}
+                    >
+                      <Alert severity="error">
+                        {updatingError.message || "Failed to update data."}
+                      </Alert>
+                    </Box>
+                  )}
+                </>
+              )}
+            </>
+          )}
+
+          {fuelLog && (
+            <>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Typography
+                  sx={{
+                    backgroundColor: "#B3CCB3",
+                    // padding: 1,
+                    flexGrow: 1,
+                    colour: "#454545",
+                    borderRadius: 1,
+                    margin: 2,
+                  }}
+                >
+                  <IconButton
+                    onClick={() => {
+                      setFuelLog(false);
+                      setTable(true);
+                      setSubHeadingLog(true);
+                    }}
+                  >
+                    <ArrowBackIcon />
+                  </IconButton>
+                  Add Fuel Details:
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "1fr",
+                    sm: "1fr 1fr",
+                    md: "1fr 1fr 1fr",
+                  },
+                  gap: "10px",
+                  padding: "20px",
+                }}
+              >
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label={<span>Fuel Date</span>}
+                    value={fuelDate}
+                    onChange={handleFuelDateChange}
+                    sx={{
+                      width: "90%",
+                      "& .MuiInputBase-root": {
+                        height: "auto",
+                      },
+                      "& .MuiInputLabel-root": {
+                        lineHeight: "40px",
+                      },
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        error={fuelDateError}
+                        helperText={fuelDateHelperText}
+                      />
+                    )}
+                    format="DD/MM/YYYY"
+                  />
+                  {fuelDateError && (
+                    <span
+                      style={{
+                        color: "red",
+                        position: "absolute",
+                        top: "100%",
+                        left: 0,
+                      }}
+                    >
+                      {fuelDateHelperText}
+                    </span>
+                  )}
+                </LocalizationProvider>
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                  label={<span>Vehicle Number</span>}
+                  value={licensePlateNumber}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    setLicensePlateNumber(newValue);
+                    validateLicensePlateNumber(newValue);
+                  }}
+                  error={licensePlateError}
+                  helperText={licensePlateHelperText}
+                />
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                    marginBottom: 2,
+                  }}
+                  label="Fuel Amount"
+                  value={fuelAmount}
+                  onChange={handleFuelAmountChange}
+                  error={!!fuelAmountError}
+                  helperText={fuelAmountError}
+                  type="number"
+                  inputProps={{ step: "0.01" }}
+                />
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                    marginBottom: 2,
+                  }}
+                  label="Current Odometer Reading"
+                  value={currentOdometer}
+                  onChange={handleCurrentOdometerChange}
+                  error={!!currentOdometerError}
+                  helperText={currentOdometerError}
+                  type="number"
+                  inputProps={{ min: "0", step: "1" }} // Ensure only non-negative integers
+                />
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                    marginBottom: 2,
+                  }}
+                  label="Fuel Liters"
+                  value={fuelLiters}
+                  onChange={handleFuelLitersChange}
+                  error={!!fuelLitersError}
+                  helperText={fuelLitersError}
+                  type="number"
+                  inputProps={{ step: "0.01" }} // Ensure only numbers with up to two decimal places
+                />
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                    marginBottom: 2,
+                  }}
+                  label="Supplier Name"
+                  value={supplierName}
+                  onChange={handleSupplierNameChange}
+                  error={!!supplierNameError}
+                  helperText={supplierNameError}
+                />
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                    marginBottom: 2,
+                  }}
+                  label="Price per Liters"
+                  value={pricePerLiter}
+                  onChange={handlePricePerLiterChange}
+                  error={!!pricePerLiterError}
+                  helperText={pricePerLiterError}
+                  type="number"
+                  inputProps={{ step: "0.01" }} // Ensure only numbers with up to two decimal places
+                />
+                <Modal
+                  open={isFuelBillModalOpen}
+                  onClose={closeFuelBillPreview}
+                  aria-labelledby="fuel-bill-modal-title"
+                  aria-describedby="fuel-bill-modal-description"
+                >
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "80%",
+                      bgcolor: "background.paper",
+                      boxShadow: 24,
+                      p: 4,
+                    }}
+                  >
+                    <IconButton
+                      aria-label="close"
+                      onClick={closeFuelBillPreview}
+                      sx={{ position: "absolute", top: 8, right: 16 }}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                    <Typography
+                      id="fuel-bill-modal-title"
+                      variant="h6"
+                      component="h2"
+                    >
+                      Fuel Bill Copy Preview
+                    </Typography>
+                    {fuelBillPreviewUrl ? (
+                      <img
+                        src={fuelBillPreviewUrl}
+                        alt="Fuel Bill Copy Preview"
+                        style={{ width: "100%", marginTop: 16 }}
+                      />
+                    ) : (
+                      <Typography
+                        variant="body2"
+                        color="textSecondary"
+                        sx={{ mt: 2 }}
+                      >
+                        No preview available for this file type.
+                      </Typography>
+                    )}
+                  </Box>
+                </Modal>
+                <Box
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    margin: "10 auto",
+                  }}
+                >
+                  <TextField
+                    sx={{ margin: "0 auto" }}
+                    label="Fuel Bill Copy"
+                    value={fuelBillFile ? fuelBillFile.name : ""}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const fileInput = document.getElementById(
+                        "fileInputFuelBill"
+                      ) as HTMLInputElement;
+                      if (fileInput) {
+                        fileInput.click();
+                      }
+                    }}
+                    sx={{ width: { xs: "100%", sm: "100%", md: "100%" } }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          {!fuelBillFile && (
+                            <UploadFileIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const fileInput = document.getElementById(
+                                  "fileInputFuelBill"
+                                ) as HTMLInputElement;
+                                if (fileInput) {
+                                  fileInput.click();
+                                }
+                              }}
+                              style={{ cursor: "pointer" }}
+                            />
+                          )}
+                          {fuelBillFile && (
+                            <VisibilityIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openFuelBillPreview();
+                              }}
+                              style={{ cursor: "pointer", marginLeft: "8px" }}
+                            />
+                          )}
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <input
+                    type="file"
+                    id="fileInputFuelBill"
+                    name="fuelBill"
+                    accept=".png,.jpg,.jpeg,.pdf,.doc"
+                    style={{ display: "none" }}
+                    onChange={handleFileChangeFuelBill}
+                  />
+                </Box>
+              </Box>
+              {editFuel && (
+                <>
                   <Box
                     sx={{
                       display: "flex",
@@ -4524,486 +3983,525 @@ const Logs: React.FC<LogsProps> = ({
                       padding: "20px",
                     }}
                   >
-                    <Alert severity="error">
-                      {updatingError.message || "Failed to update data."}
-                    </Alert>
+                    <Button
+                      className="saveBtn"
+                      disabled={
+                        fuelDateError ||
+                        fuelAmountError ||
+                        currentOdometerError ||
+                        fuelLitersError ||
+                        supplierNameError ||
+                        pricePerLiterError ||
+                        licensePlateError
+                      }
+                      onClick={CreateFuelLogDetails}
+                    >
+                      {fineLoading ? "Submitting..." : "Submit"}
+                    </Button>
                   </Box>
-                )}
-              </>
-            )}
-          </>
-        )}
-        {/* {accidentLog && <>accident log</>} */}
-        {maintenanceLog && (
-          <>
-            {" "}
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Typography
-                sx={{
-                  backgroundColor: "#B3CCB3",
-                  // padding: 1,
-                  flexGrow: 1,
-                  colour: "#454545",
-                  borderRadius: 1,
-                  margin: 2,
-                }}
-              >
-                <IconButton
-                  onClick={() => {
-                    setMaintenanceLog(false);
-                    setTable(true);
-                    setSubHeadingLog(true);
-                  }}
-                >
-                  <ArrowBackIcon />
-                </IconButton>
-                Add Maintenances Details:
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: {
-                  xs: "1fr",
-                  sm: "1fr 1fr",
-                  md: "1fr 1fr 1fr",
-                },
-                gap: "10px",
-                padding: "20px",
-              }}
-            >
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label={
-                    <span>
-                      Date of Service <span style={{ color: "red" }}>*</span>
-                    </span>
-                  }
-                  value={serviceDate}
-                  onChange={handleServiceDateChange}
-                  sx={{
-                    width: "90%",
-                    "& .MuiInputBase-root": {
-                      height: "auto",
-                    },
-                    "& .MuiInputLabel-root": {
-                      lineHeight: "40px",
-                    },
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      error={!!serviceDateError}
-                      helperText={serviceDateHelperText}
-                    />
-                  )}
-                  format="DD/MM/YYYY"
-                />
-                {serviceDateError && (
-                  <span
-                    style={{
-                      color: "red",
-                      position: "absolute",
-                      top: "100%",
-                      left: 0,
-                    }}
-                  >
-                    {serviceDateHelperText}
-                  </span>
-                )}
-              </LocalizationProvider>
-              <TextField
-                select
-                label={
-                  <span>
-                    Service Type <span style={{ color: "red" }}>*</span>
-                  </span>
-                }
-                value={serviceType}
-                onChange={(e) => setServiceType(e.target.value)}
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  "& .MuiSelect-icon": {
-                    color: "#66BB6A",
-                  },
-                  "& .MuiInputLabel-root": {
-                    color: "#000",
-                  },
-                }}
-                SelectProps={{ native: true }}
-                InputLabelProps={{ shrink: true }}
-              >
-                <option value="">Service Type</option>
-                <option value="Routine">Routine</option>
-                <option value="Repair">Repair</option>
-                <option value="Inspection">Inspection</option>
-              </TextField>
-
-              <TextField
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  height: "auto",
-                  textAlign: "left",
-                }}
-                label={<span>Vehicle Number</span>}
-                value={licensePlateNumber}
-                onChange={(e) => {
-                  const newValue = e.target.value;
-                  setLicensePlateNumber(newValue);
-                  validateLicensePlateNumber(newValue);
-                }}
-                error={licensePlateError}
-                helperText={licensePlateHelperText}
-              />
-
-              <TextField
-                label="Description"
-                value={description}
-                onChange={handleDescriptionChange}
-                error={!!descriptionError}
-                helperText={descriptionError}
-                multiline
-                rows={4}
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  height: "auto",
-                  textAlign: "left",
-                }}
-              />
-
-              <TextField
-                label="Parts Replaced (Maintenances)"
-                value={partsReplaced}
-                onChange={handlePartsReplacedChange}
-                error={!!partsReplacedError}
-                helperText={partsReplacedError}
-                multiline
-                rows={4}
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  height: "auto",
-                  textAlign: "left",
-                }}
-              />
-
-              {/* Total Cost Field */}
-              <TextField
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  height: "auto",
-                  textAlign: "left",
-                }}
-                label={
-                  <span>
-                    Total Cost <span style={{ color: "red" }}>*</span>
-                  </span>
-                }
-                value={totalCost}
-                onChange={handleTotalCostChange}
-                error={!!totalCostError}
-                helperText={totalCostError}
-              />
-
-              {/* Warranty Information Field */}
-              <TextField
-                label="Warranty Information"
-                value={warrantyInfo}
-                onChange={handleWarrantyInfoChange}
-                error={!!warrantyInfoError}
-                helperText={warrantyInfoError}
-                multiline
-                rows={4}
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  height: "auto",
-                  textAlign: "left",
-                }}
-              />
-
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label={
-                    <Typography variant="body1">
-                      Next Scheduled Maintenance Date
-                    </Typography>
-                  }
-                  value={maintenanceDate}
-                  onChange={handleMaintenanceDateChange}
-                  sx={{
-                    width: "90%",
-                    "& .MuiInputBase-root": {
-                      height: "auto",
-                    },
-                    "& .MuiInputLabel-root": {
-                      lineHeight: "40px",
-                    },
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      error={maintenanceDateError}
-                      helperText={maintenanceDateHelperText}
-                    />
-                  )}
-                  format="DD/MM/YYYY"
-                />
-              </LocalizationProvider>
-              {maintenanceDateError && (
-                <Typography
-                  variant="caption"
-                  color="error"
-                  // sx={{ display: "flex",justifyContent: "center" }}
-                >
-                  {maintenanceDateHelperText}
-                </Typography>
+                </>
               )}
-              <Modal
-                open={isWarrantyCopyModalOpen}
-                onClose={closeWarrantyCopyPreview}
-                aria-labelledby="modal-title"
-                aria-describedby="modal-description"
-              >
-                <Box
+              {!editFuel && (
+                <>
+                  {updatingLoading ? ( // Show loading spinner while updating
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        padding: "20px",
+                      }}
+                    >
+                      <CircularProgress />
+                    </Box>
+                  ) : (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        padding: "20px",
+                      }}
+                    >
+                      <Button
+                        className="saveBtn"
+                        onClick={handleUpdateFuel}
+                        disabled={updatingLoading}
+                      >
+                        Update
+                      </Button>
+                    </Box>
+                  )}
+
+                  {updatingError && (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        padding: "20px",
+                      }}
+                    >
+                      <Alert severity="error">
+                        {updatingError.message || "Failed to update data."}
+                      </Alert>
+                    </Box>
+                  )}
+                </>
+              )}
+            </>
+          )}
+          {accidentLog && (
+            <>
+              {" "}
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Typography
                   sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: "80%",
-                    bgcolor: "background.paper",
-                    boxShadow: 24,
-                    p: 4,
+                    backgroundColor: "#B3CCB3",
+                    // padding: 1,
+                    flexGrow: 1,
+                    colour: "#454545",
+                    borderRadius: 1,
+                    margin: 2,
                   }}
                 >
                   <IconButton
-                    aria-label="close"
-                    onClick={closeWarrantyCopyPreview}
-                    sx={{ position: "absolute", top: 8, right: 16 }}
+                    onClick={() => {
+                      setAccidentLog(false);
+                      setTable(true);
+                      setSubHeadingLog(true);
+                    }}
                   >
-                    <CloseIcon />
+                    <ArrowBackIcon />
                   </IconButton>
-                  <Typography id="modal-title" variant="h6" component="h2">
-                    Warranty Copy Preview
-                  </Typography>
-                  {warrantyCopyPreviewUrl && (
-                    <div style={{ marginTop: 16 }}>
-                      {warrantyCopyPreviewUrl.endsWith(".pdf") ? (
-                        <embed
-                          src={warrantyCopyPreviewUrl}
-                          type="application/pdf"
-                          width="100%"
-                          height="600px"
-                        />
+                  Add Accident Details:
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "1fr",
+                    sm: "1fr 1fr",
+                    md: "1fr 1fr 1fr",
+                  },
+                  gap: "10px",
+                  padding: "20px",
+                }}
+              >
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label={
+                      <span>
+                        Accident Date <span style={{ color: "red" }}>*</span>
+                      </span>
+                    }
+                    value={accidentDate}
+                    onChange={handleAccidentDateChange}
+                    sx={{
+                      width: "90%",
+                      "& .MuiInputBase-root": {
+                        height: "auto",
+                      },
+                      "& .MuiInputLabel-root": {
+                        lineHeight: "40px",
+                      },
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        error={accidentDateError}
+                        helperText={accidentDateHelperText}
+                      />
+                    )}
+                    format="DD/MM/YYYY"
+                  />
+                  {accidentDateError && (
+                    <span
+                      style={{
+                        color: "red",
+                        position: "absolute",
+                        top: "100%",
+                        left: 0,
+                      }}
+                    >
+                      {accidentDateHelperText}
+                    </span>
+                  )}
+                </LocalizationProvider>
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                    marginBottom: 2,
+                  }}
+                  label={<span>Police Station Number</span>}
+                  value={policeStationNumber}
+                  onChange={(e) => validatePoliceStationNumber(e.target.value)}
+                  error={!!policeStationNumberError}
+                  helperText={policeStationNumberError}
+                />
+                <Box
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    margin: "10 auto",
+                  }}
+                >
+                  <TextField
+                    sx={{
+                      margin: "0 auto",
+                      width: { xs: "100%", sm: "100%", md: "100%" },
+                    }}
+                    label={<Typography>Fir Copy</Typography>}
+                    value={firCopyImage ? firCopyImage.name : ""}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      document.getElementById("fileInputFirCopy")?.click();
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          {!firCopyImage && (
+                            <UploadFileIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                document
+                                  .getElementById("fileInputFirCopy")
+                                  ?.click();
+                              }}
+                              style={{ cursor: "pointer" }}
+                            />
+                          )}
+                          {firCopyImage && (
+                            <VisibilityIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setIsFirCopyModalOpen(true);
+                              }}
+                              style={{ cursor: "pointer", marginLeft: "8px" }}
+                            />
+                          )}
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <input
+                    type="file"
+                    id="fileInputFirCopy"
+                    accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+                    style={{ display: "none" }}
+                    onChange={handleFirCopyFileChange}
+                  />
+                  {firCopyError && (
+                    <span className="ErrorMsg">{firCopyError}</span>
+                  )}
+
+                  <Modal
+                    open={isFirCopyModalOpen}
+                    onClose={closeFirCopyImagePreview}
+                    aria-labelledby="fir-copy-modal-title"
+                  >
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        width: "80%",
+                        bgcolor: "background.paper",
+                        boxShadow: 24,
+                        p: 4,
+                      }}
+                    >
+                      <IconButton
+                        aria-label="close"
+                        onClick={closeFirCopyImagePreview}
+                        sx={{ position: "absolute", top: 8, right: 16 }}
+                      >
+                        <CloseIcon />
+                      </IconButton>
+                      <Typography id="fir-copy-modal-title" variant="h6">
+                        Fir Copy Preview
+                      </Typography>
+                      <img
+                        src={firCopyPreviewUrl || ""}
+                        alt="Fir Copy Preview"
+                        style={{ width: "100%", marginTop: 16 }}
+                      />
+                    </Box>
+                  </Modal>
+                </Box>
+                <Box
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    margin: "10 auto",
+                  }}
+                >
+                  <TextField
+                    sx={{
+                      margin: "0 auto",
+                      width: { xs: "100%", sm: "100%", md: "100%" },
+                    }}
+                    label={
+                      <Typography>
+                        Accident Image <span style={{ color: "red" }}>*</span>
+                      </Typography>
+                    }
+                    value={accidentImage ? accidentImage.name : ""}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      document
+                        .getElementById("fileInputAccidentImage")
+                        ?.click();
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          {!accidentImage && (
+                            <UploadFileIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                document
+                                  .getElementById("fileInputAccidentImage")
+                                  ?.click();
+                              }}
+                              style={{ cursor: "pointer" }}
+                            />
+                          )}
+                          {accidentImage && (
+                            <VisibilityIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setIsAccidentModalOpen(true);
+                              }}
+                              style={{ cursor: "pointer", marginLeft: "8px" }}
+                            />
+                          )}
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <input
+                    type="file"
+                    id="fileInputAccidentImage"
+                    accept=".jpg,.jpeg,.png,.pdf"
+                    style={{ display: "none" }}
+                    onChange={handleAccidentImageFileChange}
+                  />
+                  {accidentError && (
+                    <span className="ErrorMsg">{accidentError}</span>
+                  )}
+
+                  <Modal
+                    open={isAccidentModalOpen}
+                    onClose={closeAccidentImagePreview}
+                    aria-labelledby="accident-image-modal-title"
+                  >
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        width: "80%",
+                        bgcolor: "background.paper",
+                        boxShadow: 24,
+                        p: 4,
+                      }}
+                    >
+                      <IconButton
+                        aria-label="close"
+                        onClick={closeAccidentImagePreview}
+                        sx={{ position: "absolute", top: 8, right: 16 }}
+                      >
+                        <CloseIcon />
+                      </IconButton>
+                      <Typography id="accident-image-modal-title" variant="h6">
+                        Accident Image Preview
+                      </Typography>
+                      {accidentImage &&
+                      accidentImage.type === "application/pdf" ? (
+                        <Document file={accidentImagePreviewUrl}>
+                          <Page pageNumber={1} />
+                        </Document>
                       ) : (
                         <img
-                          src={warrantyCopyPreviewUrl}
-                          alt="Warranty Copy Preview"
+                          src={accidentImagePreviewUrl || ""}
+                          alt="Accident Image Preview"
                           style={{ width: "100%", marginTop: 16 }}
                         />
                       )}
-                    </div>
-                  )}
+                    </Box>
+                  </Modal>
                 </Box>
-              </Modal>
-
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                    marginBottom: 2,
+                  }}
+                  label={
+                    <span>
+                      Accident Reason <span style={{ color: "red" }}>*</span>
+                    </span>
+                  }
+                  value={accidentReason}
+                  onChange={handleAccidentReasonChange}
+                  error={!!accidentReasonError}
+                  helperText={accidentReasonError}
+                  multiline
+                  rows={2}
+                />{" "}
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                    marginBottom: 2,
+                  }}
+                  label={
+                    <span>
+                      Damage Description <span style={{ color: "red" }}>*</span>
+                    </span>
+                  }
+                  value={damageDescription}
+                  onChange={handleDamageDescriptionChange}
+                  error={!!damageDescriptionError}
+                  helperText={damageDescriptionError}
+                  multiline
+                  rows={2}
+                />
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                    marginBottom: 2,
+                  }}
+                  label="Accident Description"
+                  value={accidentDescription}
+                  onChange={handleAccidentDescriptionChange}
+                  error={!!accidentDescriptionError}
+                  helperText={accidentDescriptionError}
+                  multiline
+                  rows={2}
+                />
+              </Box>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Typography
+                  sx={{
+                    backgroundColor: "#B3CCB3",
+                    padding: 1,
+                    flexGrow: 1,
+                    colour: "#454545",
+                    borderRadius: 1,
+                    margin: 2,
+                  }}
+                >
+                  Add Driver Details:
+                </Typography>
+              </Box>
               <Box
                 sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  margin: "10 auto",
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "1fr",
+                    sm: "1fr 1fr",
+                    md: "1fr 1fr 1fr",
+                  },
+                  gap: "10px",
+                  padding: "20px",
+                }}
+              >
+                <Autocomplete
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    margin: "10 auto",
+                  }}
+                  options={employeeDetails || []}
+                  getOptionLabel={(option) => option.name}
+                  value={
+                    employeeDetails.find(
+                      (emp) => emp.name === selectedEmployee
+                    ) || null
+                  }
+                  onChange={handleEmployeeChange}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Driver ID"
+                      variant="outlined"
+                    />
+                  )}
+                />
+                <Autocomplete
+                  freeSolo
+                  options={
+                    employeeDetails.map((emp) => emp.employee_name) || []
+                  }
+                  value={driverName}
+                  onInputChange={(event, newValue) =>
+                    handleDriverNameChange(event, newValue)
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Driver Name"
+                      variant="outlined"
+                      error={driverError}
+                      helperText={driverHelperText}
+                    />
+                  )}
+                />
+              </Box>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Typography
+                  sx={{
+                    backgroundColor: "#B3CCB3",
+                    padding: 1,
+                    flexGrow: 1,
+                    colour: "#454545",
+                    borderRadius: 1,
+                    margin: 2,
+                  }}
+                >
+                  Add Vehicle Details:
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "1fr",
+                    sm: "1fr 1fr",
+                    md: "1fr 1fr 1fr",
+                  },
+                  gap: "10px",
+                  padding: "20px",
                 }}
               >
                 <TextField
-                  sx={{ margin: "0 auto", width: "100%" }}
-                  label="Warranty Copy"
-                  value={warrantyCopy ? warrantyCopy.name : ""}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const fileInput = document.getElementById(
-                      "fileInputWarrantyCopy"
-                    ) as HTMLInputElement;
-                    if (fileInput) {
-                      fileInput.click();
-                    }
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
                   }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        {!warrantyCopy && (
-                          <UploadFileIcon
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const fileInput = document.getElementById(
-                                "fileInputWarrantyCopy"
-                              ) as HTMLInputElement;
-                              if (fileInput) {
-                                fileInput.click();
-                              }
-                            }}
-                            style={{ cursor: "pointer" }}
-                          />
-                        )}
-                        {warrantyCopy && (
-                          <VisibilityIcon
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openWarrantyCopyPreview();
-                            }}
-                            style={{ cursor: "pointer", marginLeft: "8px" }}
-                          />
-                        )}
-                      </InputAdornment>
-                    ),
+                  label={
+                    <span>
+                      Vehicle Number <span style={{ color: "red" }}>*</span>
+                    </span>
+                  }
+                  value={licensePlateNumber}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    setLicensePlateNumber(newValue);
+                    validateLicensePlateNumber(newValue);
                   }}
-                />
-                <input
-                  type="file"
-                  id="fileInputWarrantyCopy"
-                  name="warranty_copy"
-                  accept=".pdf, .png, .jpg, .jpeg, .doc"
-                  style={{ display: "none" }}
-                  onChange={handleFileChangeWarrantyCopy}
+                  error={licensePlateError}
+                  helperText={licensePlateHelperText}
                 />
               </Box>
-              <Modal
-                open={isMaintenanceBillCopyModalOpen}
-                onClose={closeMaintenanceBillCopyPreview}
-                aria-labelledby="modal-title"
-                aria-describedby="modal-description"
-              >
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: "80%",
-                    bgcolor: "background.paper",
-                    boxShadow: 24,
-                    p: 4,
-                  }}
-                >
-                  <IconButton
-                    aria-label="close"
-                    onClick={closeMaintenanceBillCopyPreview}
-                    sx={{ position: "absolute", top: 8, right: 16 }}
-                  >
-                    <CloseIcon />
-                  </IconButton>
-                  <Typography id="modal-title" variant="h6" component="h2">
-                    Maintenance Bill Copy Preview
-                  </Typography>
-                  {maintenanceBillCopyPreviewUrl && (
-                    <div style={{ marginTop: 16 }}>
-                      {maintenanceBillCopyPreviewUrl.endsWith(".pdf") ? (
-                        <embed
-                          src={maintenanceBillCopyPreviewUrl}
-                          type="application/pdf"
-                          width="100%"
-                          height="600px"
-                        />
-                      ) : (
-                        <img
-                          src={maintenanceBillCopyPreviewUrl}
-                          alt="Maintenance Bill Copy Preview"
-                          style={{ width: "100%" }}
-                        />
-                      )}
-                    </div>
-                  )}
-                </Box>
-              </Modal>
-
-              <Box
-                sx={{
-                  width: { xs: "100%", sm: "100%", md: "90%" },
-                  margin: "10 auto",
-                }}
-              >
-                <TextField
-                  sx={{ margin: "0 auto", width: "100%" }}
-                  label="Maintenance Bill Copy"
-                  value={maintenanceBillCopy ? maintenanceBillCopy.name : ""}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const fileInput = document.getElementById(
-                      "fileInputMaintenanceBillCopy"
-                    ) as HTMLInputElement;
-                    if (fileInput) {
-                      fileInput.click();
-                    }
-                  }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        {!maintenanceBillCopy && (
-                          <UploadFileIcon
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const fileInput = document.getElementById(
-                                "fileInputMaintenanceBillCopy"
-                              ) as HTMLInputElement;
-                              if (fileInput) {
-                                fileInput.click();
-                              }
-                            }}
-                            style={{ cursor: "pointer" }}
-                          />
-                        )}
-                        {maintenanceBillCopy && (
-                          <VisibilityIcon
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openMaintenanceBillCopyPreview();
-                            }}
-                            style={{ cursor: "pointer", marginLeft: "8px" }}
-                          />
-                        )}
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                <input
-                  type="file"
-                  id="fileInputMaintenanceBillCopy"
-                  name="maintenance_bill_copy"
-                  accept=".pdf, .png, .jpg, .jpeg, .doc"
-                  style={{ display: "none" }}
-                  onChange={handleFileChangeMaintenanceBillCopy}
-                />
-              </Box>
-            </Box>
-            {editMaintenance && (
-              <>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    padding: "20px",
-                  }}
-                >
-                  <Button
-                    className="saveBtn"
-                    disabled={!serviceDate || !totalCost || !serviceType}
-                    onClick={CreateMaintenanceLogDetails}
-                  >
-                    {fineLoading ? "Submitting..." : "Submit"}
-                  </Button>
-                </Box>
-              </>
-            )}
-            {!editMaintenance && (
-              <>
-                {updatingLoading ? ( // Show loading spinner while updating
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      padding: "20px",
-                    }}
-                  >
-                    <CircularProgress />
-                  </Box>
-                ) : (
+              {editAccdient && (
+                <>
                   <Box
                     sx={{
                       display: "flex",
@@ -5013,15 +4511,514 @@ const Logs: React.FC<LogsProps> = ({
                   >
                     <Button
                       className="saveBtn"
-                      onClick={handleUpdate}
-                      disabled={updatingLoading}
+                      disabled={
+                        !accidentDate ||
+                        !accidentReason ||
+                        policeStationNumberError ||
+                        firCopyError ||
+                        accidentReasonError ||
+                        !damageDescription ||
+                        damageDescriptionError ||
+                        licensePlateNumber ||
+                        accidentDescriptionError ||
+                        licensePlateError ||
+                        !accidentImage
+                      }
+                      onClick={CreateAccidentLogDetails}
                     >
-                      Update
+                      {fineLoading ? "Submitting..." : "Submit"}
                     </Button>
                   </Box>
-                )}
+                </>
+              )}
+              {!editAccdient && (
+                <>
+                  {updatingLoading ? ( // Show loading spinner while updating
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        padding: "20px",
+                      }}
+                    >
+                      <CircularProgress />
+                    </Box>
+                  ) : (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        padding: "20px",
+                      }}
+                    >
+                      <Button
+                        className="saveBtn"
+                        onClick={handleUpdateAccident}
+                        disabled={updatingLoading}
+                      >
+                        Update
+                      </Button>
+                    </Box>
+                  )}
 
-                {updatingError && (
+                  {updatingError && (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        padding: "20px",
+                      }}
+                    >
+                      <Alert severity="error">
+                        {updatingError.message || "Failed to update data."}
+                      </Alert>
+                    </Box>
+                  )}
+                </>
+              )}
+            </>
+          )}
+          {/* {accidentLog && <>accident log</>} */}
+          {maintenanceLog && (
+            <>
+              {" "}
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Typography
+                  sx={{
+                    backgroundColor: "#B3CCB3",
+                    // padding: 1,
+                    flexGrow: 1,
+                    colour: "#454545",
+                    borderRadius: 1,
+                    margin: 2,
+                  }}
+                >
+                  <IconButton
+                    onClick={() => {
+                      setMaintenanceLog(false);
+                      setTable(true);
+                      setSubHeadingLog(true);
+                    }}
+                  >
+                    <ArrowBackIcon />
+                  </IconButton>
+                  Add Maintenances Details:
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "1fr",
+                    sm: "1fr 1fr",
+                    md: "1fr 1fr 1fr",
+                  },
+                  gap: "10px",
+                  padding: "20px",
+                }}
+              >
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label={
+                      <span>
+                        Date of Service <span style={{ color: "red" }}>*</span>
+                      </span>
+                    }
+                    value={serviceDate}
+                    onChange={handleServiceDateChange}
+                    sx={{
+                      width: "90%",
+                      "& .MuiInputBase-root": {
+                        height: "auto",
+                      },
+                      "& .MuiInputLabel-root": {
+                        lineHeight: "40px",
+                      },
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        error={!!serviceDateError}
+                        helperText={serviceDateHelperText}
+                      />
+                    )}
+                    format="DD/MM/YYYY"
+                  />
+                  {serviceDateError && (
+                    <span
+                      style={{
+                        color: "red",
+                        position: "absolute",
+                        top: "100%",
+                        left: 0,
+                      }}
+                    >
+                      {serviceDateHelperText}
+                    </span>
+                  )}
+                </LocalizationProvider>
+                <TextField
+                  select
+                  label={
+                    <span>
+                      Service Type <span style={{ color: "red" }}>*</span>
+                    </span>
+                  }
+                  value={serviceType}
+                  onChange={(e) => setServiceType(e.target.value)}
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    "& .MuiSelect-icon": {
+                      color: "#66BB6A",
+                    },
+                    "& .MuiInputLabel-root": {
+                      color: "#000",
+                    },
+                  }}
+                  SelectProps={{ native: true }}
+                  InputLabelProps={{ shrink: true }}
+                >
+                  <option value="">Service Type</option>
+                  <option value="Routine">Routine</option>
+                  <option value="Repair">Repair</option>
+                  <option value="Inspection">Inspection</option>
+                </TextField>
+
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                  label={<span>Vehicle Number</span>}
+                  value={licensePlateNumber}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    setLicensePlateNumber(newValue);
+                    validateLicensePlateNumber(newValue);
+                  }}
+                  error={licensePlateError}
+                  helperText={licensePlateHelperText}
+                />
+
+                <TextField
+                  label="Description"
+                  value={description}
+                  onChange={handleDescriptionChange}
+                  error={!!descriptionError}
+                  helperText={descriptionError}
+                  multiline
+                  rows={2}
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                />
+
+                <TextField
+                  label="Parts Replaced (Maintenances)"
+                  value={partsReplaced}
+                  onChange={handlePartsReplacedChange}
+                  error={!!partsReplacedError}
+                  helperText={partsReplacedError}
+                  multiline
+                  rows={2}
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                />
+
+                {/* Total Cost Field */}
+                <TextField
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                  label={
+                    <span>
+                      Total Cost <span style={{ color: "red" }}>*</span>
+                    </span>
+                  }
+                  value={totalCost}
+                  onChange={handleTotalCostChange}
+                  error={!!totalCostError}
+                  helperText={totalCostError}
+                />
+
+                {/* Warranty Information Field */}
+                <TextField
+                  label="Warranty Information"
+                  value={warrantyInfo}
+                  onChange={handleWarrantyInfoChange}
+                  error={!!warrantyInfoError}
+                  helperText={warrantyInfoError}
+                  multiline
+                  rows={2}
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    height: "auto",
+                    textAlign: "left",
+                  }}
+                />
+
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label={
+                      <Typography variant="body1">
+                        Next Scheduled Maintenance Date
+                      </Typography>
+                    }
+                    value={maintenanceDate}
+                    onChange={handleMaintenanceDateChange}
+                    sx={{
+                      width: "90%",
+                      "& .MuiInputBase-root": {
+                        height: "auto",
+                      },
+                      "& .MuiInputLabel-root": {
+                        lineHeight: "40px",
+                      },
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        error={maintenanceDateError}
+                        helperText={maintenanceDateHelperText}
+                      />
+                    )}
+                    format="DD/MM/YYYY"
+                  />
+                </LocalizationProvider>
+                {maintenanceDateError && (
+                  <Typography
+                    variant="caption"
+                    color="error"
+                    // sx={{ display: "flex",justifyContent: "center" }}
+                  >
+                    {maintenanceDateHelperText}
+                  </Typography>
+                )}
+                <Modal
+                  open={isWarrantyCopyModalOpen}
+                  onClose={closeWarrantyCopyPreview}
+                  aria-labelledby="modal-title"
+                  aria-describedby="modal-description"
+                >
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "80%",
+                      bgcolor: "background.paper",
+                      boxShadow: 24,
+                      p: 4,
+                    }}
+                  >
+                    <IconButton
+                      aria-label="close"
+                      onClick={closeWarrantyCopyPreview}
+                      sx={{ position: "absolute", top: 8, right: 16 }}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                    <Typography id="modal-title" variant="h6" component="h2">
+                      Warranty Copy Preview
+                    </Typography>
+                    {warrantyCopyPreviewUrl && (
+                      <div style={{ marginTop: 16 }}>
+                        {warrantyCopyPreviewUrl.endsWith(".pdf") ? (
+                          <embed
+                            src={warrantyCopyPreviewUrl}
+                            type="application/pdf"
+                            width="100%"
+                            height="600px"
+                          />
+                        ) : (
+                          <img
+                            src={warrantyCopyPreviewUrl}
+                            alt="Warranty Copy Preview"
+                            style={{ width: "100%", marginTop: 16 }}
+                          />
+                        )}
+                      </div>
+                    )}
+                  </Box>
+                </Modal>
+
+                <Box
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    margin: "10 auto",
+                  }}
+                >
+                  <TextField
+                    sx={{ margin: "0 auto", width: "100%" }}
+                    label="Warranty Copy"
+                    value={warrantyCopy ? warrantyCopy.name : ""}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const fileInput = document.getElementById(
+                        "fileInputWarrantyCopy"
+                      ) as HTMLInputElement;
+                      if (fileInput) {
+                        fileInput.click();
+                      }
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          {!warrantyCopy && (
+                            <UploadFileIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const fileInput = document.getElementById(
+                                  "fileInputWarrantyCopy"
+                                ) as HTMLInputElement;
+                                if (fileInput) {
+                                  fileInput.click();
+                                }
+                              }}
+                              style={{ cursor: "pointer" }}
+                            />
+                          )}
+                          {warrantyCopy && (
+                            <VisibilityIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openWarrantyCopyPreview();
+                              }}
+                              style={{ cursor: "pointer", marginLeft: "8px" }}
+                            />
+                          )}
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <input
+                    type="file"
+                    id="fileInputWarrantyCopy"
+                    name="warranty_copy"
+                    accept=".pdf, .png, .jpg, .jpeg, .doc"
+                    style={{ display: "none" }}
+                    onChange={handleFileChangeWarrantyCopy}
+                  />
+                </Box>
+                <Modal
+                  open={isMaintenanceBillCopyModalOpen}
+                  onClose={closeMaintenanceBillCopyPreview}
+                  aria-labelledby="modal-title"
+                  aria-describedby="modal-description"
+                >
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "80%",
+                      bgcolor: "background.paper",
+                      boxShadow: 24,
+                      p: 4,
+                    }}
+                  >
+                    <IconButton
+                      aria-label="close"
+                      onClick={closeMaintenanceBillCopyPreview}
+                      sx={{ position: "absolute", top: 8, right: 16 }}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                    <Typography id="modal-title" variant="h6" component="h2">
+                      Maintenance Bill Copy Preview
+                    </Typography>
+                    {maintenanceBillCopyPreviewUrl && (
+                      <div style={{ marginTop: 16 }}>
+                        {maintenanceBillCopyPreviewUrl.endsWith(".pdf") ? (
+                          <embed
+                            src={maintenanceBillCopyPreviewUrl}
+                            type="application/pdf"
+                            width="100%"
+                            height="600px"
+                          />
+                        ) : (
+                          <img
+                            src={maintenanceBillCopyPreviewUrl}
+                            alt="Maintenance Bill Copy Preview"
+                            style={{ width: "100%" }}
+                          />
+                        )}
+                      </div>
+                    )}
+                  </Box>
+                </Modal>
+
+                <Box
+                  sx={{
+                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    margin: "10 auto",
+                  }}
+                >
+                  <TextField
+                    sx={{ margin: "0 auto", width: "100%" }}
+                    label="Maintenance Bill Copy"
+                    value={maintenanceBillCopy ? maintenanceBillCopy.name : ""}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const fileInput = document.getElementById(
+                        "fileInputMaintenanceBillCopy"
+                      ) as HTMLInputElement;
+                      if (fileInput) {
+                        fileInput.click();
+                      }
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          {!maintenanceBillCopy && (
+                            <UploadFileIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const fileInput = document.getElementById(
+                                  "fileInputMaintenanceBillCopy"
+                                ) as HTMLInputElement;
+                                if (fileInput) {
+                                  fileInput.click();
+                                }
+                              }}
+                              style={{ cursor: "pointer" }}
+                            />
+                          )}
+                          {maintenanceBillCopy && (
+                            <VisibilityIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openMaintenanceBillCopyPreview();
+                              }}
+                              style={{ cursor: "pointer", marginLeft: "8px" }}
+                            />
+                          )}
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <input
+                    type="file"
+                    id="fileInputMaintenanceBillCopy"
+                    name="maintenance_bill_copy"
+                    accept=".pdf, .png, .jpg, .jpeg, .doc"
+                    style={{ display: "none" }}
+                    onChange={handleFileChangeMaintenanceBillCopy}
+                  />
+                </Box>
+              </Box>
+              {editMaintenance && (
+                <>
                   <Box
                     sx={{
                       display: "flex",
@@ -5029,16 +5026,65 @@ const Logs: React.FC<LogsProps> = ({
                       padding: "20px",
                     }}
                   >
-                    <Alert severity="error">
-                      {updatingError.message || "Failed to update data."}
-                    </Alert>
+                    <Button
+                      className="saveBtn"
+                      disabled={!serviceDate || !totalCost || !serviceType}
+                      onClick={CreateMaintenanceLogDetails}
+                    >
+                      {fineLoading ? "Submitting..." : "Submit"}
+                    </Button>
                   </Box>
-                )}
-              </>
-            )}
-          </>
-        )}
-      </Box>
+                </>
+              )}
+              {!editMaintenance && (
+                <>
+                  {updatingLoading ? ( // Show loading spinner while updating
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        padding: "20px",
+                      }}
+                    >
+                      <CircularProgress />
+                    </Box>
+                  ) : (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        padding: "20px",
+                      }}
+                    >
+                      <Button
+                        className="saveBtn"
+                        onClick={handleUpdate}
+                        disabled={updatingLoading}
+                      >
+                        Update
+                      </Button>
+                    </Box>
+                  )}
+
+                  {updatingError && (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        padding: "20px",
+                      }}
+                    >
+                      <Alert severity="error">
+                        {updatingError.message || "Failed to update data."}
+                      </Alert>
+                    </Box>
+                  )}
+                </>
+              )}
+            </>
+          )}
+        </Box>
+      </ThemeProvider>
     </>
   );
 };

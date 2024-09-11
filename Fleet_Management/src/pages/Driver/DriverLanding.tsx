@@ -630,7 +630,6 @@ const DriverLanding: React.FC<DriverProps> = ({
         }}
       >
         {/* {JSON.stringify(totalTime)} */}
-
         <Box
           sx={{
             margin: "10px 0px",
@@ -778,7 +777,6 @@ const DriverLanding: React.FC<DriverProps> = ({
           </>
         )}
         {/* Passenger Show Start */}
-
         {passengerShow && (
           <>
             <div
@@ -897,7 +895,7 @@ const DriverLanding: React.FC<DriverProps> = ({
 
                   {isRunning ? (
                     <Button
-                      sx={{ fontSize: "20px ! important" }}
+                      // sx={{ fontSize: "20px ! important" }}
                       className="deleteBtn"
                       onClick={handleStop}
                     >
@@ -905,7 +903,7 @@ const DriverLanding: React.FC<DriverProps> = ({
                     </Button>
                   ) : (
                     <Button
-                      sx={{ fontSize: "20px ! important" }}
+                      // sx={{ fontSize: "20px ! important" }}
                       className="saveBtn"
                       onClick={handleStart}
                     >
@@ -918,7 +916,6 @@ const DriverLanding: React.FC<DriverProps> = ({
             </div>
           </>
         )}
-
         {/* travel Show Start */}
         {dailyShow && (
           <>
@@ -1063,7 +1060,7 @@ const DriverLanding: React.FC<DriverProps> = ({
                         </ThemeProvider>
                       </LocalizationProvider>
                       <Button
-                        sx={{ fontSize: "20px ! important" }}
+                        // sx={{ fontSize: "20px ! important" }}
                         className="saveBtn"
                         disabled={!selectedPickup || !selectedRouteId}
                         onClick={async () => {
@@ -1095,7 +1092,7 @@ const DriverLanding: React.FC<DriverProps> = ({
                         <p>Scanned QR Data: {qrData}</p>
                       </Box>
                       <Button
-                        sx={{ fontSize: "20px ! important" }}
+                        // sx={{ fontSize: "20px ! important" }}
                         className="deleteBtn"
                         onClick={handleStopScanner}
                       >
@@ -1108,7 +1105,7 @@ const DriverLanding: React.FC<DriverProps> = ({
             </div>
           </>
         )}
-        <br />
+        <br /> <br /> <br />
       </div>
     </>
   );

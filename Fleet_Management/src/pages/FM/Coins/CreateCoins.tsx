@@ -279,6 +279,7 @@ const CreateCoins: React.FC<CreateCoinsProps> = ({
         textAlign: "center",
         color: darkMode ? "#FFF" : "#222222",
         backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+        borderTopLeftRadius: "5px",
       },
       filter: true,
       sorter: true,
@@ -305,6 +306,7 @@ const CreateCoins: React.FC<CreateCoinsProps> = ({
         textAlign: "center",
         color: darkMode ? "#FFF" : "#222222",
         backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+        borderTopRightRadius: "5px",
       },
     },
   ];
@@ -345,9 +347,15 @@ const CreateCoins: React.FC<CreateCoinsProps> = ({
           padding: "15px",
         }}
       >
-        <Box sx={{ display: "flex", justifyContent: "space-around" }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
           {" "}
-          <Box sx={{ display: "flex", justifyContent: "start" }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "start",
+              alignItems: "center",
+            }}
+          >
             <Box
               sx={{
                 color: "#FFFFFF",
@@ -365,7 +373,7 @@ const CreateCoins: React.FC<CreateCoinsProps> = ({
                 setView(true);
               }}
             >
-              <AddIcon sx={{ marginRight: "8px" }} />
+              <AddIcon sx={{ marginRight: "10px" }} />
               Create Coins
             </Box>
             <Typography
@@ -380,13 +388,13 @@ const CreateCoins: React.FC<CreateCoinsProps> = ({
                 fontSize: "15px",
                 fontWeight: 600,
                 width: "12vw",
-                borderLeft: "4px solid #BA87FC",
+                borderLeft: "5px solid #BA87FC",
               }}
             >
               Coins {totalCoinAmount}
             </Typography>
           </Box>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center" }}>
             <ToggleButtonGroup
               value={calendarView}
               exclusive
@@ -442,11 +450,7 @@ const CreateCoins: React.FC<CreateCoinsProps> = ({
           </div>
         </Box>
 
-        <br />
-        <br />
-        <br />
         <CSmartTable
-          cleaner
           clickableRows
           columns={columns}
           columnFilter
@@ -460,7 +464,6 @@ const CreateCoins: React.FC<CreateCoinsProps> = ({
           itemsPerPage={itemsPerPage} // Number of items per page
           activePage={currentPage} // Current page number
           onActivePageChange={handlePageChange} // Function
-          tableFilter
           tableProps={{
             className: "add-this-class red-border",
             responsive: true,

@@ -24,6 +24,9 @@ import {
   useFrappeUpdateDoc,
   useFrappeGetCall,
 } from "frappe-react-sdk";
+import { IoCarSportOutline } from "react-icons/io5";
+import { PiCoinsLight } from "react-icons/pi";
+
 import { IoCarSportSharp } from "react-icons/io5";
 import { PiCoinsBold } from "react-icons/pi";
 interface DepartmentSpendsProps {
@@ -457,11 +460,9 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
           <Box sx={{ flex: "2 1 20%" }}>
             <Card
               sx={{
-                borderLeft: "solid 5px blue",
-                backgroundColor: "white",
+                borderLeft: "solid 5px #5a6868",
+                backgroundColor: "#daeaea",
                 width: "100%", // Ensure the card takes up available width within the flexbox
-                height: "100px", // Adjusted height for a smaller card
-                padding: "4px", // Adjusted padding inside the card
               }}
             >
               <CardContent sx={{ padding: "8px" }}>
@@ -479,7 +480,7 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
                 >
                   <Grid item>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <IoCarSportSharp />
+                      <IoCarSportOutline size={25} />
                       <Typography
                         variant="body1"
                         sx={{ ml: 1, fontSize: "0.875rem" }}
@@ -490,7 +491,7 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
                   </Grid>
                   <Grid item>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <PiCoinsBold />
+                      <PiCoinsLight size={25} />
                       <Typography
                         variant="body1"
                         sx={{ ml: 1, fontSize: "0.875rem" }}
@@ -597,7 +598,6 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
 
         {/* {JSON.stringify(FM_Bills_Projectlead)} */}
         <CSmartTable
-          cleaner
           clickableRows
           columns={columns}
           columnFilter
@@ -606,7 +606,6 @@ const DepartmentSpends: React.FC<DepartmentSpendsProps> = ({
           itemsPerPageSelect
           itemsPerPage={10}
           pagination
-          tableFilter
           tableProps={{
             className: "add-this-class red-border",
             responsive: true,

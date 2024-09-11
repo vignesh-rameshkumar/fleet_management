@@ -288,7 +288,7 @@ const CoinsDashBoard: React.FC<CoinsDashBoardProps> = ({
     },
     {
       key: "total_amount",
-      label: "coins Spent",
+      label: "Coins Spent",
       _style: {
         width: "15%",
         fontSize: "14px",
@@ -385,8 +385,9 @@ const CoinsDashBoard: React.FC<CoinsDashBoardProps> = ({
           sx={{
             display: "flex",
             gap: 2,
-            p: 2,
+
             flexWrap: "wrap",
+            justifyContent: "space-between",
             alignItems: "flex-start",
           }}
         >
@@ -446,8 +447,7 @@ const CoinsDashBoard: React.FC<CoinsDashBoardProps> = ({
             </CardContent>
           </Card>
           <br />
-          <br />
-          <br />
+
           {/* Calendar Control Section */}
           <Box
             sx={{
@@ -554,13 +554,13 @@ const CoinsDashBoard: React.FC<CoinsDashBoardProps> = ({
         >
           <Box sx={{ width: { xs: "100%", md: "60%" } }}>
             <CSmartTable
-              cleaner
+              // cleaner
               clickableRows
               columns={servicecolumns}
               columnFilter
               columnSorter
               items={tableData}
-              tableFilter
+              // tableFilter
               itemsPerPageSelect={{
                 label: "Items per page",
                 values: [10, 20, 30, 50, 100],

@@ -275,6 +275,7 @@ const Reports: React.FC<ReportsProps> = ({
         textAlign: "center",
         color: darkMode ? "#FFF" : "#222222",
         backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+        borderTopRightRadius: "5px",
       },
       filter: true,
       sorter: true,
@@ -357,6 +358,7 @@ const Reports: React.FC<ReportsProps> = ({
         textAlign: "center",
         color: darkMode ? "#FFF" : "#222222",
         backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+        borderTopRightRadius: "5px",
       },
       filter: true,
       sorter: true,
@@ -439,6 +441,7 @@ const Reports: React.FC<ReportsProps> = ({
         textAlign: "center",
         color: darkMode ? "#FFF" : "#222222",
         backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+        borderTopRightRadius: "5px",
       },
       filter: true,
       sorter: true,
@@ -514,7 +517,7 @@ const Reports: React.FC<ReportsProps> = ({
     },
     {
       key: "driver_name_no",
-      label: "Assigned Driver Name/No.",
+      label: "Asgn Driver Name",
       _style: {
         width: "15%",
         fontSize: "14px",
@@ -535,11 +538,13 @@ const Reports: React.FC<ReportsProps> = ({
         textAlign: "center",
         color: darkMode ? "#FFF" : "#222222",
         backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+        borderTopRightRadius: "5px",
       },
       filter: true,
       sorter: true,
     },
   ];
+
   const [doctypeName, setDoctypeName] = useState("FM_Travel_Route_Request");
   const [columns, setColumns] = useState(travelRouteColumns);
   //handle change
@@ -747,7 +752,6 @@ const Reports: React.FC<ReportsProps> = ({
                       style={{
                         color: "#5B5B5B",
                         fontWeight: "500",
-                        marginBottom: "10px",
                       }}
                     >
                       {data.title}
@@ -776,12 +780,12 @@ const Reports: React.FC<ReportsProps> = ({
             <div
               style={{
                 backgroundColor: darkMode ? "#222222" : "#fff",
-                padding: "15px",
+                padding: "10px",
               }}
             >
               {/* {JSON.stringify(tableData)} */}
               <CSmartTable
-                cleaner
+                // cleaner
                 clickableRows
                 columns={columns}
                 columnFilter
@@ -790,7 +794,7 @@ const Reports: React.FC<ReportsProps> = ({
                 itemsPerPageSelect
                 itemsPerPage={10}
                 pagination
-                tableFilter
+                // tableFilter
                 tableProps={{
                   className: "add-this-class red-border",
                   responsive: true,

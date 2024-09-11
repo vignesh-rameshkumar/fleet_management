@@ -150,7 +150,7 @@ const App: React.FC = () => {
             employeeID={employeeID}
           >
             <Routes>
-              {userName === "Employee" ? (
+              {userName === "Guest" ? (
                 <Route path="*" element={<NotFoundPage />} />
               ) : (
                 <>
@@ -226,10 +226,10 @@ const App: React.FC = () => {
                     path="/Fleet_Management/calendar"
                     element={
                       <Calendar
-                      // darkMode={darkMode}
-                      userEmailId={userEmailId}
-                      userName={userName}
-                      employeeID={employeeID}
+                        // darkMode={darkMode}
+                        userEmailId={userEmailId}
+                        userName={userName}
+                        employeeID={employeeID}
                       />
                     }
                   />
@@ -440,6 +440,7 @@ const App: React.FC = () => {
                   />
                 </>
               )}
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </SideBar>
 

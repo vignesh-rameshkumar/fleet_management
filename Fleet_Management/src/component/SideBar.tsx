@@ -646,11 +646,11 @@ const SideBar: React.FC<SideBarProps> = ({
 
   const navigate = useNavigate(); // Use useNavigate hook
 
-  // useEffect(() => {
-  //   if (employeeRole === "Driver") {
-  //     navigate("/Fleet_Management/driver"); // Navigate to /driver route
-  //   }
-  // }, [employeeRole, navigate]);
+  useEffect(() => {
+    if (employeeRole === "Driver") {
+      navigate("/Fleet_Management/driver"); // Navigate to /driver route
+    }
+  }, [employeeRole, navigate]);
   return (
     <Box
       sx={{

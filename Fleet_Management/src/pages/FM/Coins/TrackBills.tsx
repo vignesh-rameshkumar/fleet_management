@@ -354,7 +354,7 @@ const TrackBills: React.FC<TrackBillsProps> = ({
   useEffect(() => {
     const filterInput = document.querySelector(".form-control");
     if (filterInput) {
-      filterInput.placeholder = "Request Type";
+      filterInput.placeholder = "Request Id";
     }
   }, []);
 
@@ -545,8 +545,7 @@ const TrackBills: React.FC<TrackBillsProps> = ({
                 sx={{
                   color: "#5A6868",
                   fontSize: { xs: "12px", md: "14px" },
-                  fontWeight: 600,
-                  marginBottom: "8px",
+
                   textAlign: "center",
                 }}
               >
@@ -606,7 +605,7 @@ const TrackBills: React.FC<TrackBillsProps> = ({
                     fontSize: { xs: "12px", md: "14px" },
                     fontWeight: 600,
                     color: activeLog === logType ? "#375d33" : "#A1A1A1",
-                    height: "40px",
+
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",

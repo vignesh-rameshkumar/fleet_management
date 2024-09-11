@@ -78,7 +78,7 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
   useEffect(() => {
     const filterInput = document.querySelector(".form-control");
     if (filterInput) {
-      filterInput.placeholder = "Request Type";
+      filterInput.placeholder = "Request ID";
     }
   }, []);
   //api
@@ -182,7 +182,7 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
       key: "name",
       label: "Request ID",
       _style: {
-        width: "15%",
+        width: "10%",
         fontSize: "14px",
         textAlign: "center",
         color: darkMode ? "#FFF" : "#222222",
@@ -206,9 +206,9 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
     },
     {
       key: "project_name",
-      label: "Project Name / Department",
+      label: "Project Name ",
       _style: {
-        width: "15%",
+        width: "18%",
         fontSize: "14px",
         textAlign: "center",
         color: darkMode ? "#FFF" : "#222222",
@@ -222,7 +222,7 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
       key: "type",
       label: "Type of Service",
       _style: {
-        width: "15%",
+        width: "18%",
         fontSize: "14px",
         textAlign: "center",
         color: darkMode ? "#FFF" : "#222222",
@@ -236,7 +236,7 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
       key: "action",
       label: "Action",
       _style: {
-        width: "18%",
+        width: "15%",
         fontSize: "14px",
         textAlign: "center",
         color: darkMode ? "#FFF" : "#222222",
@@ -248,6 +248,20 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
     },
   ];
   const TravelRoutesColumns = [
+    {
+      key: "S_no",
+      label: "S.No",
+      _style: {
+        width: "7%",
+        fontSize: "14px",
+        textAlign: "center",
+        color: darkMode ? "#FFF" : "#222222",
+        backgroundColor: darkMode ? "#4d8c52" : "#A5D0A9",
+        borderTopLeftRadius: "5px",
+      },
+      filter: false,
+      sorter: false,
+    },
     {
       key: "date_time",
       label: "Travel Date",
@@ -549,16 +563,15 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                minWidth: "200px",
-                width: "38%",
+                // minWidth: "100px",
+                width: "35%",
               }}
             >
               <Typography
                 sx={{
                   color: "#5A6868",
                   fontSize: { xs: "14px", md: "16px" },
-                  fontWeight: 600,
-                  marginBottom: "8px",
+
                   textAlign: "center",
                 }}
               >
@@ -571,7 +584,7 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
                 <Typography
                   sx={{
                     fontSize: { xs: "24px", md: "32px" },
-                    fontWeight: 700,
+
                     color: "#5A6868",
                   }}
                 >

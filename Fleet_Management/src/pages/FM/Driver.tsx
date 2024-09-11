@@ -28,8 +28,7 @@ import jsPDF from "jspdf";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { MdOutlineVisibility, MdDeleteForever } from "react-icons/md";
 import { toast } from "react-toastify";
-import { PDFViewer } from "@react-pdf-viewer/core";
-import { saveAs } from "file-saver";
+
 import { createTheme } from "@mui/material/styles";
 
 import {
@@ -224,7 +223,7 @@ const Driver: React.FC<DriverProps> = ({
   useEffect(() => {
     const filterInput = document.querySelector(".form-control");
     if (filterInput) {
-      filterInput.placeholder = "Request Type";
+      filterInput.placeholder = "Driver Name";
     }
   }, []);
 

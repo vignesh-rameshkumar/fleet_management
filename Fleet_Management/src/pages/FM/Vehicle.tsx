@@ -22,18 +22,7 @@ import {
   IconButton,
   Alert,
 } from "@mui/material";
-import { useParams, Link } from "react-router-dom";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  useMap,
-  useMapEvents,
-} from "react-leaflet";
-import L from "leaflet";
-// import "leaflet/dist/leaflet.css";
-import { FaMapMarkerAlt } from "react-icons/fa";
+
 import { LuMapPin } from "react-icons/lu";
 import { createTheme } from "@mui/material/styles";
 
@@ -47,8 +36,6 @@ import { MdOutlineVisibility, MdDeleteForever } from "react-icons/md";
 import { toast } from "react-toastify";
 import { ThemeProvider } from "@mui/material";
 
-import { PDFViewer } from "@react-pdf-viewer/core";
-import { saveAs } from "file-saver";
 import {
   useFrappeGetDocList,
   useFrappeUpdateDoc,
@@ -250,7 +237,7 @@ const Vehicle: React.FC<VehicleProps> = ({
   useEffect(() => {
     const filterInput = document.querySelector(".form-control");
     if (filterInput) {
-      filterInput.placeholder = "Request Type";
+      filterInput.placeholder = "Vehicle Number";
     }
   }, []);
 
@@ -2403,7 +2390,7 @@ const Vehicle: React.FC<VehicleProps> = ({
                     error={!!policyHolderAddressError}
                     helperText={policyHolderAddressError}
                     multiline
-                    rows={4}
+                    rows={2}
                   />
                   <TextField
                     sx={{
@@ -2417,7 +2404,7 @@ const Vehicle: React.FC<VehicleProps> = ({
                     error={!!insuranceCompanyAddressError}
                     helperText={insuranceCompanyAddressError}
                     multiline
-                    rows={4}
+                    rows={2}
                   />
                   <TextField
                     sx={{

@@ -247,3 +247,46 @@ def get_active_employees():
     
     # Return the list of employees
     return employees
+
+
+    # Lakshmi
+    from frappe.utils import getdate, add_days, date_diff,formatdate
+from datetime import datetime, timedelta
+@frappe.whitelist()
+def get_daily_counts(doctype, start_date, end_date):
+    # Parse the date strings into date objects
+    start_date = datetime.strptime(start_date, "%Y-%m-%d")
+    end_date = datetime.strptime(end_date, "%Y-%m-%d")
+
+    # Initialize a dictionary to hold the counts for each day
+    date_counts = {}
+    current_date = start_date
+    while current_date <= end_date:
+        date_str = current_date.strftime("%Y-%m-%d")
+        date_counts[date_str] = {
+            "Approved": 0,
+            "Pending": 0,
+            "Rejected": 0
+        }
+        current_date += timedelta(days=1)
+
+    # Fetch records from the database based on doctype and date range
+    records = frappe.get_all(
+        doctype,
+        filters={"creation": ["between", [start_date, end_date]]},
+        fields=["creation", "status"]
+    )
+
+    # Update the counts for each day based on the records
+    for record in records:
+        creation_date = record.creation.strftime("%Y-%m-%d")
+        status = record.status
+        if creation_date in date_counts:
+            if status == "Approved":
+                date_counts[creation_date]["Approved"] += 1
+            elif status == "Pending":
+                date_counts[creation_date]["Pending"] += 1
+            elif status == "Rejected":
+                date_counts[creation_date]["Rejected"] += 1
+
+    return date_counts

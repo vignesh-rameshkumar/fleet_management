@@ -15,10 +15,14 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from "@mui/material";
+
+import { IoCarSportOutline } from "react-icons/io5";
+
 import { MdOutlineVisibility, MdDeleteForever } from "react-icons/md";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import { DirectionsCar, Route, CreditCard } from "@mui/icons-material";
 import dayjs from "dayjs";
+import { PiCoinsLight } from "react-icons/pi";
 
 import {
   useFrappeGetDocList,
@@ -84,21 +88,25 @@ const YourSpends: React.FC<YourSpendsProps> = ({
       title: "Booked",
       car: bookedCarCount,
       coins: totalcoinBookedAmount,
-      icon: MonetizationOnIcon,
-      bgColor: "#F0F0F0",
+      icon: PiCoinsLight,
+      bgColor: "#DAEAEA",
+      topBorder: "5px solid #5A6868",
     },
     {
       title: "Travel Route",
       car: travelRouteCount,
       coins: totalcointTravelAmount,
-      icon: MonetizationOnIcon,
-      bgColor: "#FFD6E5",
+      icon: PiCoinsLight,
+      bgColor: "#fdd0f8",
+      topBorder: "5px solid #b599b2",
     },
     {
       title: "Total Coins Consumed",
+      car: 0,
       coins: totalcoinBookedAmount + totalcointTravelAmount,
-      icon: MonetizationOnIcon,
-      bgColor: "#FFD6E5",
+      icon: PiCoinsLight,
+      bgColor: "#fdbbd4",
+      topBorder: "5px solid #9b7181",
     },
   ];
 
@@ -588,7 +596,7 @@ const YourSpends: React.FC<YourSpendsProps> = ({
           marginBottom: "10px",
         }}
       >
-        Coins
+        Your Spends
       </Box>
 
       <div
@@ -597,22 +605,35 @@ const YourSpends: React.FC<YourSpendsProps> = ({
           padding: "15px",
         }}
       >
-        <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 2,
+          }}
+        >
           {cardData.map((card, index) => (
-            <Card key={index} sx={{ flex: 1, backgroundColor: card.bgColor }}>
-              <CardContent>
-                <Typography variant="h6" component="div">
-                  {card.title}
-                </Typography>
-                <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
-                  {card.car && (
+            <Card
+              key={index}
+              sx={{
+                flex: 1,
+                backgroundColor: card.bgColor,
+                borderTop: card.topBorder,
+              }}
+            >
+              <CardContent sx={{ textAlign: "center" }}>
+                {card.title}
+                <Box
+                  sx={{ display: "flex", alignItems: "center", mt: 1, gap: 2 }}
+                >
+                  <IoCarSportOutline size={25} />
+                  {card?.car && (
                     <Box sx={{ display: "flex", alignItems: "center", mr: 2 }}>
-                      <DirectionsCar sx={{ mr: 1 }} />
-                      <Typography variant="body1">{card.car}</Typography>
+                      {card.car}
                     </Box>
                   )}
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <card.icon sx={{ mr: 1 }} />
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                    <PiCoinsLight size={25} />
                     <Typography variant="body1">
                       {card.coins.toLocaleString()}
                     </Typography>
@@ -628,8 +649,7 @@ const YourSpends: React.FC<YourSpendsProps> = ({
         <Box
           sx={{
             display: "flex",
-            gap: 2,
-            p: 2,
+
             flexWrap: "wrap",
             alignItems: "flex-start",
           }}
@@ -637,10 +657,10 @@ const YourSpends: React.FC<YourSpendsProps> = ({
           <Box
             sx={{
               display: "flex",
-              // flexDirection: "column",
+              justifyContent: "space-between",
               gap: 5,
-              minWidth: "250px",
-              padding: "23px",
+              // minWidth: "250px",
+              padding: "20px",
             }}
           >
             <ToggleButtonGroup
@@ -648,7 +668,6 @@ const YourSpends: React.FC<YourSpendsProps> = ({
               exclusive
               onChange={handleViewChange}
               aria-label="Calendar View Selector"
-              size="small"
               sx={{
                 "& .MuiToggleButton-root": {
                   padding: "4px 8px",
@@ -741,7 +760,9 @@ const YourSpends: React.FC<YourSpendsProps> = ({
                 fontSize: { xs: "12px", md: "14px" },
                 fontWeight: 600,
                 color: activeLog === "bookRide" ? "#375d33" : "#A1A1A1",
-                height: "8vh",
+                marginTop: "13px",
+                alignItems: "center",
+                width: "200px",
                 borderBottom:
                   activeLog === "bookRide"
                     ? "2px solid #487644"
@@ -762,15 +783,19 @@ const YourSpends: React.FC<YourSpendsProps> = ({
                 padding: "8px",
                 borderRadius: "4px 4px 0 0",
                 display: "flex",
+                alignItems: "center",
                 justifyContent: "center",
                 fontSize: { xs: "12px", md: "14px" },
                 fontWeight: 600,
+                marginTop: "13px",
+                marginLeft: "10px",
                 color: activeLog === "travelRoute" ? "#375d33" : "#A1A1A1",
                 borderBottom:
                   activeLog === "travelRoute"
                     ? "2px solid #487644"
                     : "2px solid transparent",
-                height: "8vh",
+                // height: "8vh",
+                width: "200px",
               }}
             >
               Travel Route

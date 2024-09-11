@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Drawer } from "@mui/material";
-import { bgcolor, border, display, margin, padding, width } from "@mui/system";
-
+import { useNavigate } from "react-router-dom";
 import Bg from "../../assets/Bg.png";
-import { FaArrowRight } from "react-icons/fa6";
-import { BsJustify } from "react-icons/bs";
 import { MdDashboardCustomize } from "react-icons/md";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { toast } from "react-toastify";
@@ -42,6 +39,7 @@ const QuickAccess: React.FC<QuickAccessProps> = ({
   const handleCome = () => {
     toast.warning("Coming Soon...");
   };
+  const navigate = useNavigate(); // Create a navigate function
 
   const getGreeting = () => {
     const currentHour = new Date().getHours();
@@ -262,7 +260,9 @@ const QuickAccess: React.FC<QuickAccessProps> = ({
                       cursor: "pointer",
                       fontSize: "16px",
                     }}
-                    onClick={() => handleCome()}
+                    onClick={() =>
+                      navigate("/Fleet_Management/Coins/yourspends")
+                    }
                   >
                     <span style={{ background: "#88AB8A", padding: "5px" }}>
                       <MdDashboardCustomize size={40} color="#fff" />

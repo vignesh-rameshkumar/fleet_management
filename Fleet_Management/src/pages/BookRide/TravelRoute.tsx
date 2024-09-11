@@ -470,11 +470,10 @@ const TravelRoute: React.FC<TravelRouteProps> = ({
                         flexDirection="column"
                         alignItems="center"
                       >
-                        <Box sx={{ display: "flex" }}>
+                        {/* <Box sx={{ display: "flex" }}>
                           <Button
                             className="saveBtn"
                             onClick={() => {
-                              // setUpdateView(true);
                               handleCome();
                             }}
                           >
@@ -491,7 +490,7 @@ const TravelRoute: React.FC<TravelRouteProps> = ({
                               style={{ marginLeft: "10px" }}
                             />
                           </Button>
-                        </Box>
+                        </Box> */}
                       </Box>
                     </Box>
                   )}
