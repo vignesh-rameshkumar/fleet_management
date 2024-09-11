@@ -99,7 +99,7 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
     "FM_Request_Master",
     {
       fields: ["*"],
-      // filters: [["ride_status", "=", "Completed"]],
+      filters: [["ride_status", "=", "Completed"]],
       orderBy: {
         field: "modified",
         order: "desc",
@@ -151,6 +151,7 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
       setTravelData(Travel_route);
     }
   }, [Travel_route]);
+ 
   // console.log("api", travelData);
   // Handle drawer toggle
   const toggleDrawer = (open: boolean) => {
