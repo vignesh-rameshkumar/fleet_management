@@ -75,6 +75,22 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
       { parameter: "", costPerQty: "", totalQty: "", coins: "" }, // New row
     ]);
   };
+  const [isGenerateBillEnabled, setIsGenerateBillEnabled] = useState(false);
+  // Function to check if at least one row has been filled
+  const validateRows = () => {
+    return rows.some(
+      (row) =>
+        row.parameter.trim() !== "" ||
+        row.costPerQty.trim() !== "" ||
+        row.totalQty.trim() !== ""
+    );
+  };
+
+  // Effect to enable or disable the Generate Bill button
+  useEffect(() => {
+    const isValid = validateRows();
+    setIsGenerateBillEnabled(isValid);
+  }, [rows]);
   useEffect(() => {
     const filterInput = document.querySelector(".form-control");
     if (filterInput) {
@@ -1916,7 +1932,11 @@ const GenerateBills: React.FC<GenerateBillsProps> = ({
                       Cancel
                     </Button>
 
-                    <Button className="saveBtn" onClick={CreateBillRequest}>
+                    <Button
+                      className="saveBtn"
+                      disabled={!isGenerateBillEnabled}
+                      onClick={CreateBillRequest}
+                    >
                       Generate Bill
                     </Button>
                   </Box>

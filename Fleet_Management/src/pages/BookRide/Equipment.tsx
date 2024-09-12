@@ -262,7 +262,7 @@ const Equipment: React.FC<EquipmentProps> = ({
 
   useEffect(() => {
     setProjectName(RM_Project_Lead);
-  }, [RM_Project_Lead]);
+  }, [RM_Project_Lead]);  
 
   const [selectedProject, setSelectedProject] = useState();
 
