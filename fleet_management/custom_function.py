@@ -290,6 +290,7 @@ def get_daily_counts(doctype, start_date, end_date):
                 date_counts[creation_date]["Rejected"] += 1
 
     return date_counts
+
 @frappe.whitelist()
 def get_lead_or_employee_email(project_name, documentname=None):
     if project_name == "General":
