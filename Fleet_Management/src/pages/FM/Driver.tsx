@@ -2386,7 +2386,7 @@ const Driver: React.FC<DriverProps> = ({
                 >
                   <Box
                     component="img"
-                    src={drawerDetails.driver_photo.replace("/private", "")}
+                    src={drawerDetails.driver_photo?.replace("/private", "")}
                     alt="Vehicle Image"
                     sx={{
                       maxWidth: "30%",
