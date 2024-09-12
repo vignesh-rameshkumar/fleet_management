@@ -213,7 +213,7 @@ const Vehicle: React.FC<VehicleProps> = ({
   const handleDownload = () => {
     const doc = new jsPDF();
     const img = new Image();
-    img.src = drawerDetails.vehicle_image.replace("/private", "");
+    img.src = drawerDetails.vehicle_image?.replace("/private", "");
     img.onload = () => {
       doc.addImage(img, "JPEG", 10, 10, 190, 0); // Adjust the dimensions as needed
       doc.save("vehicle_image.pdf");
@@ -3144,7 +3144,7 @@ const Vehicle: React.FC<VehicleProps> = ({
                 >
                   <Box
                     component="img"
-                    src={drawerDetails.vehicle_image.replace("/private", "")}
+                    src={drawerDetails.vehicle_image?.replace("/private", "")}
                     alt="Vehicle Image"
                     sx={{
                       maxWidth: "70%",
@@ -3195,7 +3195,7 @@ const Vehicle: React.FC<VehicleProps> = ({
                     </IconButton>
                     <Box
                       component="img"
-                      src={drawerDetails.vehicle_image.replace("/private", "")}
+                      src={drawerDetails.vehicle_image?.replace("/private", "")}
                       alt="Vehicle Image"
                       sx={{
                         maxWidth: "100%",

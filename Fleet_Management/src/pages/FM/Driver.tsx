@@ -383,7 +383,7 @@ const Driver: React.FC<DriverProps> = ({
   const handleDownload = () => {
     const doc = new jsPDF();
     const img = new Image();
-    img.src = drawerDetails.driver_photo.replace("/private", "");
+    img.src = drawerDetails.driver_photo?.replace("/private", "");
     img.onload = () => {
       doc.addImage(img, "JPEG", 10, 10, 190, 0);
       doc.save("Driver_image.pdf");
@@ -403,7 +403,7 @@ const Driver: React.FC<DriverProps> = ({
     return fileUrl?.toLowerCase().endsWith(".pdf");
   };
   const handleDownloadMedical = () => {
-    const fileUrl = drawerDetails.medical_fitness_certificate.replace(
+    const fileUrl = drawerDetails.medical_fitness_certificate?.replace(
       "/private",
       ""
     );
@@ -439,7 +439,7 @@ const Driver: React.FC<DriverProps> = ({
   const handleDownloadPolice = () => {
     const doc = new jsPDF();
     const img = new Image();
-    img.src = drawerDetails.police_verification_certificate.replace(
+    img.src = drawerDetails.police_verification_certificate?.replace(
       "/private",
       ""
     );
@@ -453,7 +453,7 @@ const Driver: React.FC<DriverProps> = ({
     if (drawerDetails.license_copy) {
       const doc = new jsPDF();
       const img = new Image();
-      img.src = drawerDetails.license_copy.replace("/private", "");
+      img.src = drawerDetails.license_copy?.replace("/private", "");
       img.onload = () => {
         doc.addImage(img, "JPEG", 10, 10, 190, 0); // Adjust the size and position as needed
         doc.save("License_Copy.pdf");
@@ -474,7 +474,7 @@ const Driver: React.FC<DriverProps> = ({
   const handleDownloadAadhar = () => {
     const doc = new jsPDF();
     const img = new Image();
-    img.src = drawerDetails.aadhar_copy.replace("/private", "");
+    img.src = drawerDetails.aadhar_copy?.replace("/private", "");
     img.onload = () => {
       doc.addImage(img, "JPEG", 10, 10, 190, 0);
       doc.save("Aadhar_Copy.pdf"); // Save as Aadhar_Copy.pdf
@@ -2437,7 +2437,7 @@ const Driver: React.FC<DriverProps> = ({
                     </IconButton>
                     <Box
                       component="img"
-                      src={drawerDetails.driver_photo.replace("/private", "")}
+                      src={drawerDetails.driver_photo?.replace("/private", "")}
                       alt="Vehicle Image"
                       sx={{
                         maxWidth: "100%",
@@ -2662,7 +2662,7 @@ const Driver: React.FC<DriverProps> = ({
                         {drawerDetails.license_copy ? (
                           <Box
                             component="img"
-                            src={drawerDetails.license_copy.replace(
+                            src={drawerDetails.license_copy?.replace(
                               "/private",
                               ""
                             )}
@@ -2802,7 +2802,7 @@ const Driver: React.FC<DriverProps> = ({
                         </IconButton>
                         <Box
                           component="img"
-                          src={drawerDetails.aadhar_copy.replace(
+                          src={drawerDetails.aadhar_copy?.replace(
                             "/private",
                             ""
                           )}
@@ -2901,7 +2901,7 @@ const Driver: React.FC<DriverProps> = ({
                         </IconButton>
                         <Box
                           component="img"
-                          src={drawerDetails.police_verification_certificate.replace(
+                          src={drawerDetails.police_verification_certificate?.replace(
                             "/private",
                             ""
                           )}
@@ -2999,7 +2999,7 @@ const Driver: React.FC<DriverProps> = ({
                         </IconButton>
                         {isPdf(drawerDetails.medical_fitness_certificate) ? (
                           <iframe
-                            src={drawerDetails.medical_fitness_certificate.replace(
+                            src={drawerDetails.medical_fitness_certificate?.replace(
                               "/private",
                               ""
                             )}
@@ -3010,7 +3010,7 @@ const Driver: React.FC<DriverProps> = ({
                         ) : (
                           <Box
                             component="img"
-                            src={drawerDetails.medical_fitness_certificate.replace(
+                            src={drawerDetails.medical_fitness_certificate?.replace(
                               "/private",
                               ""
                             )}

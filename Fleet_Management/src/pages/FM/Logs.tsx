@@ -1083,13 +1083,9 @@ const Logs: React.FC<LogsProps> = ({
     }
   };
   const { data: Employee, isLoading: employeeDetailsLoading } =
-    useFrappeGetDocList("Employee", {
-      fields: ["name", "employee_name"],
-      filters: [
-        ["designation", "=", "Driver"],
-        ["status", "=", "Active"],
-        ["department", "like", "%Transportation%"],
-      ],
+    useFrappeGetDocList("FM_Driver_Details", {
+      fields: ["employee_id", "employee_name"],
+      filters: [["status", "=", "Online"]],
 
       orderBy: {
         field: "modified",
@@ -1105,6 +1101,7 @@ const Logs: React.FC<LogsProps> = ({
       setEmployeeDetails(Employee);
     }
   }, [Employee]);
+  console.log("employeeDetails", employeeDetails);
   //handle change
   // Handlers for Maintenance Bill Copy
   const handleBillCopyDialogOpen = () => {
@@ -1614,27 +1611,33 @@ const Logs: React.FC<LogsProps> = ({
   };
   const handleEmployeeChange = (event, newValue) => {
     if (newValue) {
-      setSelectedEmployee(newValue.name); // Set employee ID
+      setSelectedEmployee(newValue.employee_id); // Set employee ID correctly
       setDriverName(newValue.employee_name); // Set driver name
     } else {
-      setSelectedEmployee(null);
-      setDriverName("");
+      setSelectedEmployee(null); // Clear when no selection
+      setDriverName(""); // Reset driver name
     }
   };
 
-  // Handle selection from driver name autocomplete
   const handleDriverNameChange = (event, newValue) => {
     const matchedEmployee = employeeDetails.find(
       (emp) => emp.employee_name === newValue
     );
+
     if (matchedEmployee) {
-      setDriverName(newValue);
-      setSelectedEmployee(matchedEmployee.name); // Set employee ID
+      setDriverName(matchedEmployee.employee_name); // Set driver name
+      setSelectedEmployee(matchedEmployee.employee_id); // Set employee ID
     } else {
-      setDriverName(newValue);
-      setSelectedEmployee(null);
+      setDriverName(newValue); // Allow free typing
+      setSelectedEmployee(null); // Reset employee ID when there's no match
     }
   };
+
+  useEffect(() => {
+    if (Employee) {
+      setEmployeeDetails(Employee);
+    }
+  }, [Employee]);
 
   const handleFileChangeFineBill = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -3572,16 +3575,17 @@ const Logs: React.FC<LogsProps> = ({
                   padding: "20px",
                 }}
               >
+                {/* Autocomplete for Driver ID */}
                 <Autocomplete
                   sx={{
                     width: { xs: "100%", sm: "100%", md: "90%" },
                     margin: "10 auto",
                   }}
                   options={employeeDetails || []}
-                  getOptionLabel={(option) => option.name}
+                  getOptionLabel={(option) => option.employee_id || ""} // Display employee ID
                   value={
                     employeeDetails.find(
-                      (emp) => emp.name === selectedEmployee
+                      (emp) => emp.employee_id === selectedEmployee
                     ) || null
                   }
                   onChange={handleEmployeeChange}
@@ -3593,6 +3597,8 @@ const Logs: React.FC<LogsProps> = ({
                     />
                   )}
                 />
+
+                {/* Autocomplete for Driver Name */}
                 <Autocomplete
                   freeSolo
                   options={
@@ -4447,7 +4453,7 @@ const Logs: React.FC<LogsProps> = ({
                     margin: 2,
                   }}
                 >
-                  Add Driver Details:
+                  Add Driver Details :
                 </Typography>
               </Box>
               <Box
@@ -4462,16 +4468,17 @@ const Logs: React.FC<LogsProps> = ({
                   padding: "20px",
                 }}
               >
+                {/* Autocomplete for Driver ID */}
                 <Autocomplete
                   sx={{
                     width: { xs: "100%", sm: "100%", md: "90%" },
                     margin: "10 auto",
                   }}
                   options={employeeDetails || []}
-                  getOptionLabel={(option) => option.name}
+                  getOptionLabel={(option) => option.employee_id || ""} // Display employee ID
                   value={
                     employeeDetails.find(
-                      (emp) => emp.name === selectedEmployee
+                      (emp) => emp.employee_id === selectedEmployee
                     ) || null
                   }
                   onChange={handleEmployeeChange}
@@ -4483,6 +4490,8 @@ const Logs: React.FC<LogsProps> = ({
                     />
                   )}
                 />
+
+                {/* Autocomplete for Driver Name */}
                 <Autocomplete
                   freeSolo
                   options={
@@ -4574,7 +4583,7 @@ const Logs: React.FC<LogsProps> = ({
                         accidentReasonError ||
                         !damageDescription ||
                         damageDescriptionError ||
-                        selectedVehicle ||
+                        !selectedVehicle ||
                         accidentDescriptionError ||
                         licensePlateError ||
                         !accidentImage

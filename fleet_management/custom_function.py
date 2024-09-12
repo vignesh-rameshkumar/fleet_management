@@ -221,17 +221,20 @@ def update_attendance(document_name=None, employee_email=None):
         if child_doc.attendance == "Present":
             return {"success": True, "message": "Already scanned", "child_doc_name": child_doc.name}
 
+        # Update attendance and check-in time
         child_doc.attendance = "Present"
+        child_doc.checkin_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Update with current time
         parent_doc.save()
         frappe.db.commit()
         
         parent_doc.reload()
         updated_member = next((member for member in parent_doc.get("onboarded_employees") if member.employee_email == employee_email), None)
         updated_attendance = updated_member.attendance if updated_member else "Not Found"
+        updated_checkin_time = updated_member.checkin_time if updated_member else "Not Found"
         
-        frappe.logger().info(f"Updated attendance for {employee_email}: {updated_attendance}")
+        frappe.logger().info(f"Updated attendance for {employee_email}: {updated_attendance}, Check-in Time: {updated_checkin_time}")
 
-        return {"success": True, "message": "Attendance updated to Present", "child_doc_name": child_doc.name}
+        return {"success": True, "message": "Attendance updated to Present", "child_doc_name": child_doc.name, "checkin_time": updated_checkin_time}
 
     except Exception as e:
         frappe.log_error(message=str(e), title="Error in update_attendance")
