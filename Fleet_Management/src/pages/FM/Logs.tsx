@@ -200,7 +200,6 @@ const Logs: React.FC<LogsProps> = ({
   const [driverName, setDriverName] = useState("");
   const [driverError, setDriverError] = useState(false);
   const [driverHelperText, setDriverHelperText] = useState("");
-  const [licensePlateNumber, setLicensePlateNumber] = useState("");
   const [licensePlateError, setLicensePlateError] = useState(false);
   const [licensePlateHelperText, setLicensePlateHelperText] = useState("");
   const [edit, setEdit] = useState(true);
@@ -587,6 +586,36 @@ const Logs: React.FC<LogsProps> = ({
       sorter: false,
     },
   ];
+  const { data: vehicles, isLoading: vehiclesLoading } = useFrappeGetDocList(
+    "FM_Vehicle_Details",
+    {
+      fields: ["plate_number"],
+      filters: [["status", "=", "Online"]],
+      orderBy: {
+        field: "modified",
+        order: "desc",
+      },
+      limit: 10000,
+    }
+  );
+
+  // Store vehicle details in the state
+  const [vehicleOptions, setVehicleOptions] = useState([]);
+
+  useEffect(() => {
+    if (vehicles) {
+      // Map the plate numbers for dropdown options
+      const vehicleList = vehicles.map((vehicle) => ({
+        label: vehicle.plate_number,
+        value: vehicle.plate_number,
+      }));
+      setVehicleOptions(vehicleList);
+    }
+  }, [vehicles]);
+
+  // Handle vehicle selection
+  const [selectedVehicle, setSelectedVehicle] = useState("");
+
   const [tableData, setTableData] = useState<any[]>([]);
   const [columns, setColumns] = useState(fineLogColumns);
   const [doctypeName, setDoctypeName] = useState("FM_Fine_Log");
@@ -601,7 +630,6 @@ const Logs: React.FC<LogsProps> = ({
       limit: 10000,
     }
   );
-
   // Set table data when the fetched data changes
   useEffect(() => {
     if (LogData) {
@@ -651,7 +679,7 @@ const Logs: React.FC<LogsProps> = ({
     setDriverName(" ");
     setDamageDescription(" ");
     setSelectedEmployee(null);
-    setLicensePlateNumber("");
+    setSelectedVehicle("");
     setFirCopyImage(null);
     setAccidentImage(null);
     setPoliceStationNumber(" ");
@@ -669,7 +697,7 @@ const Logs: React.FC<LogsProps> = ({
       setFineBillFile(drawerDetails.fine_bill_copy || null);
       setSelectedEmployee(drawerDetails.driver_employee_id || null);
       setDriverName(drawerDetails.driver_name || " ");
-      setLicensePlateNumber(drawerDetails.vehicle_number || " ");
+      setSelectedVehicle(drawerDetails.vehicle_number || " ");
       setFuelAmount(drawerDetails.fuel_amount || "");
       setCurrentOdometer(drawerDetails.current_odometer_reading || " ");
       setFuelAmount(drawerDetails.bill_amount || "");
@@ -739,7 +767,7 @@ const Logs: React.FC<LogsProps> = ({
         reason: reason,
         driver_employee_id: selectedEmployee,
         driver_name: driverName,
-        vehicle_number: licensePlateNumber,
+        vehicle_number: selectedVehicle,
       };
 
       // Create the document
@@ -768,7 +796,7 @@ const Logs: React.FC<LogsProps> = ({
       const requestBody = {
         bill_copy: fuelImageUrl,
         date: formatDate(fuelDate),
-        vehicle_number: licensePlateNumber,
+        vehicle_number: selectedVehicle,
         current_odometer_reading: currentOdometer,
         bill_amount: fuelAmount,
         fuel_in_litres: fuelLiters,
@@ -808,7 +836,7 @@ const Logs: React.FC<LogsProps> = ({
       const requestBody = {
         reason: accidentReason,
         accident_date: formatDate(accidentDate),
-        vehicle_number: licensePlateNumber,
+        vehicle_number: selectedVehicle,
         accident_description: accidentDescription,
         damage_description: damageDescription,
         images: accidentImageUrl,
@@ -850,7 +878,7 @@ const Logs: React.FC<LogsProps> = ({
       const requestBody = {
         service_type: serviceType,
         date_of_service: formatDate(serviceDate),
-        vehicle_number: licensePlateNumber,
+        vehicle_number: selectedVehicle,
         description: description,
         parts_replaced: partsReplaced,
         total_cost: totalCost,
@@ -899,7 +927,7 @@ const Logs: React.FC<LogsProps> = ({
         reason: reason,
         driver_employee_id: selectedEmployee,
         driver_name: driverName,
-        vehicle_number: licensePlateNumber,
+        vehicle_number: selectedVehicle,
       };
       // Update the document
       await updateDoc("FM_Fine_Log", drawerDetails.name, requestBody);
@@ -926,7 +954,7 @@ const Logs: React.FC<LogsProps> = ({
       const requestBody = {
         bill_copy: fuelImageUrl,
         date: formatDate(fuelDate),
-        vehicle_number: licensePlateNumber,
+        vehicle_number: selectedVehicle,
         current_odometer_reading: currentOdometer,
         bill_amount: fuelAmount,
         fuel_in_litres: fuelLiters,
@@ -963,7 +991,7 @@ const Logs: React.FC<LogsProps> = ({
       const requestBody = {
         reason: accidentReason,
         accident_date: formatDate(accidentDate),
-        vehicle_number: licensePlateNumber,
+        vehicle_number: selectedVehicle,
         accident_description: accidentDescription,
         damage_description: damageDescription,
         images: accidentImageUrl,
@@ -998,7 +1026,7 @@ const Logs: React.FC<LogsProps> = ({
       const requestBody = {
         service_type: serviceType,
         date_of_service: formatDate(serviceDate),
-        vehicle_number: licensePlateNumber,
+        vehicle_number: selectedVehicle,
         description: description,
         parts_replaced: partsReplaced,
         total_cost: totalCost,
@@ -1056,11 +1084,11 @@ const Logs: React.FC<LogsProps> = ({
   };
   const { data: Employee, isLoading: employeeDetailsLoading } =
     useFrappeGetDocList("Employee", {
-      fields: ["*"],
+      fields: ["name", "employee_name"],
       filters: [
-        ["department", "Like", "Transportation - ACPL"],
         ["designation", "=", "Driver"],
         ["status", "=", "Active"],
+        ["department", "like", "%Transportation%"],
       ],
 
       orderBy: {
@@ -3617,16 +3645,25 @@ const Logs: React.FC<LogsProps> = ({
                     height: "auto",
                     textAlign: "left",
                   }}
-                  label={<span>Vehicle Number</span>}
-                  value={licensePlateNumber}
+                  label={
+                    <span>
+                      Vehicle Number <span style={{ color: "red" }}>*</span>
+                    </span>
+                  }
+                  value={selectedVehicle}
                   onChange={(e) => {
-                    const newValue = e.target.value;
-                    setLicensePlateNumber(newValue);
-                    validateLicensePlateNumber(newValue);
+                    setSelectedVehicle(e.target.value); // Set selected vehicle
                   }}
+                  select // Add select prop to make it a dropdown
                   error={licensePlateError}
                   helperText={licensePlateHelperText}
-                />
+                >
+                  {vehicleOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
               </Box>
               {edit && (
                 <>
@@ -3779,20 +3816,32 @@ const Logs: React.FC<LogsProps> = ({
                 </LocalizationProvider>
                 <TextField
                   sx={{
-                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    width: { xs: "100%", sm: "100%", md: "90%" }, // Responsive width
                     height: "auto",
                     textAlign: "left",
                   }}
-                  label={<span>Vehicle Number</span>}
-                  value={licensePlateNumber}
+                  label={
+                    <span>
+                      Vehicle Number <span style={{ color: "red" }}>*</span>
+                    </span>
+                  }
+                  value={selectedVehicle} // Bind selected value to the state
                   onChange={(e) => {
-                    const newValue = e.target.value;
-                    setLicensePlateNumber(newValue);
-                    validateLicensePlateNumber(newValue);
+                    setSelectedVehicle(e.target.value); // Set the selected vehicle
+                    validateLicensePlateNumber(e.target.value); // Optional validation function
                   }}
-                  error={licensePlateError}
-                  helperText={licensePlateHelperText}
-                />
+                  error={licensePlateError} // Error handling for invalid input
+                  helperText={licensePlateHelperText} // Display helper text
+                  select // Makes the TextField a dropdown
+                >
+                  {/* Map the vehicle options into dropdown items */}
+                  {vehicleOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+
                 <TextField
                   sx={{
                     width: { xs: "100%", sm: "100%", md: "90%" },
@@ -4491,15 +4540,20 @@ const Logs: React.FC<LogsProps> = ({
                       Vehicle Number <span style={{ color: "red" }}>*</span>
                     </span>
                   }
-                  value={licensePlateNumber}
+                  value={selectedVehicle}
                   onChange={(e) => {
-                    const newValue = e.target.value;
-                    setLicensePlateNumber(newValue);
-                    validateLicensePlateNumber(newValue);
+                    setSelectedVehicle(e.target.value); // Set selected vehicle
                   }}
+                  select // Add select prop to make it a dropdown
                   error={licensePlateError}
                   helperText={licensePlateHelperText}
-                />
+                >
+                  {vehicleOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
               </Box>
               {editAccdient && (
                 <>
@@ -4520,7 +4574,7 @@ const Logs: React.FC<LogsProps> = ({
                         accidentReasonError ||
                         !damageDescription ||
                         damageDescriptionError ||
-                        licensePlateNumber ||
+                        selectedVehicle ||
                         accidentDescriptionError ||
                         licensePlateError ||
                         !accidentImage
@@ -4687,20 +4741,31 @@ const Logs: React.FC<LogsProps> = ({
 
                 <TextField
                   sx={{
-                    width: { xs: "100%", sm: "100%", md: "90%" },
+                    width: { xs: "100%", sm: "100%", md: "90%" }, // Responsive width
                     height: "auto",
                     textAlign: "left",
                   }}
-                  label={<span>Vehicle Number</span>}
-                  value={licensePlateNumber}
+                  label={
+                    <span>
+                      Vehicle Number <span style={{ color: "red" }}>*</span>
+                    </span>
+                  }
+                  value={selectedVehicle} // Bind selected value to the state
                   onChange={(e) => {
-                    const newValue = e.target.value;
-                    setLicensePlateNumber(newValue);
-                    validateLicensePlateNumber(newValue);
+                    setSelectedVehicle(e.target.value); // Set the selected vehicle
+                    validateLicensePlateNumber(e.target.value); // Optional validation function
                   }}
-                  error={licensePlateError}
-                  helperText={licensePlateHelperText}
-                />
+                  error={licensePlateError} // Error handling for invalid input
+                  helperText={licensePlateHelperText} // Display helper text
+                  select // Makes the TextField a dropdown
+                >
+                  {/* Map the vehicle options into dropdown items */}
+                  {vehicleOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
 
                 <TextField
                   label="Description"
