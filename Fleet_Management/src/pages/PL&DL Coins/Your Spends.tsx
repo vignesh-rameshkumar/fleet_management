@@ -89,24 +89,28 @@ const YourSpends: React.FC<YourSpendsProps> = ({
       car: bookedCarCount,
       coins: totalcoinBookedAmount,
       icon: PiCoinsLight,
-      bgColor: "#DAEAEA",
-      topBorder: "5px solid #5A6868",
+      bgColor: "#E5F3E6",
+      color: "#375d33",
+      padd: "0px 0px 5px 5px",
+      leftBorder: "5px solid #5A6868",
     },
     {
       title: "Travel Route",
       car: travelRouteCount,
       coins: totalcointTravelAmount,
       icon: PiCoinsLight,
-      bgColor: "#fdd0f8",
-      topBorder: "5px solid #b599b2",
+      bgColor: "#FDD0F8",
+      color: "#604E5E",
+      leftBorder: "5px solid #b599b2",
     },
     {
       title: "Total Coins Consumed",
       car: 0,
       coins: totalcoinBookedAmount + totalcointTravelAmount,
       icon: PiCoinsLight,
-      bgColor: "#fdbbd4",
-      topBorder: "5px solid #9b7181",
+      bgColor: "#FDD0F8",
+      color: "#523A43",
+      leftBorder: "5px solid #9b7181",
     },
   ];
 
@@ -618,21 +622,40 @@ const YourSpends: React.FC<YourSpendsProps> = ({
               sx={{
                 flex: 1,
                 backgroundColor: card.bgColor,
-                borderTop: card.topBorder,
+                borderLeft: card.leftBorder, // Use borderLeft to apply the left border
+                padding: card.padd,
+                width: { xs: "100px", sm: "150px", md: "200px", lg: "250px" }, // Adjust sizes for different breakpoints
+                height: { xs: "150px", sm: "200px", md: "250px", lg: "80px" }, // Adjust sizes for different breakpoints
               }}
             >
               <CardContent sx={{ textAlign: "center" }}>
-                {card.title}
+                <Typography
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    fontSize: { xs: "12px", md: "14px" }, // Responsive font size
+                    fontWeight: 600,
+                  }}
+                >
+                  {card.title}
+                </Typography>
                 <Box
                   sx={{ display: "flex", alignItems: "center", mt: 1, gap: 2 }}
                 >
                   <IoCarSportOutline size={25} />
                   {card?.car && (
                     <Box sx={{ display: "flex", alignItems: "center", mr: 2 }}>
-                      {card.car}
+                      <Typography variant="body1">{card.car}</Typography>
                     </Box>
                   )}
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 2,
+                    }}
+                  >
                     <PiCoinsLight size={25} />
                     <Typography variant="body1">
                       {card.coins.toLocaleString()}
@@ -643,24 +666,25 @@ const YourSpends: React.FC<YourSpendsProps> = ({
             </Card>
           ))}
         </Box>
+
         {/* Calendar Control Section */}
         {/* <Box sx={{ marginTop: "20px" }}>
            <Grid container spacing={2} alignItems="center"> */}
         <Box
           sx={{
             display: "flex",
-
+            gap: 0.1,
             flexWrap: "wrap",
             alignItems: "flex-start",
+            justifyContent: "space-between",
           }}
         >
           <Box
             sx={{
               display: "flex",
-              justifyContent: "space-between",
-              gap: 5,
-              // minWidth: "250px",
-              padding: "20px",
+              gap: "30px",
+              minWidth: "250px",
+              padding: "27px 0px 10px 10px",
             }}
           >
             <ToggleButtonGroup
@@ -694,7 +718,7 @@ const YourSpends: React.FC<YourSpendsProps> = ({
                   type="date"
                   value={selectedDay}
                   onChange={handleDayChange}
-                  style={{ width: "100%", padding: "4px", fontSize: "14px" }}
+                  style={{ width: "100%", padding: "8px", fontSize: "14px" }}
                 />
               )}
 
@@ -706,7 +730,7 @@ const YourSpends: React.FC<YourSpendsProps> = ({
                     onChange={(e) =>
                       handleWeekChange(e.target.value, selectedWeek.end)
                     }
-                    style={{ flex: 1, padding: "4px", fontSize: "14px" }}
+                    style={{ flex: 1, padding: "8px", fontSize: "14px" }}
                   />
                   <input
                     type="date"
@@ -753,14 +777,16 @@ const YourSpends: React.FC<YourSpendsProps> = ({
                 backgroundColor:
                   activeLog === "bookRide" ? "#E5F3E6" : "#f5f5f5",
                 cursor: "pointer",
-                padding: "8px",
+                padding: "10px",
+                margin: "25px",
                 borderRadius: "4px 4px 0 0",
                 display: "flex",
                 justifyContent: "center",
                 fontSize: { xs: "12px", md: "14px" },
                 fontWeight: 600,
                 color: activeLog === "bookRide" ? "#375d33" : "#A1A1A1",
-                marginTop: "13px",
+                // marginTop: "13px",
+                height: "auto",
                 alignItems: "center",
                 width: "200px",
                 borderBottom:
@@ -780,21 +806,20 @@ const YourSpends: React.FC<YourSpendsProps> = ({
                 backgroundColor:
                   activeLog === "travelRoute" ? "#E5F3E6" : "#f5f5f5",
                 cursor: "pointer",
-                padding: "8px",
+                padding: "10px",
                 borderRadius: "4px 4px 0 0",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 fontSize: { xs: "12px", md: "14px" },
                 fontWeight: 600,
-                marginTop: "13px",
-                marginLeft: "10px",
+                margin: "25px",
                 color: activeLog === "travelRoute" ? "#375d33" : "#A1A1A1",
                 borderBottom:
                   activeLog === "travelRoute"
                     ? "2px solid #487644"
                     : "2px solid transparent",
-                // height: "8vh",
+                height: "auto",
                 width: "200px",
               }}
             >

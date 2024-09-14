@@ -17,7 +17,8 @@ import {
 } from "@mui/material";
 import { MdOutlineVisibility, MdDeleteForever } from "react-icons/md";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
-import { DirectionsCar, Route, CreditCard } from "@mui/icons-material";
+import { PiCoins } from "react-icons/pi";
+import { DirectionsCar } from "@mui/icons-material";
 import dayjs from "dayjs";
 
 import {
@@ -26,6 +27,7 @@ import {
   useFrappeGetCall,
 } from "frappe-react-sdk";
 import { CFormSelect } from "@coreui/react";
+import { color } from "@mui/system";
 
 interface CoinProps {
   darkMode: boolean;
@@ -85,20 +87,24 @@ const Coin: React.FC<CoinProps> = ({
       car: bookedCarCount,
       coins: totalcoinBookedAmount,
       icon: MonetizationOnIcon,
-      bgColor: "#F0F0F0",
+      bgColor: "#E5F3E6",
+      color: "#375d33",
+      padd: "0px 0px 5px 5px",
     },
     {
       title: "Travel Route",
       car: travelRouteCount,
       coins: totalcointTravelAmount,
       icon: MonetizationOnIcon,
-      bgColor: "#FFD6E5",
+      bgColor: "#FDD0F8",
+      color: "#604E5E",
     },
     {
       title: "Total Coins Consumed",
       coins: totalcoinBookedAmount + totalcointTravelAmount,
       icon: MonetizationOnIcon,
-      bgColor: "#FFD6E5",
+      bgColor: "#FDD0F8",
+      color: "#523A43",
     },
   ];
 
@@ -597,50 +603,83 @@ const Coin: React.FC<CoinProps> = ({
           padding: "15px",
         }}
       >
-        <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 2,
+            flexWrap: "wrap",
+          }}
+        >
           {cardData.map((card, index) => (
-            <Card key={index} sx={{ flex: 1, backgroundColor: card.bgColor }}>
+            <Card
+              key={index}
+              sx={{
+                backgroundColor: card.bgColor,
+                color: card.color,
+                padding: card.padd,
+                // Responsive width and height settings
+                width: { xs: "100px", sm: "150px", md: "200px", lg: "250px" }, // Adjust sizes for different breakpoints
+                height: { xs: "150px", sm: "200px", md: "250px", lg: "80px" }, // Adjust sizes for different breakpoints
+              }}
+            >
               <CardContent>
-                <Typography variant="h6" component="div">
+                <Typography
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    fontSize: { xs: "12px", md: "14px" }, // Responsive font size
+                    fontWeight: 600,
+                  }}
+                >
                   {card.title}
                 </Typography>
-                <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
+                <Box sx={{ display: "flex", alignItems: "center", mt: 2,gap:2 }}>
                   {card.car && (
-                    <Box sx={{ display: "flex", alignItems: "center", mr: 2 }}>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
                       <DirectionsCar sx={{ mr: 1 }} />
                       <Typography variant="body1">{card.car}</Typography>
                     </Box>
                   )}
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <card.icon sx={{ mr: 1 }} />
-                    <Typography variant="body1">
-                      {card.coins.toLocaleString()}
-                    </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <PiCoins
+                      size={24}
+                      style={{ marginRight: "20px", marginLeft: "20px" }}
+                    />
+                    <Typography>{card.coins.toLocaleString()}</Typography>
                   </Box>
                 </Box>
               </CardContent>
             </Card>
           ))}
         </Box>
+
         {/* Calendar Control Section */}
         {/* <Box sx={{ marginTop: "20px" }}>
           <Grid container spacing={2} alignItems="center"> */}
         <Box
           sx={{
             display: "flex",
-            gap: 2,
-            p: 2,
+            gap: 0.1,
+            // p: 2,
             flexWrap: "wrap",
             alignItems: "flex-start",
+            justifyContent: "space-between",
           }}
         >
           <Box
             sx={{
               display: "flex",
               // flexDirection: "column",
-              gap: 5,
+              gap: "30px",
               minWidth: "250px",
-              padding: "23px",
+              padding: "23px 0px 10px 10px",
             }}
           >
             <ToggleButtonGroup
@@ -669,7 +708,9 @@ const Coin: React.FC<CoinProps> = ({
               <ToggleButton value="year">Year</ToggleButton>
             </ToggleButtonGroup>
 
-            <Box sx={{ width: "100%" }}>
+            <Box
+              sx={{ width: "100%", display: "flex", justifyContent: "center" }}
+            >
               {calendarView === "day" && (
                 <input
                   type="date"
@@ -734,14 +775,16 @@ const Coin: React.FC<CoinProps> = ({
                 backgroundColor:
                   activeLog === "bookRide" ? "#E5F3E6" : "#f5f5f5",
                 cursor: "pointer",
-                padding: "8px",
+                padding: "10px",
+                margin: "15px",
                 borderRadius: "4px 4px 0 0",
                 display: "flex",
                 justifyContent: "center",
                 fontSize: { xs: "12px", md: "14px" },
                 fontWeight: 600,
                 color: activeLog === "bookRide" ? "#375d33" : "#A1A1A1",
-                height: "8vh",
+                height: "auto",
+                width: "200px",
                 borderBottom:
                   activeLog === "bookRide"
                     ? "2px solid #487644"
@@ -759,7 +802,7 @@ const Coin: React.FC<CoinProps> = ({
                 backgroundColor:
                   activeLog === "travelRoute" ? "#E5F3E6" : "#f5f5f5",
                 cursor: "pointer",
-                padding: "8px",
+                padding: "10px",
                 borderRadius: "4px 4px 0 0",
                 display: "flex",
                 justifyContent: "center",
@@ -770,7 +813,10 @@ const Coin: React.FC<CoinProps> = ({
                   activeLog === "travelRoute"
                     ? "2px solid #487644"
                     : "2px solid transparent",
-                height: "8vh",
+                // height: "8vh",
+                width: "180px",
+                height: "auto",
+                margin: "15px",
               }}
             >
               Travel Route
