@@ -49,6 +49,7 @@ import {
   useFrappeGetDocList,
   useFrappeUpdateDoc,
   useFrappeGetDoc,
+  useFrappeGetCall,
 } from "frappe-react-sdk";
 import Autocomplete from "@mui/material/Autocomplete";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -385,6 +386,22 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
     });
   };
 
+  const [reportsTo, setReportsTo] = useState("");
+
+  const { data: reports_to } = useFrappeGetCall(
+    "fleet_management.custom_function.get_lead_or_employee_email",
+    {
+      project_name: selectedProject,
+      documentname: employeeID,
+    }
+  );
+
+  useEffect(() => {
+    if (reports_to) {
+      setReportsTo(reports_to.message);
+    }
+  }, [reports_to]);
+
   const handleSaveClickGroupRide = async (index) => {
     const updatedPassengerDetails = groupRideData.passenger_details.map(
       (passenger, i) =>
@@ -644,6 +661,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
     const currentValues = {
       type: rideType,
       project_name: selectedProject,
+      reports_to: reportsTo,
       from_location: fromLocation,
       to_location: toLocation,
       terms: terms,
@@ -902,6 +920,7 @@ const TrackRequest: React.FC<TrackRequestProps> = ({
       borderColor: "#4D8C52", // Line color
     },
   };
+
   return (
     <>
       <Box

@@ -399,7 +399,7 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
       fields: ["*"],
       filters: [
         ["owner", "!=", userEmailId],
-        ["status", "not in", ["Delete", "Project Lead Rejected"]],
+        ["status", "not in", ["Cancelled", "Project Lead Rejected"]],
       ],
       orderBy: {
         field: "modified",

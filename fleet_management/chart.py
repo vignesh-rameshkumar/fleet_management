@@ -163,13 +163,3 @@ def get_month_view(vehicle_no, from_date, to_date):
 @frappe.whitelist()
 def get_year_view(vehicle_no, from_date, to_date):
     return get_fuel_log_data("year", vehicle_no, from_date, to_date)
-
-@frappe.whitelist(allow_guest=True)  # Adjust as needed for authentication
-def get_online_vehicle_names():
-    # Query for documents where status = 'Online' and return document names
-    online_vehicles = frappe.get_all(
-        'FM_Vehicle_Details',
-        filters={'status': 'Online'},
-        fields=['name']  # Adjust the fields you want to return
-    )
-    return online_vehicles

@@ -493,11 +493,11 @@ const SideBar: React.FC<SideBarProps> = ({
         },
       ],
     },
-    {
-      path: "/Fleet_Management/bills",
-      name: "Bills",
-      icon: <GoNote />,
-    },
+    // {
+    //   path: "/Fleet_Management/bills",
+    //   name: "Bills",
+    //   icon: <GoNote />,
+    // },
     {
       path: "/Fleet_Management/calendar",
       name: "Calender",

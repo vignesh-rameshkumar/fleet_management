@@ -75,8 +75,7 @@
    "fieldname": "bill_details",
    "fieldtype": "Table",
    "label": "Bill Details",
-   "options": "FM_Bill_Parameters",
-   "reqd": 1
+   "options": "FM_Bill_Parameters"
   },
   {
    "fieldname": "doctype_name",
@@ -121,7 +120,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-05 12:45:54.759023",
+ "modified": "2024-09-12 14:22:50.223946",
  "modified_by": "Administrator",
  "module": "Fleet Management",
  "name": "FM_Bills",

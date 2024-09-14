@@ -221,17 +221,20 @@ def update_attendance(document_name=None, employee_email=None):
         if child_doc.attendance == "Present":
             return {"success": True, "message": "Already scanned", "child_doc_name": child_doc.name}
 
+        # Update attendance and check-in time
         child_doc.attendance = "Present"
+        child_doc.checkin_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Update with current time
         parent_doc.save()
         frappe.db.commit()
         
         parent_doc.reload()
         updated_member = next((member for member in parent_doc.get("onboarded_employees") if member.employee_email == employee_email), None)
         updated_attendance = updated_member.attendance if updated_member else "Not Found"
+        updated_checkin_time = updated_member.checkin_time if updated_member else "Not Found"
         
-        frappe.logger().info(f"Updated attendance for {employee_email}: {updated_attendance}")
+        frappe.logger().info(f"Updated attendance for {employee_email}: {updated_attendance}, Check-in Time: {updated_checkin_time}")
 
-        return {"success": True, "message": "Attendance updated to Present", "child_doc_name": child_doc.name}
+        return {"success": True, "message": "Attendance updated to Present", "child_doc_name": child_doc.name, "checkin_time": updated_checkin_time}
 
     except Exception as e:
         frappe.log_error(message=str(e), title="Error in update_attendance")
@@ -291,3 +294,28 @@ def get_daily_counts(doctype, start_date, end_date):
                 date_counts[creation_date]["Rejected"] += 1
 
     return date_counts
+
+@frappe.whitelist()
+def get_lead_or_employee_email(project_name, documentname=None):
+    if project_name == "General":
+        if not documentname:
+            raise frappe.ValidationError("Document name is required for General project_name")
+
+        # Fetch the department from the Employee doctype using the documentname
+        employee_doc = frappe.get_doc("Employee", documentname)
+        user_department = employee_doc.department
+
+        # Fetch the email for the department
+        department_doc = frappe.get_all("RM_Department", filters={'department_name': user_department}, fields=['employee_email'])
+        if department_doc:
+            return department_doc[0].get('employee_email')
+        else:
+            return None
+
+    else:
+        # Fetch the project lead email for the given project_name
+        project_lead_doc = frappe.get_all("RM_Project_Lead", filters={'project_name': project_name}, fields=['project_lead_email'])
+        if project_lead_doc:
+            return project_lead_doc[0].get('project_lead_email')
+        else:
+            return None

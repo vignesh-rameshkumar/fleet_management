@@ -101,6 +101,7 @@ const Driver: React.FC<DriverProps> = ({
   const [licensePlateNumber, setLicensePlateNumber] = useState("");
   const [licensePlateError, setLicensePlateError] = useState(false);
   const [licensePlateHelperText, setLicensePlateHelperText] = useState("");
+
   const [licenseExpiredDate, setLicenseExpiredDate] = useState(null);
   const [dateOfBirth, setDateOfBirth] = useState(null);
   const [typeofLicense, setTypeofLicense] = useState("");
@@ -246,10 +247,11 @@ const Driver: React.FC<DriverProps> = ({
   }, [FM_Driver_Details]);
   const { data: Employee, isLoading: employeeDetailsLoading } =
     useFrappeGetDocList("Employee", {
-      fields: ["*"],
+      fields: ["name", "employee_name"],
       filters: [
-        ["department", "=", "Transportation - ACPL"],
         ["designation", "=", "Driver"],
+        ["status", "=", "Active"],
+        ["department", "like", "%Transportation%"],
       ],
 
       orderBy: {
@@ -266,6 +268,7 @@ const Driver: React.FC<DriverProps> = ({
       setEmployeeDetails(Employee);
     }
   }, [Employee]);
+  console.log("Employee", Employee);
   const handleEmployeeChange = (event, newValue) => {
     if (newValue) {
       setSelectedEmployee(newValue.name); // Set employee ID
@@ -380,7 +383,7 @@ const Driver: React.FC<DriverProps> = ({
   const handleDownload = () => {
     const doc = new jsPDF();
     const img = new Image();
-    img.src = drawerDetails.driver_photo.replace("/private", "");
+    img.src = drawerDetails.driver_photo?.replace("/private", "");
     img.onload = () => {
       doc.addImage(img, "JPEG", 10, 10, 190, 0);
       doc.save("Driver_image.pdf");
@@ -400,7 +403,7 @@ const Driver: React.FC<DriverProps> = ({
     return fileUrl?.toLowerCase().endsWith(".pdf");
   };
   const handleDownloadMedical = () => {
-    const fileUrl = drawerDetails.medical_fitness_certificate.replace(
+    const fileUrl = drawerDetails.medical_fitness_certificate?.replace(
       "/private",
       ""
     );
@@ -436,7 +439,7 @@ const Driver: React.FC<DriverProps> = ({
   const handleDownloadPolice = () => {
     const doc = new jsPDF();
     const img = new Image();
-    img.src = drawerDetails.police_verification_certificate.replace(
+    img.src = drawerDetails.police_verification_certificate?.replace(
       "/private",
       ""
     );
@@ -450,7 +453,7 @@ const Driver: React.FC<DriverProps> = ({
     if (drawerDetails.license_copy) {
       const doc = new jsPDF();
       const img = new Image();
-      img.src = drawerDetails.license_copy.replace("/private", "");
+      img.src = drawerDetails.license_copy?.replace("/private", "");
       img.onload = () => {
         doc.addImage(img, "JPEG", 10, 10, 190, 0); // Adjust the size and position as needed
         doc.save("License_Copy.pdf");
@@ -471,7 +474,7 @@ const Driver: React.FC<DriverProps> = ({
   const handleDownloadAadhar = () => {
     const doc = new jsPDF();
     const img = new Image();
-    img.src = drawerDetails.aadhar_copy.replace("/private", "");
+    img.src = drawerDetails.aadhar_copy?.replace("/private", "");
     img.onload = () => {
       doc.addImage(img, "JPEG", 10, 10, 190, 0);
       doc.save("Aadhar_Copy.pdf"); // Save as Aadhar_Copy.pdf
@@ -684,25 +687,24 @@ const Driver: React.FC<DriverProps> = ({
     // Remove spaces from the input value
     const trimmedValue = value.replace(/\s+/g, "");
 
-    // Regular expression for Indian license plate numbers without spaces
-    const validPattern = /^[A-Z]{2}\d{2}[A-Z]{1,2}\d{4}$/i;
+    // Corrected regular expression for Indian driver’s license numbers
+    const validPattern = /^[A-Z]{2}\d{2}\s\d{4}\d{7}$/i;
 
     if (trimmedValue === "") {
-      // If the field is empty, do not show an error message
       setLicensePlateError(false);
       setLicensePlateHelperText("");
-    } else if (!validPattern.test(trimmedValue)) {
-      // If the field is not empty but does not match the pattern
+    } else if (!validPattern.test(value)) {
       setLicensePlateError(true);
       setLicensePlateHelperText(
-        "Invalid license plate number. Format should be XXYYZZZZ (e.g., MH12AB1234)."
+        "Invalid license number. Format should be XXYY 2021XXXXXXX (e.g., MH24 202100012345)."
       );
     } else {
-      // If the field is valid
+      // If the license number is valid
       setLicensePlateError(false);
       setLicensePlateHelperText("");
     }
   };
+
   const validateContactNumber = (number: string) => {
     // Regex pattern to allow only digits and exactly 10 digits in length
     const phoneNumberPattern = /^[0-9]{10}$/;
@@ -1506,8 +1508,7 @@ const Driver: React.FC<DriverProps> = ({
                   }}
                   label={
                     <span>
-                      License Plate Number{" "}
-                      <span style={{ color: "red" }}>*</span>
+                      License Number <span style={{ color: "red" }}>*</span>
                     </span>
                   }
                   value={licensePlateNumber}
@@ -2385,7 +2386,7 @@ const Driver: React.FC<DriverProps> = ({
                 >
                   <Box
                     component="img"
-                    src={drawerDetails.driver_photo.replace("/private", "")}
+                    src={drawerDetails.driver_photo?.replace("/private", "")}
                     alt="Vehicle Image"
                     sx={{
                       maxWidth: "30%",
@@ -2436,7 +2437,7 @@ const Driver: React.FC<DriverProps> = ({
                     </IconButton>
                     <Box
                       component="img"
-                      src={drawerDetails.driver_photo.replace("/private", "")}
+                      src={drawerDetails.driver_photo?.replace("/private", "")}
                       alt="Vehicle Image"
                       sx={{
                         maxWidth: "100%",
@@ -2661,7 +2662,7 @@ const Driver: React.FC<DriverProps> = ({
                         {drawerDetails.license_copy ? (
                           <Box
                             component="img"
-                            src={drawerDetails.license_copy.replace(
+                            src={drawerDetails.license_copy?.replace(
                               "/private",
                               ""
                             )}
@@ -2801,7 +2802,7 @@ const Driver: React.FC<DriverProps> = ({
                         </IconButton>
                         <Box
                           component="img"
-                          src={drawerDetails.aadhar_copy.replace(
+                          src={drawerDetails.aadhar_copy?.replace(
                             "/private",
                             ""
                           )}
@@ -2900,7 +2901,7 @@ const Driver: React.FC<DriverProps> = ({
                         </IconButton>
                         <Box
                           component="img"
-                          src={drawerDetails.police_verification_certificate.replace(
+                          src={drawerDetails.police_verification_certificate?.replace(
                             "/private",
                             ""
                           )}
@@ -2998,7 +2999,7 @@ const Driver: React.FC<DriverProps> = ({
                         </IconButton>
                         {isPdf(drawerDetails.medical_fitness_certificate) ? (
                           <iframe
-                            src={drawerDetails.medical_fitness_certificate.replace(
+                            src={drawerDetails.medical_fitness_certificate?.replace(
                               "/private",
                               ""
                             )}
@@ -3009,7 +3010,7 @@ const Driver: React.FC<DriverProps> = ({
                         ) : (
                           <Box
                             component="img"
-                            src={drawerDetails.medical_fitness_certificate.replace(
+                            src={drawerDetails.medical_fitness_certificate?.replace(
                               "/private",
                               ""
                             )}
