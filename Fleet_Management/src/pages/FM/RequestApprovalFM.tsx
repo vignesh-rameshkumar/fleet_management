@@ -766,6 +766,8 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
         {view && (
           <>
             <Box sx={{ padding: "20px" }}>
+              {/* {/* {JSON.stringify(Approvel_date_time)} <hr />{" "} */}
+              {/* {JSON.stringify(drawerData)} */}
               <Box>
                 <div className="m-4">
                   <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -958,6 +960,64 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
                         {drawerData[0]?.purpose}
                       </Typography>
                     </Grid>
+
+                    {drawerData[0]?.vehicle_no && (
+                      <>
+                        <Grid item xs={6}>
+                          <Typography variant="body1">
+                            Assigned Vehicle
+                          </Typography>
+                          <Typography
+                            variant="body1"
+                            sx={{
+                              fontWeight: 600,
+                            }}
+                          >
+                            {drawerData[0]?.vehicle_no}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="body1">
+                            Assigned Driver Name
+                          </Typography>
+                          <Typography
+                            variant="body1"
+                            sx={{
+                              fontWeight: 600,
+                            }}
+                          >
+                            {drawerData[0]?.driver_name_no}
+                          </Typography>
+                        </Grid>{" "}
+                      </>
+                    )}
+                    {drawerData[0]?.approved_date_time !==
+                      drawerData[0]?.request_date_time &&
+                      drawerData[0]?.approved_date_time !== null &&
+                      drawerData[0]?.approved_date_time !== "" && (
+                        <Grid
+                          sx={{
+                            backgroundColor: "#a5d0a9",
+                            padding: "10px",
+                            margin: "10px 0px 0px 10px",
+                            width: "fit-content",
+                            borderRadius: "10px",
+                          }}
+                        >
+                          <Typography variant="body1">
+                            Change Date & Time
+                          </Typography>
+                          <Typography
+                            variant="body1"
+                            sx={{
+                              fontWeight: 600,
+                            }}
+                          >
+                            {drawerData[0]?.approved_date_time}
+                          </Typography>
+                        </Grid>
+                      )}
+
                     {doctypeName === "FM_Goods_Vehicle_Request" && (
                       <>
                         <Grid item xs={12}>
@@ -1111,7 +1171,7 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
                   <br />
                   {/* Option  */}
 
-                  {drawerDetails?.status === "Project Lead Approved" && (
+                  {drawerDetails?.status !== "Pending" && (
                     <>
                       <Box>
                         <ThemeProvider theme={ThemeColor}>
@@ -1603,7 +1663,7 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
 
         {btnshow && (
           <>
-            {drawerDetails?.status === "Project Lead Approved" && (
+            {drawerDetails?.status !== "Pending" && (
               <Box display="flex" flexDirection="column" alignItems="center">
                 <Box sx={{ display: "flex" }}>
                   <Button
