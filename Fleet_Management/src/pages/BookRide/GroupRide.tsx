@@ -858,7 +858,11 @@ const GroupRide: React.FC<GroupRideProps> = ({
                                 }}
                               >
                                 <Typography>
-                                  Number of Passengers {""}
+                                  Passengers :{" "}
+                                  <b style={{ color: "#000" }}>
+                                    {JSON.stringify(passengerCount)}{" "}
+                                  </b>
+                                  {""}
                                 </Typography>
                                 <IconButton
                                   onClick={handleDecrement}
