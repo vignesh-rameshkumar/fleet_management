@@ -26,14 +26,14 @@ export const Auth = () => {
           // login({ username: "tn18av7889@agnikul.in", password: "Agnikul_1" })
           // () =>
           // login({ username: "tn18av7099@agnikul.in", password: "Agnikul_1" })
-          // () => login({ username: "testfm@agnikul.in", password: "Agnikul_1" })
+          () => login({ username: "testfm@agnikul.in", password: "Agnikul_1" })
           // () => login({ username: "testdl@agnikul.in", password: "Agnikul_1" })
           // () => login({ username: "testpl@agnikul.in", password: "Agnikul_1" })
           // () => login({ username: "testpl2@agnikul.in", password: "Agnikul_1" })
           // () =>
           // login({ username: "testemp3@agnikul.in", password: "Agnikul_1" })
-          () =>
-            login({ username: "testemp2@agnikul.in", password: "Agnikul_1" })
+          // () =>
+          //   login({ username: "testemp2@agnikul.in", password: "Agnikul_1" })
           // () => login({ username: "testemp@agnikul.in", password: "Agnikul_1" })
           // () => login({ username: "user2@erp.in", password: "Agnikul_1" })
           // () => login({ username: "testpl@erp.in", password: "Agnikul_1" })
