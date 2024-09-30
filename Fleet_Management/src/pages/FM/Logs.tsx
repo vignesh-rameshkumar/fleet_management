@@ -3414,7 +3414,11 @@ const Logs: React.FC<LogsProps> = ({
                     textAlign: "left",
                     marginBottom: 2,
                   }}
-                  label="Fine Amount"
+                  label={
+                    <span>
+                      Fine Amount<span style={{ color: "red" }}>*</span>
+                    </span>
+                  }
                   value={fineAmount}
                   onChange={handleFineAmountChange}
                   error={!!fineAmountError}
@@ -3429,7 +3433,12 @@ const Logs: React.FC<LogsProps> = ({
                     textAlign: "left",
                     marginBottom: 2,
                   }}
-                  label="Reason"
+                  label={
+                    <span>
+                      {" "}
+                      Reason <span style={{ color: "red" }}>*</span>
+                    </span>
+                  }
                   value={reason}
                   onChange={handleReasonChange}
                   error={!!reasonError}
@@ -3497,7 +3506,11 @@ const Logs: React.FC<LogsProps> = ({
                 >
                   <TextField
                     sx={{ margin: "0 auto" }}
-                    label="Fine Bill Copy"
+                    label={
+                      <span>
+                        Fine Bill Copy <span style={{ color: "red" }}>*</span>
+                      </span>
+                    }
                     value={fineBillFile ? fineBillFile.name : ""}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -3592,7 +3605,11 @@ const Logs: React.FC<LogsProps> = ({
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="Driver ID"
+                      label={
+                        <span>
+                          Driver ID<span style={{ color: "red" }}>*</span>
+                        </span>
+                      }
                       variant="outlined"
                     />
                   )}
@@ -3683,13 +3700,17 @@ const Logs: React.FC<LogsProps> = ({
                     <Button
                       className="saveBtn"
                       disabled={
-                        !location ||
+                        incidentDateError ||
                         !incidentDate ||
-                        //   !incidentDateError
-                        //    ||
+                        !location ||
                         locationError ||
+                        !fineAmount ||
                         fineAmountError ||
-                        reasonError
+                        !reason ||
+                        reasonError ||
+                        !fineBillFile ||
+                        employeeDetails.length === 0 ||
+                        !selectedVehicle
                       }
                       onClick={CreateFineLogDetails}
                     >
@@ -3769,7 +3790,12 @@ const Logs: React.FC<LogsProps> = ({
                   >
                     <ArrowBackIcon />
                   </IconButton>
-                  Add Fuel Details:
+                  Add Fuel Details:{" "}
+                  <span
+                    style={{ color: "rgb(117, 117, 117)", fontSize: "14px" }}
+                  >
+                    All fields are mandatory.
+                  </span>
                 </Typography>
               </Box>
               <Box
@@ -3786,7 +3812,7 @@ const Logs: React.FC<LogsProps> = ({
               >
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
-                    label={<span>Fuel Date</span>}
+                    label={<span>Fuel Date </span>}
                     value={fuelDate}
                     onChange={handleFuelDateChange}
                     sx={{
@@ -3847,7 +3873,6 @@ const Logs: React.FC<LogsProps> = ({
                     </MenuItem>
                   ))}
                 </TextField>
-
                 <TextField
                   sx={{
                     width: { xs: "100%", sm: "100%", md: "90%" },
@@ -4046,9 +4071,15 @@ const Logs: React.FC<LogsProps> = ({
                         fuelAmountError ||
                         currentOdometerError ||
                         fuelLitersError ||
-                        supplierNameError ||
                         pricePerLiterError ||
-                        licensePlateError
+                        licensePlateError ||
+                        !fuelDate ||
+                        !selectedVehicle ||
+                        !fuelAmount ||
+                        !currentOdometer ||
+                        !pricePerLiter ||
+                        !fuelBillFile ||
+                        !fuelLiters
                       }
                       onClick={CreateFuelLogDetails}
                     >
@@ -5041,7 +5072,12 @@ const Logs: React.FC<LogsProps> = ({
                 >
                   <TextField
                     sx={{ margin: "0 auto", width: "100%" }}
-                    label="Maintenance Bill Copy"
+                    label={
+                      <span>
+                        Maintenance Bill Copy{" "}
+                        <span style={{ color: "red" }}>*</span>
+                      </span>
+                    }
                     value={maintenanceBillCopy ? maintenanceBillCopy.name : ""}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -5103,7 +5139,16 @@ const Logs: React.FC<LogsProps> = ({
                   >
                     <Button
                       className="saveBtn"
-                      disabled={!serviceDate || !totalCost || !serviceType}
+                      disabled={
+                        !serviceDate ||
+                        !totalCost ||
+                        !serviceType ||
+                        !selectedVehicle ||
+                        !description ||
+                        !partsReplaced ||
+                        !totalCost ||
+                        !maintenanceBillCopy
+                      }
                       onClick={CreateMaintenanceLogDetails}
                     >
                       {fineLoading ? "Submitting..." : "Submit"}

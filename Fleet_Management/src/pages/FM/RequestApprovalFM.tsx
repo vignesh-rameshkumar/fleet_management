@@ -843,16 +843,9 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
                           fontWeight: 600,
                         }}
                       >
-                        {`${new Date(drawerDetails.creation)
-                          .getDate()
-                          .toString()
-                          .padStart(2, "0")}-${(
-                          new Date(drawerDetails.creation).getMonth() + 1
-                        )
-                          .toString()
-                          .padStart(2, "0")}-${new Date(
-                          drawerDetails.creation
-                        ).getFullYear()}`}
+                        {drawerData[0]?.request_date_time
+                          ? drawerData[0]?.request_date_time.split(" ")[0] // Extracts the date part
+                          : " - "}{" "}
                       </Typography>
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -863,7 +856,9 @@ const RequestApprovalFM: React.FC<RequestApprovalFMProps> = ({
                           fontWeight: 600,
                         }}
                       >
-                        {new Date(drawerDetails.creation).toLocaleTimeString()}
+                        {drawerData[0]?.request_date_time
+                          ? drawerData[0]?.request_date_time.split(" ")[1] // Extracts the time part
+                          : "N/A"}{" "}
                       </Typography>
                     </Grid>
                     <Grid item xs={6}>
