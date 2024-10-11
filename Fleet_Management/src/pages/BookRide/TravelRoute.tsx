@@ -48,6 +48,11 @@ import {
 import { ThemeProvider } from "@mui/material";
 
 import dayjs from "dayjs";
+//creation
+import duration from "dayjs/plugin/duration";
+dayjs.extend(duration);
+
+//creation
 interface TravelRouteProps {
   darkMode: boolean;
   onCloseDrawer: () => void;
@@ -354,7 +359,7 @@ const TravelRoute: React.FC<TravelRouteProps> = ({
 
     generateQR();
   }, [travelData, userEmailId]);
-
+console.log("travelData",travelData)
   const [open, setOpen] = React.useState(false);
   const handleCloseDelete = () => {
     setOpen(false);
@@ -380,6 +385,54 @@ const TravelRoute: React.FC<TravelRouteProps> = ({
   const handleCome = () => {
     toast.warning("Coming Soon...");
   };
+//creation
+const [timeLeft, setTimeLeft] = useState(null);
+const [qrCodeTime, setQrCodeTime] = useState(null);
+const [countdownFinished, setCountdownFinished] = useState(false);
+
+useEffect(() => {
+  // Use optional chaining to safely access travelData.creation
+  const creationTime = dayjs(travelData?.[0]?.creation); // Accessing the first element in the array
+
+  // Ensure creationTime is valid before proceeding
+  if (!creationTime.isValid()) {
+    console.error("Invalid creation time.");
+    return;
+  }
+
+  // Check if creationTime is before 8:30 PM
+  const eightThirtyPM = creationTime.set("hour", 20).set("minute", 30).set("second", 0);
+
+  // If creation time is before 8:30 PM, render immediately
+  if (creationTime.isBefore(eightThirtyPM)) {
+    setQrCodeTime(creationTime.format("YYYY-MM-DD HH:mm:ss")); // Render immediately
+    setCountdownFinished(true); // Set countdown finished
+  } else {
+    // Define QR generation time as 24 hours after creation
+    const qrGenerationTime = creationTime.add(24, "hours");
+    setQrCodeTime(qrGenerationTime.format("YYYY-MM-DD HH:mm:ss"));
+
+    // Start countdown timer
+    const timer = setInterval(() => {
+      const now = dayjs();
+      const timeRemaining = dayjs.duration(qrGenerationTime.diff(now));
+
+      if (timeRemaining.asSeconds() <= 0) {
+        setCountdownFinished(true);
+        clearInterval(timer);
+      } else {
+        setTimeLeft({
+          hours: timeRemaining.hours(),
+          minutes: timeRemaining.minutes(),
+          seconds: timeRemaining.seconds(),
+        });
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }
+}, [travelData]);
+//creation
 
   return (
     <>
@@ -408,93 +461,125 @@ const TravelRoute: React.FC<TravelRouteProps> = ({
             {/* {qrCodeDataUrl !== null ? ( */}
             {qrCodeDataUrl !== null && !updateView ? (
               <>
-                <Box>
-                  {qrCodeDataUrl && (
-                    <Box
-                      display="flex"
-                      flexDirection="column"
-                      alignItems="center"
-                    >
-                      <Box
-                        sx={{
-                          display: "flex",
-                          gap: "150px",
-                        }}
-                      >
-                        {" "}
-                        <p>
-                          Pick up : {""}
-                          {Pickup}
-                        </p>
-                        <p>
-                          Drop :{""} {Drop}
-                        </p>
-                      </Box>
-                      <img src={qrCodeDataUrl} alt="QR Code" width={280} />
-                      <br />
-
-                      <Box
-                        display="flex"
-                        flexDirection="column"
-                        alignItems="center"
-                      >
-                        <Box sx={{ display: "flex" }}>
-                          <Button
-                            className="saveBtn"
-                            component="a"
-                            href={qrCodeDataUrl}
-                            download="qrcode.png"
-                          >
-                            Download {""}
-                            <HiOutlineCloudDownload
-                              size={25}
-                              style={{ marginLeft: "10px" }}
-                            />
-                          </Button>
-                          <Button
-                            className="deleteBtn"
-                            onClick={() => {
-                              setOpen(true);
-                            }}
-                          >
-                            Delete {""}
-                            <MdDeleteOutline
-                              size={25}
-                              style={{ marginLeft: "10px" }}
-                            />
-                          </Button>
-                        </Box>
-                      </Box>
-                      <Box
-                        display="flex"
-                        flexDirection="column"
-                        alignItems="center"
-                      >
-                        {/* <Box sx={{ display: "flex" }}>
-                          <Button
-                            className="saveBtn"
-                            onClick={() => {
-                              handleCome();
-                            }}
-                          >
-                            Update
-                            <LiaExchangeAltSolid
-                              size={25}
-                              style={{ marginLeft: "10px" }}
-                            />
-                          </Button>
-                          <Button className="saveBtn" onClick={handleCome}>
-                            View Map {""}
-                            <FiMapPin
-                              size={25}
-                              style={{ marginLeft: "10px" }}
-                            />
-                          </Button>
-                        </Box> */}
-                      </Box>
-                    </Box>
-                  )}
+     <div className="box">
+      {!countdownFinished ? (
+        <>
+          <Box 
+            display="flex" 
+            flexDirection="column" 
+            alignItems="center" 
+            sx={{ 
+              marginBottom: '20px',
+              textAlign: 'center',
+              fontWeight: '900',  // Slightly bold
+              letterSpacing: '0.5px', // Letter spacing
+              fontSize:"18px"
+            }}
+          >
+            <p>Your QR code will be generated at  {qrCodeTime}.</p>
+            {timeLeft && (
+              <Box display="flex" gap="10px" alignItems="center">
+                <Box
+                  sx={{
+                    border: '2px solid #ccc',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+                    padding: '10px',
+                    transition: 'background-color 0.3s',
+                    '&:hover': {
+                      backgroundColor: '#f0f0f0',
+                    },
+                  }}
+                >
+                  <p style={{ margin: 0 }}>{timeLeft?.hours ?? 0}h</p>
                 </Box>
+                <Box
+                  sx={{
+                    border: '2px solid #ccc',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+                    padding: '10px',
+                    transition: 'background-color 0.3s',
+                    '&:hover': {
+                      backgroundColor: '#f0f0f0',
+                    },
+                  }}
+                >
+                  <p style={{ margin: 0 }}>{timeLeft?.minutes ?? 0}m</p>
+                </Box>
+                <Box
+                  sx={{
+                    border: '2px solid #ccc',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+                    padding: '10px',
+                    transition: 'background-color 0.3s, transform 0.5s',
+                    '&:hover': {
+                      backgroundColor: '#f0f0f0',
+                    },
+                    // Slow-motion transition effect for seconds
+                    '&:nth-child(3)': {
+                      transition: 'transform 0.5s', // Longer transition for seconds
+                      '&:hover': {
+                        transform: 'scale(1.1)', // Slightly enlarge on hover
+                      },
+                    },
+                  }}
+                >
+                  <p style={{ margin: 0 }}>{timeLeft?.seconds ?? 0}s</p>
+                </Box>
+              </Box>
+            )}
+          </Box>
+        </>
+      ) : (
+        <Box>
+          {qrCodeDataUrl && (
+            <Box display="flex" flexDirection="column" alignItems="center">
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: "150px",
+                }}
+              >
+                <p>Pick up: {Pickup ?? "N/A"}</p>
+                <p>Drop: {Drop ?? "N/A"}</p>
+              </Box>
+              <img src={qrCodeDataUrl} alt="QR Code" width={280} />
+              <br />
+              <Box display="flex" flexDirection="column" alignItems="center">
+                <Box sx={{ display: "flex" }}>
+                  <Button
+                    className="saveBtn"
+                    component="a"
+                    href={qrCodeDataUrl}
+                    download="qrcode.png"
+                  >
+                    Download{" "}
+                    <HiOutlineCloudDownload
+                      size={25}
+                      style={{ marginLeft: "10px" }}
+                    />
+                  </Button>
+                  <Button
+                    className="deleteBtn"
+                    onClick={() => {
+                      setOpen(true);
+                    }}
+                  >
+                    Delete{" "}
+                    <MdDeleteOutline
+                      size={25}
+                      style={{ marginLeft: "10px" }}
+                    />
+                  </Button>
+                </Box>
+              </Box>
+            </Box>
+          )}
+        </Box>
+      )}
+    </div>
               </>
             ) : (
               <>

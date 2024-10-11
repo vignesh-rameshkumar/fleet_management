@@ -164,7 +164,7 @@ const Equipment: React.FC<EquipmentProps> = ({
     if (dayjs(date).isValid()) {
       const formattedDate = dayjs(date).format("DD-MM-YYYY");
       setRideDate(formattedDate);
-    } else {
+    } else if (date && date.length === 10){
       toast.error("Invalid date selected");
       setRideDate(null);
     }
@@ -193,7 +193,7 @@ const Equipment: React.FC<EquipmentProps> = ({
         toast.error("To Time must be greater than From Time");
         setToTime(null);
       }
-    } else {
+    } else if (time && time.length === 5) {
       toast.error("Invalid time selected");
       setToTime(null);
     }

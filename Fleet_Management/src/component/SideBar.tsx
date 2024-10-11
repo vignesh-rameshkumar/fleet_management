@@ -394,44 +394,44 @@ const SideBar: React.FC<SideBarProps> = ({
       icon: <MdOutlineDashboard />,
     },
 
-    // {
-    //   name: "Book Ride",
-    //   icon: <IoCarSportOutline />,
-    //   path: "/Fleet_Management/quickaccess",
-    //   submenu: [
-    //     {
-    //       path: "/Fleet_Management",
-    //       name: "Passenger",
-    //       onClick: () => toggleDrawer(true, "Passenger"),
-    //     },
-    //     {
-    //       path: "/Fleet_Management",
-    //       name: "Goods",
-    //       onClick: () => toggleDrawer(true, "Goods"),
-    //     },
-    //     {
-    //       path: "/Fleet_Management",
-    //       name: "Equipment",
-    //       onClick: () => toggleDrawer(true, "Equipment"),
-    //     },
-    //     {
-    //       path: "/Fleet_Management",
-    //       name: "Group Ride",
-    //       onClick: () => toggleDrawer(true, "GroupRide"),
-    //     },
-    //   ],
-    // },
-    // {
-    //   path: "/Fleet_Management/quickaccess",
-    //   name: "Travel Route",
-    //   icon: <MdOutlineRoute />,
-    //   onClick: () => toggleDrawer(true, "TravelRoute"),
-    // },
-    // {
-    //   path: "/Fleet_Management/trackrequest",
-    //   name: "Track Request",
-    //   icon: <RiFocus3Line />,
-    // },
+    {
+      name: "Book Ride",
+      icon: <IoCarSportOutline />,
+      path: "/Fleet_Management/quickaccess",
+      submenu: [
+        {
+          path: "/Fleet_Management",
+          name: "Passenger",
+          onClick: () => toggleDrawer(true, "Passenger"),
+        },
+        {
+          path: "/Fleet_Management",
+          name: "Goods",
+          onClick: () => toggleDrawer(true, "Goods"),
+        },
+        {
+          path: "/Fleet_Management",
+          name: "Equipment",
+          onClick: () => toggleDrawer(true, "Equipment"),
+        },
+        {
+          path: "/Fleet_Management",
+          name: "Group Ride",
+          onClick: () => toggleDrawer(true, "GroupRide"),
+        },
+      ],
+    },
+    {
+      path: "/Fleet_Management/quickaccess",
+      name: "Travel Route",
+      icon: <MdOutlineRoute />,
+      onClick: () => toggleDrawer(true, "TravelRoute"),
+    },
+    {
+      path: "/Fleet_Management/trackrequest",
+      name: "Track Request",
+      icon: <RiFocus3Line />,
+    },
     {
       name: "Manage Fleet",
       icon: <LiaCarSideSolid />,

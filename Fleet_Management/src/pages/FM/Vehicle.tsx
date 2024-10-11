@@ -649,17 +649,16 @@ const Vehicle: React.FC<VehicleProps> = ({
 
   const handleInsuranceCompanyAddressChange = (e) => {
     const newValue = e.target.value;
-    // Allow letters, numbers, spaces, and basic punctuation
-    if (/^[a-zA-Z0-9\s,.-]*$/.test(newValue)) {
+    // Allow any character (letters, numbers, spaces, and special characters)
+    if (/^[\s\S]*$/.test(newValue)) {
       setInsuranceCompanyAddress(newValue);
       setInsuranceCompanyAddressError(""); // Clear error if valid
     } else {
       setInsuranceCompanyAddressError(
-        "Only letters, numbers, spaces, and basic punctuation are allowed."
+        "Invalid input. Please check your entry."
       );
     }
   };
-
   const handleIdvChange = (e) => {
     const newValue = e.target.value;
     // Example validation: Allow only letters, numbers, and spaces
@@ -1234,12 +1233,23 @@ const Vehicle: React.FC<VehicleProps> = ({
     fetchVehicleData();
   }, []);
 
-  const filteredVehicles = vehicleData?.filter(
-    (y) =>
-      Array.isArray(tableData) &&
-      tableData.some((x) => x?.plate_number === y?.vehicle_number)
+  // const filteredVehicles = vehicleData?.filter(
+  //   (y) =>
+  //     Array.isArray(tableData) &&
+  //     tableData.some((x) => x?.plate_number === y?.vehicle_number)
+  // );
+  const filteredVehicles = vehicleData?.filter((y) => 
+    Array.isArray(tableData) && 
+    tableData.some((x) => {
+      const plateNumberTrimmed = x?.plate_number?.trim().replace(/\s+/g, '');
+    const vehicleNumberTrimmed = y?.vehicle_number?.trim().replace(/\s+/g, '');
+      
+      // Log the trimmed values for comparison
+      console.log(`Comparing Plate Number: "${plateNumberTrimmed}" with Vehicle Number: "${vehicleNumberTrimmed}"`);
+  
+      return plateNumberTrimmed === vehicleNumberTrimmed;
+    })
   );
-
   return (
     <>
       <Box

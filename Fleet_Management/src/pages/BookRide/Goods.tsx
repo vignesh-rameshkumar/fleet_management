@@ -205,7 +205,7 @@ const Goods: React.FC<GoodsProps> = ({
     if (dayjs(date).isValid()) {
       const formattedDate = dayjs(date).format("DD-MM-YYYY");
       setRideDate(formattedDate);
-    } else {
+    } else if (date && date.length === 10){
       toast.error("Invalid date selected");
       setRideDate(null);
     }
@@ -217,7 +217,7 @@ const Goods: React.FC<GoodsProps> = ({
     if (dayjs(time).isValid()) {
       const formattedTime = dayjs(time).format("HH:mm:ss");
       setRideTime(formattedTime);
-    } else {
+    } else if (time && time.length === 8) {
       toast.error("Invalid time selected");
       setRideTime(null);
     }
